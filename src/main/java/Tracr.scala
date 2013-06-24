@@ -1,7 +1,7 @@
 import java.io.{FileWriter, BufferedWriter, File}
 import play.api.libs.json.{JsArray, Json}
+import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
-import scala.collection.{GenSet, GenSeq, GenMap, immutable}
 
 object ObjectLifetime {
   implicit val fmt = Json.format[ObjectLifetime]
@@ -14,6 +14,8 @@ case class ObjectLifetime(digest: String, ctorTime: Long, dtorTime: Option[Long]
 }
 
 object Tracr extends App {
+
+  import TracrUtil._
 
   val filename = "/Users/Michael/Dropbox/Research/ObjectLifetime/FirstRun/target/universe.json"
 
@@ -30,7 +32,7 @@ object Tracr extends App {
   val sortedUniverse = universe.toList sortWith (_.ctorTime < _.ctorTime)
   //  sortedUniverse foreach println
 
-  val overlapStatistics = valueOverlapStatistics(sortedUniverse)
+  val overlapStatistics: GenMap[String, GenSeq[GenSeq[ObjectLifetime]]] = valueOverlapStatistics(sortedUniverse)
 
   //  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
   //    println(s"${runs.length} runs for $digest")
@@ -44,20 +46,48 @@ object Tracr extends App {
   /*
    * Replay heap size history.
    */
-  val timestampUniverse = universe.map(_.ctorTime) union universe.flatMap(_.dtorTime)
+  val timestampUniverse: GenSet[Long] = universe.map(_.ctorTime) union universe.flatMap(_.dtorTime)
 
   val timestampRange = timestampUniverse.min to timestampUniverse.max
   val heapSizes = projectHeapSize(universe, timestampRange)
 
-  val outputFile = new File("heapSizes.dat")
-  val writer = new BufferedWriter(new FileWriter(outputFile))
+  writeHeapSizeHistory("heapSizes-nom.dat", (timestampRange zip heapSizes))
 
-  (timestampRange zip heapSizes) map {
-    case (timestamp, heapSize) => writer.write(s"$timestamp $heapSize"); writer.newLine
+  /*
+   * Suggest optimistic heap history.
+   */
+  val replacements: GenIterable[ObjectLifetime] = for {
+    overlaps <- overlapStatistics.values
+    overlap <- overlaps
+    digest = overlap.head.digest
+    ctorTime = overlap.map(_.ctorTime).min
+    dtorTime = overlap.map(_.dtorTime).max
+    size = overlap.head.measuredSizeInBytes
+  } yield ObjectLifetime(digest, ctorTime, dtorTime, size);
+
+  assert (replacements.size == overlapStatistics.values.flatten.size)
+
+  val operlapsMin = overlapStatistics.values.flatten.flatten
+  val universeMin = (universe union replacements.toSet) diff operlapsMin.toSet
+  val heapSizesMin = projectHeapSize(universeMin, timestampRange)
+
+  writeHeapSizeHistory("heapSizes-min.dat", (timestampRange zip heapSizesMin))
+
+}
+
+object TracrUtil {
+
+  def writeHeapSizeHistory(filename: String, heapHistory: GenIterable[(Long, BigInt)]) {
+    val outputFile = new File(filename)
+    val writer = new BufferedWriter(new FileWriter(outputFile))
+
+    heapHistory map {
+      case (timestamp, heapSize) => writer.write(s"$timestamp $heapSize"); writer.newLine
+    }
+
+    writer.flush
+    writer.close
   }
-
-  writer.flush
-  writer.close
 
   def valueOverlapStatistics(sortedUniverse: GenSeq[ObjectLifetime]): GenMap[String, GenSeq[GenSeq[ObjectLifetime]]] = {
     val identitiesByValue: GenMap[String, GenSeq[ObjectLifetime]] = sortedUniverse groupBy (_.digest)
@@ -66,8 +96,8 @@ object Tracr extends App {
   }
 
   def calculateRuns(sortedIdentities: GenSeq[ObjectLifetime]): GenSeq[GenSeq[ObjectLifetime]] = {
-    val resBuilder = immutable.List.newBuilder[GenSeq[ObjectLifetime]]
-    val runBuilder = immutable.List.newBuilder[ObjectLifetime]
+    val resBuilder = List.newBuilder[GenSeq[ObjectLifetime]]
+    val runBuilder = List.newBuilder[ObjectLifetime]
     var isEmpty = true
     var (ctorMin, dtorMax) = (0L, Option.empty[Long])
 
