@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="SBT: org.eclipse.imp:org.eclipse.imp.pdb.values:0.4.1.qualifier">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.eclipse.imp/org.eclipse.imp.pdb.values/jars/org.eclipse.imp.pdb.values-0.4.1.qualifier.jar!/" />
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.eclipse.imp/org.eclipse.imp.pdb.values/eclipse-plugins/org.eclipse.imp.pdb.values-0.4.1.qualifier.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.ivy2/cache/org.eclipse.imp/org.eclipse.imp.pdb.values/srcs/org.eclipse.imp.pdb.values-0.4.1.qualifier-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

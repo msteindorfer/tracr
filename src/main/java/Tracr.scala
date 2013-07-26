@@ -1,7 +1,12 @@
-import java.io.{FileWriter, BufferedWriter, File}
-import play.api.libs.json.{JsArray, Json}
+import java.io._
+import org.eclipse.imp.pdb.facts.`type`.TypeStore
+import org.eclipse.imp.pdb.facts.io.binary.BinaryReader
+import org.eclipse.imp.pdb.facts._
+import play.api.libs.json.Json
 import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
+import scala.collection.JavaConverters.asScalaIteratorConverter
+import scala.Some
 
 object ObjectLifetime {
   implicit val fmt = Json.format[ObjectLifetime]
@@ -17,17 +22,42 @@ object Tracr extends App {
 
   import TracrUtil._
 
-  val filename = "/Users/Michael/Dropbox/Research/ObjectLifetime/ActualRun/target/universe.json"
+  val filename = "/Users/Michael/Dropbox/Research/ObjectLifetime/ActualRun/target/universe"
 
-  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe-SingleElementSetJUnitBenchmark.json"
-  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values/target/universe.json"
-  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe.json"
+  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe-SingleElementSetJUnitBenchmark"
+  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values/target/universe"
+  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe"
 
-  val jsonString = scala.io.Source.fromFile(filename).mkString
-  val jsonArray = Json.parse(jsonString).asInstanceOf[JsArray]
+  val pdbInputStream = new FileInputStream(filename + ".bin")
+  val pdbValueFactory = org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance();
+  val pdbTypeStore = new TypeStore();
 
-  val universe: GenSet[ObjectLifetime] = Set.empty ++ jsonArray.value map (_.as[ObjectLifetime])
-  //  println(universe)
+  val pdbBinaryReader = new BinaryReader(pdbValueFactory, pdbTypeStore, pdbInputStream)
+  val pdbSet = pdbBinaryReader.deserialize.asInstanceOf[ISet]
+
+  val universeBuilder = Set.newBuilder[ObjectLifetime]
+
+  // transform pdb ISet[ITuple] to scala Set[ObjectLifetime]
+  for (v: IValue <- pdbSet.iterator.asScala) {
+    val t = v.asInstanceOf[ITuple]
+    val digest = t.get(0).asInstanceOf[IString].getValue
+    val ctorTime = t.get(1).asInstanceOf[IInteger].longValue
+    val dtorTime = {
+      val tmp = t.get(2).asInstanceOf[IInteger].longValue()
+      if (tmp != -1) Some(tmp) else None
+    }
+    val measuredSizeInBytes = t.get(3).asInstanceOf[IInteger].intValue
+
+    universeBuilder += ObjectLifetime(digest, ctorTime, dtorTime, measuredSizeInBytes)
+  }
+
+  val universe: GenSet[ObjectLifetime] = universeBuilder.result
+
+//  val jsonString = scala.io.Source.fromFile(filename + ".json").mkString
+//  val jsonArray = Json.parse(jsonString).asInstanceOf[JsArray]
+//
+//  val universe: GenSet[ObjectLifetime] = Set.empty ++ jsonArray.value map (_.as[ObjectLifetime])
+//  //  println(universe)
 
   val sortedUniverse = universe.toList sortWith (_.ctorTime < _.ctorTime)
   //  sortedUniverse foreach println
