@@ -17,7 +17,7 @@ object Tracr extends App {
 
   import TracrUtil._
 
-  val filename = "/Users/Michael/Dropbox/Research/ObjectLifetime/FirstRun/target/universe.json"
+  val filename = "/Users/Michael/Dropbox/Research/ObjectLifetime/ActualRun/target/universe.json"
 
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe-SingleElementSetJUnitBenchmark.json"
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values/target/universe.json"
