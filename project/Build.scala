@@ -23,6 +23,7 @@ object ApplicationBuild extends Build {
     appName, file("."),
     settings = Project.defaultSettings ++ Seq(
       fork := true,
+//      javaHome := Some(file("/Library/Java/JavaVirtualMachines/jdk1.7.0.jdk/Contents/Home")),
       scalaVersion := "2.10.2",
       javaOptions in run += "-Xmx8G",
       resolvers ++= localRepo ++ sonatypeRepo ++ mandubianRepo,
