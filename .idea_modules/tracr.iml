@@ -37,6 +37,7 @@
     <orderEntry type="library" name="SBT: org.codehaus.jackson:jackson-core-asl:1.9.10" level="project" />
     <orderEntry type="library" name="SBT: org.codehaus.jackson:jackson-mapper-asl:1.9.10" level="project" />
     <orderEntry type="library" name="SBT: org.eclipse.imp:org.eclipse.imp.pdb.values:0.4.1.qualifier" level="project" />
+    <orderEntry type="library" name="SBT: com.google.protobuf:protobuf-java:2.5.0" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.specs2:specs2_2.10:1.13:test" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.specs2:scalaz-core_2.10:7.0.0:test" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.specs2:scalaz-concurrent_2.10:7.0.0:test" level="project" />

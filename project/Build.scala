@@ -23,13 +23,14 @@ object ApplicationBuild extends Build {
     appName, file("."),
     settings = Project.defaultSettings ++ Seq(
       fork := true,
-//      javaHome := Some(file("/Library/Java/JavaVirtualMachines/jdk1.7.0.jdk/Contents/Home")),
+      javaHome := Some(file("/Library/Java/JavaVirtualMachines/jdk1.7.0.jdk/Contents/Home")),
       scalaVersion := "2.10.2",
-      javaOptions in run += "-Xmx8G",
+      javaOptions in run += "-Xmx12G",
       resolvers ++= localRepo ++ sonatypeRepo ++ mandubianRepo,
       libraryDependencies ++= Seq(
         "play" %% "play-json" % "2.2-SNAPSHOT",
         "org.eclipse.imp" % "org.eclipse.imp.pdb.values" % "0.4.1.qualifier",
+        "com.google.protobuf" % "protobuf-java" % "2.5.0",
         "org.specs2" %% "specs2" % "1.13" % "test",
         "junit" % "junit" % "4.11" % "test"
       )
