@@ -33,27 +33,29 @@ object Tracr extends App {
   /*
    * Deserialize universe from Google Protocol Buffers
    */
-  val universeBuilder = Set.newBuilder[ObjectLifetime]
+  val universe: GenSet[ObjectLifetime] = time("Deserialize universe from Google Protocol Buffers") {
+    val universeBuilder = Set.newBuilder[ObjectLifetime]
 
-  {
-    val protoInputStream = new FileInputStream(filename + ".raw")
-    try {
-      while (true) {
-        val protoObjectLifetime = TrackingProtocolBuffers.ObjectLifetime.parseDelimitedFrom(protoInputStream)
+    {
+      val protoInputStream = new FileInputStream(filename + ".raw")
+      try {
+        while (true) {
+          val protoObjectLifetime = TrackingProtocolBuffers.ObjectLifetime.parseDelimitedFrom(protoInputStream)
 
-        val digest = protoObjectLifetime.getDigest
-        val ctorTime = protoObjectLifetime.getCtorTime
-        val dtorTime = if (protoObjectLifetime.hasDtorTime) Some(protoObjectLifetime.getDtorTime) else None
-        val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
+          val digest = protoObjectLifetime.getDigest
+          val ctorTime = protoObjectLifetime.getCtorTime
+          val dtorTime = if (protoObjectLifetime.hasDtorTime) Some(protoObjectLifetime.getDtorTime) else None
+          val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
 
-        universeBuilder += ObjectLifetime(digest, ctorTime, dtorTime, measuredSizeInBytes)
+          universeBuilder += ObjectLifetime(digest, ctorTime, dtorTime, measuredSizeInBytes)
+        }
+      } catch {
+        case _: Exception => {}
       }
-    } catch {
-      case _: Exception => {}
     }
-  }
 
-  val universe: GenSet[ObjectLifetime] = universeBuilder.result
+    universeBuilder.result
+  }
 
   /*
    * Deserialize universe from PDB
@@ -99,10 +101,14 @@ object Tracr extends App {
 //  //  println(universe)
   }
 
-  val sortedUniverse = universe.toList sortWith (_.ctorTime < _.ctorTime)
+  val sortedUniverse = time("Sort universe") {
+    universe.toList sortWith (_.ctorTime < _.ctorTime)
+  }
   //  sortedUniverse foreach println
 
-  val overlapStatistics: GenMap[String, GenSeq[GenSeq[ObjectLifetime]]] = valueOverlapStatistics(sortedUniverse)
+  val overlapStatistics: GenMap[String, GenSeq[GenSeq[ObjectLifetime]]] = time("Calculate overlap statistics") {
+    valueOverlapStatistics(sortedUniverse)
+  }
 
   //  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
   //    println(s"${runs.length} runs for $digest")
@@ -116,16 +122,31 @@ object Tracr extends App {
   /*
    * Replay heap size history.
    */
-  val timestampUniverse: GenSet[Long] = universe.map(_.ctorTime) union universe.flatMap(_.dtorTime)
+//  val timestampUniverse: GenSet[Long] = universe.map(_.ctorTime) union universe.flatMap(_.dtorTime)
+//  val timestampRange = timestampUniverse.min to timestampUniverse.max
 
-  val timestampRange = timestampUniverse.min to timestampUniverse.max
+  // initialize min/max with any value (i.e. first one encountered)
+  var tsMin: Long = universe.head.ctorTime
+  var tsMax: Long = universe.head.ctorTime
 
-  {
+  time ("Calculate min / max timestamp") {
+    for (olt <- universe) {
+      tsMin = math.min(tsMin, olt.ctorTime)
+
+      tsMax = math.max(tsMax, olt.ctorTime)
+      if (olt.dtorTime.isDefined)
+        tsMax = math.max(tsMax, olt.dtorTime.get)
+    }
+  }
+
+  val timestampRange = tsMin to tsMax
+
+  time ("Project Heap Size") {
     val heapSizes = projectHeapSize(universe, timestampRange)
     writePropertyHistory("heapSizes-nom.dat", (timestampRange zip heapSizes))
   }
 
-  {
+  time ("Project Object Size") {
     val objectCount = projectObjectCount(universe, timestampRange)
     writePropertyHistory("objectCount-nom.dat", (timestampRange zip objectCount))
   }
@@ -133,14 +154,16 @@ object Tracr extends App {
   /*
    * Suggest optimistic heap history.
    */
-  val replacements: GenIterable[ObjectLifetime] = for {
-    overlaps <- overlapStatistics.values
-    overlap <- overlaps
-    digest = overlap.head.digest
-    ctorTime = overlap.map(_.ctorTime).min
-    dtorTime = overlap.map(_.dtorTime).max
-    size = overlap.head.measuredSizeInBytes
-  } yield ObjectLifetime(digest, ctorTime, dtorTime, size);
+  val replacements: GenIterable[ObjectLifetime] = time ("Suggest optimistic heap history.") {
+    for {
+      overlaps <- overlapStatistics.values
+      overlap <- overlaps
+      digest = overlap.head.digest
+      ctorTime = overlap.map(_.ctorTime).min
+      dtorTime = overlap.map(_.dtorTime).max
+      size = overlap.head.measuredSizeInBytes
+    } yield ObjectLifetime(digest, ctorTime, dtorTime, size)
+  };
 
   /*
    * There are hardly any differences in size. It's neglectable.
@@ -156,12 +179,12 @@ object Tracr extends App {
   val operlapsMin = overlapStatistics.values.flatten.flatten
   val universeMin = (universe union replacements.toSet) diff operlapsMin.toSet
 
-  {
+  time ("Project Heap Size [min]") {
     val heapSizesMin = projectHeapSize(universeMin, timestampRange)
     writePropertyHistory("heapSizes-min.dat", (timestampRange zip heapSizesMin))
   }
 
-  {
+  time ("Project Object Count [min]") {
     val objectCountMin = projectObjectCount(universeMin, timestampRange)
     writePropertyHistory("objectCount-min.dat", (timestampRange zip objectCountMin))
   }
@@ -272,6 +295,19 @@ object TracrUtil {
     }
 
     builder.result
+  }
+
+  /*
+   * Timing a block of code.
+   * Originates from: http://stackoverflow.com/questions/9160001/how-to-profile-methods-in-scala
+   */
+  def time[R](blockCaption: String)(block: => R): R = {
+    println(blockCaption)
+    val t0 = System.nanoTime()
+    val result = block // call-by-name
+    val t1 = System.nanoTime()
+    println("Elapsed time: " + (t1 - t0)/1000000000 + "s")
+    result
   }
 
 }
