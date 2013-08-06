@@ -142,13 +142,15 @@ object Tracr extends App {
   val timestampRange = tsMin to tsMax
 
   time ("Project Heap Size") {
-    val heapSizes = projectHeapSize(universe, timestampRange)
-    writePropertyHistory("heapSizes-nom.dat", (timestampRange zip heapSizes))
+//    val heapSizes = projectHeapSize(universe, timestampRange)
+//    writePropertyHistory("heapSizes-nom.dat", (timestampRange zip heapSizes))
+    projectProperty("heapSizes-nom.dat", universe, timestampRange)(_.measuredSizeInBytes)
   }
 
   time ("Project Object Size") {
-    val objectCount = projectObjectCount(universe, timestampRange)
-    writePropertyHistory("objectCount-nom.dat", (timestampRange zip objectCount))
+//    val objectCount = projectObjectCount(universe, timestampRange)
+//    writePropertyHistory("objectCount-nom.dat", (timestampRange zip objectCount))
+    projectProperty("objectCount-nom.dat", universe, timestampRange)(_ => 1)
   }
 
   /*
@@ -180,13 +182,15 @@ object Tracr extends App {
   val universeMin = (universe union replacements.toSet) diff operlapsMin.toSet
 
   time ("Project Heap Size [min]") {
-    val heapSizesMin = projectHeapSize(universeMin, timestampRange)
-    writePropertyHistory("heapSizes-min.dat", (timestampRange zip heapSizesMin))
+//    val heapSizesMin = projectHeapSize(universeMin, timestampRange)
+//    writePropertyHistory("heapSizes-min.dat", (timestampRange zip heapSizesMin))
+    projectProperty("heapSizes-min.dat", universeMin, timestampRange)(_.measuredSizeInBytes)
   }
 
   time ("Project Object Count [min]") {
-    val objectCountMin = projectObjectCount(universeMin, timestampRange)
-    writePropertyHistory("objectCount-min.dat", (timestampRange zip objectCountMin))
+//    val objectCountMin = projectObjectCount(universeMin, timestampRange)
+//    writePropertyHistory("objectCount-min.dat", (timestampRange zip objectCountMin))
+    projectProperty("objectCount-min.dat", universeMin, timestampRange)(_ => 1)
   }
 
 }
@@ -253,32 +257,91 @@ object TracrUtil {
     resBuilder.result
   }
 
-  def projectObjectCount(universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long]): GenSeq[BigInt] =
-    projectProperty(universe, timestampRange)(_ => 1)
+//  def projectObjectCount(universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long]): GenSeq[BigInt] =
+//    projectProperty(universe, timestampRange)(_ => 1)
+//
+//  def projectHeapSize(universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long]): GenSeq[BigInt] =
+//    projectProperty(universe, timestampRange)(_.measuredSizeInBytes)
+//
+//  def projectProperty(universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long])
+//                     (accumulatorProperty: ObjectLifetime => Long): GenSeq[BigInt] = {
+//    val universeList = time("set to list") { universe.toVector }
+//    val ctorSorted = time("ctorSorted") { universeList sortWith (_.ctorTime < _.ctorTime) }
+//    val dtorSorted = time("dtorSorted") { universeList sortWith (_.dtorTime < _.dtorTime) filter (_.dtorTime.isDefined) }
+//
+////    val ctorAccumulated = accumulatedProperty(_.ctorTime    , accumulatorProperty)(ctorSorted);
+////    val dtorAccumulated = accumulatedProperty(_.dtorTime.get, accumulatorProperty)(dtorSorted);
+//
+//
+//    var ctorIdx = 0;
+//    var dtorIdx = 0;
+//
+//    var ctorSum = BigInt(0);
+//    var dtorSum = BigInt(0);
+//    val builder = List.newBuilder[BigInt]
+//
+//    time("Iterate and project") {
+//      for (timestamp <- timestampRange) {
+//        while (ctorIdx < ctorSorted.length && ctorSorted(ctorIdx).ctorTime <= timestamp) {
+//          ctorSum += accumulatorProperty(ctorSorted(ctorIdx))
+//          ctorIdx += 1
+//        }
+//        println(s"ctorSum: $ctorSum")
+//
+//        while (dtorIdx < dtorSorted.length && dtorSorted(dtorIdx).dtorTime.get <= timestamp) {
+//          // previously filtered, thus dtor is always defined
+//          dtorSum += accumulatorProperty(dtorSorted(dtorIdx))
+//          dtorIdx += 1
+//        }
+//        println(s"dtorSum: $dtorSum")
+//
+//        //      ctorSum = ctorAccumulated.getOrElse(timestamp, ctorSum)
+//        //      dtorSum = dtorAccumulated.getOrElse(timestamp, dtorSum)
+//
+//        println(s"deltSum: ${ctorSum - dtorSum}")
+//        builder += ctorSum - dtorSum
+//      }
+//      builder.result
+//    }
+//  }
 
-  def projectHeapSize(universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long]): GenSeq[BigInt] =
-    projectProperty(universe, timestampRange)(_.measuredSizeInBytes)
+  def projectProperty(filename: String, universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long])
+                     (accumulatorProperty: ObjectLifetime => Long) {
 
-  def projectProperty(universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long])
-                     (accumulatorProperty: ObjectLifetime => Long): GenSeq[BigInt] = {
-    val universeList = universe.toList
-    val ctorSorted = universeList sortBy (_.ctorTime)
-    val dtorSorted = universeList sortBy (_.dtorTime) filter (_.dtorTime.isDefined)
+    val universeList = time("set to list") { universe.toVector }
+    val ctorSorted = time("ctorSorted") { universeList sortWith (_.ctorTime < _.ctorTime) }
+    val dtorSorted = time("dtorSorted") { universeList  filter (_.dtorTime.isDefined) sortWith (_.dtorTime.get < _.dtorTime.get) }
 
-    val ctorAccumulated = accumulatedProperty(_.ctorTime    , accumulatorProperty)(ctorSorted);
-    val dtorAccumulated = accumulatedProperty(_.dtorTime.get, accumulatorProperty)(dtorSorted);
+    var ctorIdx = 0;
+    var dtorIdx = 0;
 
     var ctorSum = BigInt(0);
     var dtorSum = BigInt(0);
-    val builder = List.newBuilder[BigInt]
 
-    for (timestamp <- timestampRange) {
-      ctorSum = ctorAccumulated.getOrElse(timestamp, ctorSum)
-      dtorSum = dtorAccumulated.getOrElse(timestamp, dtorSum)
-      builder += ctorSum - dtorSum
+    time("Iterate and project") {
+      val outputFile = new File(filename)
+      val writer = new BufferedWriter(new FileWriter(outputFile))
+
+      for (timestamp <- timestampRange) {
+        while (ctorIdx < ctorSorted.length && ctorSorted(ctorIdx).ctorTime <= timestamp) {
+          ctorSum += accumulatorProperty(ctorSorted(ctorIdx))
+          ctorIdx += 1
+        }
+//        println(s"ctorSum: $ctorSum")
+
+        while (dtorIdx < dtorSorted.length && dtorSorted(dtorIdx).dtorTime.get <= timestamp) {
+          // previously filtered, thus dtor is always defined
+          dtorSum += accumulatorProperty(dtorSorted(dtorIdx))
+          dtorIdx += 1
+        }
+//        println(s"dtorSum: $dtorSum")
+
+//        println(s"deltSum: ${ctorSum - dtorSum}")
+        writer.write(s"$timestamp ${ctorSum - dtorSum}"); writer.newLine
+      }
+      writer.flush
+      writer.close
     }
-
-    builder.result
   }
 
   /*
