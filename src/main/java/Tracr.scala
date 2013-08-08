@@ -240,6 +240,7 @@ object TracrUtil {
           runBuilder += identity
           dtorMax = maxOption(dtorMax, identity.dtorTime)
         } else {
+          // end run
           val currentRun = runBuilder.result
           if (currentRun.size > 1) resBuilder += currentRun
 
@@ -253,6 +254,10 @@ object TracrUtil {
         }
       }
     }
+
+    // end run (if unfinished)
+    val currentRun = runBuilder.result
+    if (currentRun.size > 1) resBuilder += currentRun
 
     resBuilder.result
   }
