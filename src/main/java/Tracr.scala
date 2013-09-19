@@ -1,18 +1,8 @@
 import java.io._
-import org.eclipse.imp.pdb.facts.`type`.TypeStore
-import org.eclipse.imp.pdb.facts.io.binary.BinaryReader
-import org.eclipse.imp.pdb.facts._
-import org.eclipse.imp.pdb.facts.io.StandardTextReader
 import org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers
-import play.api.libs.json.Json
 import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
-import scala.collection.JavaConverters.asScalaIteratorConverter
 import scala.Some
-
-object ObjectLifetime {
-  implicit val fmt = Json.format[ObjectLifetime]
-}
 
 case class ObjectLifetime(digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long) {
   require(ctorTime >= 0)
@@ -28,7 +18,8 @@ object Tracr extends App {
 
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe-SingleElementSetJUnitBenchmark"
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values/target/universe"
-  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe"
+  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe"
+  val filename = "/Users/Michael/Development/rascal-devel/rascal-shell/target/universe"
 
   /*
    * Deserialize universe from Google Protocol Buffers
@@ -57,50 +48,6 @@ object Tracr extends App {
     universeBuilder.result
   }
 
-  /*
-   * Deserialize universe from PDB
-   */
-//  {
-//    val pdbInputStream = new FileInputStream(filename + ".bin")
-//    val pdbValueFactory = org.eclipse.imp.pdb.facts.impl.fast.ValueFactory.getInstance();
-//    val pdbTypeStore = new TypeStore();
-//
-////  val pdbBinaryReader = new BinaryReader(pdbValueFactory, pdbTypeStore, pdbInputStream)
-////  val pdbSet = pdbBinaryReader.deserialize.asInstanceOf[ISet]
-//
-//    val pdbTextReader = new StandardTextReader()
-//    val pdbSet = pdbTextReader.read(pdbValueFactory, new InputStreamReader(pdbInputStream)).asInstanceOf[ISet]
-//
-//    val universeBuilder = Set.newBuilder[ObjectLifetime]
-//
-//    // transform pdb ISet[ITuple] to scala Set[ObjectLifetime]
-//    for (v: IValue <- pdbSet.iterator.asScala) {
-//      val t = v.asInstanceOf[ITuple]
-//      val digest = t.get(0).asInstanceOf[IString].getValue
-//      val ctorTime = t.get(1).asInstanceOf[IInteger].longValue
-//      val dtorTime = {
-//        val tmp = t.get(2).asInstanceOf[IInteger].longValue()
-//        if (tmp != -1) Some(tmp) else None
-//      }
-//      val measuredSizeInBytes = t.get(3).asInstanceOf[IInteger].intValue
-//
-//      universeBuilder += ObjectLifetime(digest, ctorTime, dtorTime, measuredSizeInBytes)
-//    }
-//
-//    val universe: GenSet[ObjectLifetime] = universeBuilder.result
-//  }
-
-  /*
-   * Deserialize universe from JSON
-   */
-  {
-//  val jsonString = scala.io.Source.fromFile(filename + ".json").mkString
-//  val jsonArray = Json.parse(jsonString).asInstanceOf[JsArray]
-//
-//  val universe: GenSet[ObjectLifetime] = Set.empty ++ jsonArray.value map (_.as[ObjectLifetime])
-//  //  println(universe)
-  }
-
   val sortedUniverse = time("Sort universe") {
     universe.toList sortWith (_.ctorTime < _.ctorTime)
   }
@@ -110,14 +57,14 @@ object Tracr extends App {
     valueOverlapStatistics(sortedUniverse)
   }
 
-  //  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
-  //    println(s"${runs.length} runs for $digest")
-  //
-  //    for (run <- runs) {
-  //      println("A RUN")
-  //      run.foreach(println)
-  //    }
-  //  }
+//  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
+//    println(s"${runs.length} runs for $digest")
+//
+//    for (run <- runs) {
+//      println("A RUN")
+//      run.foreach(println)
+//    }
+//  }
 
   /*
    * Replay heap size history.
@@ -141,16 +88,18 @@ object Tracr extends App {
 
   val timestampRange = tsMin to tsMax
 
-  time ("Project Heap Size") {
-//    val heapSizes = projectHeapSize(universe, timestampRange)
-//    writePropertyHistory("heapSizes-nom.dat", (timestampRange zip heapSizes))
-    projectProperty("heapSizes-nom.dat", universe, timestampRange)(_.measuredSizeInBytes)
-  }
+  {
+    val universeList = time("set to list") { universe.toVector }
+    val ctorSorted: Vector[ObjectLifetime] = time("ctorSorted") { universeList sortWith (_.ctorTime < _.ctorTime) }
+    val dtorSorted: Vector[ObjectLifetime] = time("dtorSorted") { universeList   filter (_.dtorTime.isDefined) sortWith (_.dtorTime.get < _.dtorTime.get) }
 
-  time ("Project Object Size") {
-//    val objectCount = projectObjectCount(universe, timestampRange)
-//    writePropertyHistory("objectCount-nom.dat", (timestampRange zip objectCount))
-    projectProperty("objectCount-nom.dat", universe, timestampRange)(_ => 1)
+    time ("Project Heap Size") {
+      projectProperty("heapSizes-nom.dat", ctorSorted, dtorSorted, timestampRange)(_.measuredSizeInBytes)
+    }
+
+    time ("Project Object Size") {
+      projectProperty("objectCount-nom.dat", ctorSorted, dtorSorted, timestampRange)(_ => 1)
+    }
   }
 
   /*
@@ -181,18 +130,19 @@ object Tracr extends App {
   val operlapsMin = overlapStatistics.values.flatten.flatten
   val universeMin = (universe union replacements.toSet) diff operlapsMin.toSet
 
-  time ("Project Heap Size [min]") {
-//    val heapSizesMin = projectHeapSize(universeMin, timestampRange)
-//    writePropertyHistory("heapSizes-min.dat", (timestampRange zip heapSizesMin))
-    projectProperty("heapSizes-min.dat", universeMin, timestampRange)(_.measuredSizeInBytes)
-  }
+  {
+    val universeMinList = time("set to list") { universeMin.toVector }
+    val ctorMinSorted: Vector[ObjectLifetime] = time("ctorSorted") { universeMinList sortWith (_.ctorTime < _.ctorTime) }
+    val dtorMinSorted: Vector[ObjectLifetime] = time("dtorSorted") { universeMinList   filter (_.dtorTime.isDefined) sortWith (_.dtorTime.get < _.dtorTime.get) }
 
-  time ("Project Object Count [min]") {
-//    val objectCountMin = projectObjectCount(universeMin, timestampRange)
-//    writePropertyHistory("objectCount-min.dat", (timestampRange zip objectCountMin))
-    projectProperty("objectCount-min.dat", universeMin, timestampRange)(_ => 1)
-  }
+    time ("Project Heap Size [min]") {
+      projectProperty("heapSizes-min.dat", ctorMinSorted, dtorMinSorted, timestampRange)(_.measuredSizeInBytes)
+    }
 
+    time ("Project Object Count [min]") {
+      projectProperty("objectCount-min.dat", ctorMinSorted, dtorMinSorted, timestampRange)(_ => 1)
+    }
+  }
 }
 
 object TracrUtil {
@@ -262,61 +212,8 @@ object TracrUtil {
     resBuilder.result
   }
 
-//  def projectObjectCount(universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long]): GenSeq[BigInt] =
-//    projectProperty(universe, timestampRange)(_ => 1)
-//
-//  def projectHeapSize(universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long]): GenSeq[BigInt] =
-//    projectProperty(universe, timestampRange)(_.measuredSizeInBytes)
-//
-//  def projectProperty(universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long])
-//                     (accumulatorProperty: ObjectLifetime => Long): GenSeq[BigInt] = {
-//    val universeList = time("set to list") { universe.toVector }
-//    val ctorSorted = time("ctorSorted") { universeList sortWith (_.ctorTime < _.ctorTime) }
-//    val dtorSorted = time("dtorSorted") { universeList sortWith (_.dtorTime < _.dtorTime) filter (_.dtorTime.isDefined) }
-//
-////    val ctorAccumulated = accumulatedProperty(_.ctorTime    , accumulatorProperty)(ctorSorted);
-////    val dtorAccumulated = accumulatedProperty(_.dtorTime.get, accumulatorProperty)(dtorSorted);
-//
-//
-//    var ctorIdx = 0;
-//    var dtorIdx = 0;
-//
-//    var ctorSum = BigInt(0);
-//    var dtorSum = BigInt(0);
-//    val builder = List.newBuilder[BigInt]
-//
-//    time("Iterate and project") {
-//      for (timestamp <- timestampRange) {
-//        while (ctorIdx < ctorSorted.length && ctorSorted(ctorIdx).ctorTime <= timestamp) {
-//          ctorSum += accumulatorProperty(ctorSorted(ctorIdx))
-//          ctorIdx += 1
-//        }
-//        println(s"ctorSum: $ctorSum")
-//
-//        while (dtorIdx < dtorSorted.length && dtorSorted(dtorIdx).dtorTime.get <= timestamp) {
-//          // previously filtered, thus dtor is always defined
-//          dtorSum += accumulatorProperty(dtorSorted(dtorIdx))
-//          dtorIdx += 1
-//        }
-//        println(s"dtorSum: $dtorSum")
-//
-//        //      ctorSum = ctorAccumulated.getOrElse(timestamp, ctorSum)
-//        //      dtorSum = dtorAccumulated.getOrElse(timestamp, dtorSum)
-//
-//        println(s"deltSum: ${ctorSum - dtorSum}")
-//        builder += ctorSum - dtorSum
-//      }
-//      builder.result
-//    }
-//  }
-
-  def projectProperty(filename: String, universe: GenSet[ObjectLifetime], timestampRange: NumericRange[Long])
+  def projectProperty(filename: String, ctorSorted: Vector[ObjectLifetime], dtorSorted: Vector[ObjectLifetime], timestampRange: NumericRange[Long])
                      (accumulatorProperty: ObjectLifetime => Long) {
-
-    val universeList = time("set to list") { universe.toVector }
-    val ctorSorted = time("ctorSorted") { universeList sortWith (_.ctorTime < _.ctorTime) }
-    val dtorSorted = time("dtorSorted") { universeList  filter (_.dtorTime.isDefined) sortWith (_.dtorTime.get < _.dtorTime.get) }
-
     var ctorIdx = 0;
     var dtorIdx = 0;
 
