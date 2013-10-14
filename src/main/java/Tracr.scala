@@ -1,10 +1,11 @@
 import java.io._
+import java.nio.{ByteOrder, ByteBuffer}
 import org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers
 import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
 import scala.Some
 
-case class ObjectLifetime(digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long) {
+case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long) {
   require(ctorTime >= 0)
   require(!dtorTime.isDefined || dtorTime.get >= 0)
   require(measuredSizeInBytes >= 0)
@@ -19,26 +20,55 @@ object Tracr extends App {
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe-SingleElementSetJUnitBenchmark"
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values/target/universe"
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe"
-  val filename = "/Users/Michael/Development/rascal-devel/rascal-shell/target/universe"
+  val path = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/"
 
   /*
    * Deserialize universe from Google Protocol Buffers
    */
   val universe: GenSet[ObjectLifetime] = time("Deserialize universe from Google Protocol Buffers") {
+    /*
+     * Deserialize GC timestamps. File contains tuples [Long, Long] in big endian encoding.
+     */
+    val mapWriter = Map.newBuilder[Long, Long]
+
+    {
+      val stream = new FileInputStream(path + "object_free_data.bin")
+      val channel = stream.getChannel
+
+      val buffer = ByteBuffer.allocate(2 * 8 * 1024);
+      buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+      while (channel.read(buffer) >= 0) {
+        buffer.flip
+
+        while (buffer.hasRemaining) {
+          val tag = buffer.getLong
+          val timestamp = buffer.getLong
+
+          mapWriter += (tag -> timestamp)
+        }
+
+        buffer.compact
+      }
+    }
+
+    val objectFreeMap = mapWriter.result
+
     val universeBuilder = Set.newBuilder[ObjectLifetime]
 
     {
-      val protoInputStream = new FileInputStream(filename + ".raw")
+      val protoInputStream = new FileInputStream(path + "universe.raw")
       try {
         while (true) {
           val protoObjectLifetime = TrackingProtocolBuffers.ObjectLifetime.parseDelimitedFrom(protoInputStream)
 
+          val tag = protoObjectLifetime.getTag
           val digest = protoObjectLifetime.getDigest
           val ctorTime = protoObjectLifetime.getCtorTime
-          val dtorTime = if (protoObjectLifetime.hasDtorTime) Some(protoObjectLifetime.getDtorTime) else None
+          val dtorTime = objectFreeMap.get(tag)
           val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
 
-          universeBuilder += ObjectLifetime(digest, ctorTime, dtorTime, measuredSizeInBytes)
+          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes)
         }
       } catch {
         case _: Exception => {}
@@ -51,7 +81,7 @@ object Tracr extends App {
   val sortedUniverse = time("Sort universe") {
     universe.toList sortWith (_.ctorTime < _.ctorTime)
   }
-  //  sortedUniverse foreach println
+//  sortedUniverse foreach println
 
   val overlapStatistics: GenMap[String, GenSeq[GenSeq[ObjectLifetime]]] = time("Calculate overlap statistics") {
     valueOverlapStatistics(sortedUniverse)
@@ -113,7 +143,7 @@ object Tracr extends App {
       ctorTime = overlap.map(_.ctorTime).min
       dtorTime = overlap.map(_.dtorTime).max
       size = overlap.head.measuredSizeInBytes
-    } yield ObjectLifetime(digest, ctorTime, dtorTime, size)
+    } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size)
   };
 
   /*
