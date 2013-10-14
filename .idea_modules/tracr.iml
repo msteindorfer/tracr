@@ -4,7 +4,7 @@
     <facet type="scala" name="Scala">
       <configuration>
         <option name="compilerLibraryLevel" value="Project" />
-        <option name="compilerLibraryName" value="SBT: scala:2.10.2" />
+        <option name="compilerLibraryName" value="SBT: scala:2.10.3" />
         <option name="fsc" value="true" />
       </configuration>
     </facet>
@@ -24,7 +24,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.10.2" level="project" />
+    <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.10.3" level="project" />
     <orderEntry type="library" name="SBT: play:play-json_2.10:2.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="SBT: play:play-iteratees_2.10:2.2-SNAPSHOT" level="project" />
     <orderEntry type="library" name="SBT: org.scala-stm:scala-stm_2.10.0:0.6" level="project" />
