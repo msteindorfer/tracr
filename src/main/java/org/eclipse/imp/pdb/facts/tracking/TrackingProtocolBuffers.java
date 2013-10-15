@@ -827,11 +827,1432 @@ public final class TrackingProtocolBuffers {
     // @@protoc_insertion_point(class_scope:ObjectLifetime)
   }
 
+  public interface EqualsRelationOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // required int64 tag1 = 1;
+    /**
+     * <code>required int64 tag1 = 1;</code>
+     */
+    boolean hasTag1();
+    /**
+     * <code>required int64 tag1 = 1;</code>
+     */
+    long getTag1();
+
+    // required int64 tag2 = 2;
+    /**
+     * <code>required int64 tag2 = 2;</code>
+     */
+    boolean hasTag2();
+    /**
+     * <code>required int64 tag2 = 2;</code>
+     */
+    long getTag2();
+
+    // optional bool result = 3;
+    /**
+     * <code>optional bool result = 3;</code>
+     */
+    boolean hasResult();
+    /**
+     * <code>optional bool result = 3;</code>
+     */
+    boolean getResult();
+
+    // optional int32 deepCount = 4;
+    /**
+     * <code>optional int32 deepCount = 4;</code>
+     *
+     * <pre>
+     * number of calls to equals in deep callstack (including top level call)
+     * </pre>
+     */
+    boolean hasDeepCount();
+    /**
+     * <code>optional int32 deepCount = 4;</code>
+     *
+     * <pre>
+     * number of calls to equals in deep callstack (including top level call)
+     * </pre>
+     */
+    int getDeepCount();
+  }
+  /**
+   * Protobuf type {@code EqualsRelation}
+   */
+  public static final class EqualsRelation extends
+      com.google.protobuf.GeneratedMessage
+      implements EqualsRelationOrBuilder {
+    // Use EqualsRelation.newBuilder() to construct.
+    private EqualsRelation(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private EqualsRelation(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final EqualsRelation defaultInstance;
+    public static EqualsRelation getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public EqualsRelation getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private EqualsRelation(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              tag1_ = input.readInt64();
+              break;
+            }
+            case 16: {
+              bitField0_ |= 0x00000002;
+              tag2_ = input.readInt64();
+              break;
+            }
+            case 24: {
+              bitField0_ |= 0x00000004;
+              result_ = input.readBool();
+              break;
+            }
+            case 32: {
+              bitField0_ |= 0x00000008;
+              deepCount_ = input.readInt32();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_EqualsRelation_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_EqualsRelation_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation.class, org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<EqualsRelation> PARSER =
+        new com.google.protobuf.AbstractParser<EqualsRelation>() {
+      public EqualsRelation parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new EqualsRelation(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<EqualsRelation> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // required int64 tag1 = 1;
+    public static final int TAG1_FIELD_NUMBER = 1;
+    private long tag1_;
+    /**
+     * <code>required int64 tag1 = 1;</code>
+     */
+    public boolean hasTag1() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required int64 tag1 = 1;</code>
+     */
+    public long getTag1() {
+      return tag1_;
+    }
+
+    // required int64 tag2 = 2;
+    public static final int TAG2_FIELD_NUMBER = 2;
+    private long tag2_;
+    /**
+     * <code>required int64 tag2 = 2;</code>
+     */
+    public boolean hasTag2() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>required int64 tag2 = 2;</code>
+     */
+    public long getTag2() {
+      return tag2_;
+    }
+
+    // optional bool result = 3;
+    public static final int RESULT_FIELD_NUMBER = 3;
+    private boolean result_;
+    /**
+     * <code>optional bool result = 3;</code>
+     */
+    public boolean hasResult() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional bool result = 3;</code>
+     */
+    public boolean getResult() {
+      return result_;
+    }
+
+    // optional int32 deepCount = 4;
+    public static final int DEEPCOUNT_FIELD_NUMBER = 4;
+    private int deepCount_;
+    /**
+     * <code>optional int32 deepCount = 4;</code>
+     *
+     * <pre>
+     * number of calls to equals in deep callstack (including top level call)
+     * </pre>
+     */
+    public boolean hasDeepCount() {
+      return ((bitField0_ & 0x00000008) == 0x00000008);
+    }
+    /**
+     * <code>optional int32 deepCount = 4;</code>
+     *
+     * <pre>
+     * number of calls to equals in deep callstack (including top level call)
+     * </pre>
+     */
+    public int getDeepCount() {
+      return deepCount_;
+    }
+
+    private void initFields() {
+      tag1_ = 0L;
+      tag2_ = 0L;
+      result_ = false;
+      deepCount_ = 0;
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      if (!hasTag1()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasTag2()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt64(1, tag1_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeInt64(2, tag2_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBool(3, result_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        output.writeInt32(4, deepCount_);
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, tag1_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(2, tag2_);
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(3, result_);
+      }
+      if (((bitField0_ & 0x00000008) == 0x00000008)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(4, deepCount_);
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code EqualsRelation}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelationOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_EqualsRelation_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_EqualsRelation_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation.class, org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation.Builder.class);
+      }
+
+      // Construct using org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        tag1_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        tag2_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000002);
+        result_ = false;
+        bitField0_ = (bitField0_ & ~0x00000004);
+        deepCount_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000008);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_EqualsRelation_descriptor;
+      }
+
+      public org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation getDefaultInstanceForType() {
+        return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation.getDefaultInstance();
+      }
+
+      public org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation build() {
+        org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation buildPartial() {
+        org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation result = new org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.tag1_ = tag1_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.tag2_ = tag2_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.result_ = result_;
+        if (((from_bitField0_ & 0x00000008) == 0x00000008)) {
+          to_bitField0_ |= 0x00000008;
+        }
+        result.deepCount_ = deepCount_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation) {
+          return mergeFrom((org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation other) {
+        if (other == org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation.getDefaultInstance()) return this;
+        if (other.hasTag1()) {
+          setTag1(other.getTag1());
+        }
+        if (other.hasTag2()) {
+          setTag2(other.getTag2());
+        }
+        if (other.hasResult()) {
+          setResult(other.getResult());
+        }
+        if (other.hasDeepCount()) {
+          setDeepCount(other.getDeepCount());
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasTag1()) {
+          
+          return false;
+        }
+        if (!hasTag2()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelation) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // required int64 tag1 = 1;
+      private long tag1_ ;
+      /**
+       * <code>required int64 tag1 = 1;</code>
+       */
+      public boolean hasTag1() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required int64 tag1 = 1;</code>
+       */
+      public long getTag1() {
+        return tag1_;
+      }
+      /**
+       * <code>required int64 tag1 = 1;</code>
+       */
+      public Builder setTag1(long value) {
+        bitField0_ |= 0x00000001;
+        tag1_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int64 tag1 = 1;</code>
+       */
+      public Builder clearTag1() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        tag1_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // required int64 tag2 = 2;
+      private long tag2_ ;
+      /**
+       * <code>required int64 tag2 = 2;</code>
+       */
+      public boolean hasTag2() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>required int64 tag2 = 2;</code>
+       */
+      public long getTag2() {
+        return tag2_;
+      }
+      /**
+       * <code>required int64 tag2 = 2;</code>
+       */
+      public Builder setTag2(long value) {
+        bitField0_ |= 0x00000002;
+        tag2_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int64 tag2 = 2;</code>
+       */
+      public Builder clearTag2() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        tag2_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional bool result = 3;
+      private boolean result_ ;
+      /**
+       * <code>optional bool result = 3;</code>
+       */
+      public boolean hasResult() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional bool result = 3;</code>
+       */
+      public boolean getResult() {
+        return result_;
+      }
+      /**
+       * <code>optional bool result = 3;</code>
+       */
+      public Builder setResult(boolean value) {
+        bitField0_ |= 0x00000004;
+        result_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool result = 3;</code>
+       */
+      public Builder clearResult() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        result_ = false;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 deepCount = 4;
+      private int deepCount_ ;
+      /**
+       * <code>optional int32 deepCount = 4;</code>
+       *
+       * <pre>
+       * number of calls to equals in deep callstack (including top level call)
+       * </pre>
+       */
+      public boolean hasDeepCount() {
+        return ((bitField0_ & 0x00000008) == 0x00000008);
+      }
+      /**
+       * <code>optional int32 deepCount = 4;</code>
+       *
+       * <pre>
+       * number of calls to equals in deep callstack (including top level call)
+       * </pre>
+       */
+      public int getDeepCount() {
+        return deepCount_;
+      }
+      /**
+       * <code>optional int32 deepCount = 4;</code>
+       *
+       * <pre>
+       * number of calls to equals in deep callstack (including top level call)
+       * </pre>
+       */
+      public Builder setDeepCount(int value) {
+        bitField0_ |= 0x00000008;
+        deepCount_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 deepCount = 4;</code>
+       *
+       * <pre>
+       * number of calls to equals in deep callstack (including top level call)
+       * </pre>
+       */
+      public Builder clearDeepCount() {
+        bitField0_ = (bitField0_ & ~0x00000008);
+        deepCount_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:EqualsRelation)
+    }
+
+    static {
+      defaultInstance = new EqualsRelation(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:EqualsRelation)
+  }
+
+  public interface TagMapOrBuilder
+      extends com.google.protobuf.MessageOrBuilder {
+
+    // required int64 tag = 1;
+    /**
+     * <code>required int64 tag = 1;</code>
+     */
+    boolean hasTag();
+    /**
+     * <code>required int64 tag = 1;</code>
+     */
+    long getTag();
+
+    // required string digest = 2;
+    /**
+     * <code>required string digest = 2;</code>
+     */
+    boolean hasDigest();
+    /**
+     * <code>required string digest = 2;</code>
+     */
+    java.lang.String getDigest();
+    /**
+     * <code>required string digest = 2;</code>
+     */
+    com.google.protobuf.ByteString
+        getDigestBytes();
+
+    // optional string classname = 3;
+    /**
+     * <code>optional string classname = 3;</code>
+     */
+    boolean hasClassname();
+    /**
+     * <code>optional string classname = 3;</code>
+     */
+    java.lang.String getClassname();
+    /**
+     * <code>optional string classname = 3;</code>
+     */
+    com.google.protobuf.ByteString
+        getClassnameBytes();
+  }
+  /**
+   * Protobuf type {@code TagMap}
+   */
+  public static final class TagMap extends
+      com.google.protobuf.GeneratedMessage
+      implements TagMapOrBuilder {
+    // Use TagMap.newBuilder() to construct.
+    private TagMap(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
+      super(builder);
+      this.unknownFields = builder.getUnknownFields();
+    }
+    private TagMap(boolean noInit) { this.unknownFields = com.google.protobuf.UnknownFieldSet.getDefaultInstance(); }
+
+    private static final TagMap defaultInstance;
+    public static TagMap getDefaultInstance() {
+      return defaultInstance;
+    }
+
+    public TagMap getDefaultInstanceForType() {
+      return defaultInstance;
+    }
+
+    private final com.google.protobuf.UnknownFieldSet unknownFields;
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+        getUnknownFields() {
+      return this.unknownFields;
+    }
+    private TagMap(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      initFields();
+      int mutable_bitField0_ = 0;
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            default: {
+              if (!parseUnknownField(input, unknownFields,
+                                     extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+            case 8: {
+              bitField0_ |= 0x00000001;
+              tag_ = input.readInt64();
+              break;
+            }
+            case 18: {
+              bitField0_ |= 0x00000002;
+              digest_ = input.readBytes();
+              break;
+            }
+            case 26: {
+              bitField0_ |= 0x00000004;
+              classname_ = input.readBytes();
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e.getMessage()).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_TagMap_descriptor;
+    }
+
+    protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_TagMap_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap.class, org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap.Builder.class);
+    }
+
+    public static com.google.protobuf.Parser<TagMap> PARSER =
+        new com.google.protobuf.AbstractParser<TagMap>() {
+      public TagMap parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new TagMap(input, extensionRegistry);
+      }
+    };
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<TagMap> getParserForType() {
+      return PARSER;
+    }
+
+    private int bitField0_;
+    // required int64 tag = 1;
+    public static final int TAG_FIELD_NUMBER = 1;
+    private long tag_;
+    /**
+     * <code>required int64 tag = 1;</code>
+     */
+    public boolean hasTag() {
+      return ((bitField0_ & 0x00000001) == 0x00000001);
+    }
+    /**
+     * <code>required int64 tag = 1;</code>
+     */
+    public long getTag() {
+      return tag_;
+    }
+
+    // required string digest = 2;
+    public static final int DIGEST_FIELD_NUMBER = 2;
+    private java.lang.Object digest_;
+    /**
+     * <code>required string digest = 2;</code>
+     */
+    public boolean hasDigest() {
+      return ((bitField0_ & 0x00000002) == 0x00000002);
+    }
+    /**
+     * <code>required string digest = 2;</code>
+     */
+    public java.lang.String getDigest() {
+      java.lang.Object ref = digest_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          digest_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>required string digest = 2;</code>
+     */
+    public com.google.protobuf.ByteString
+        getDigestBytes() {
+      java.lang.Object ref = digest_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        digest_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    // optional string classname = 3;
+    public static final int CLASSNAME_FIELD_NUMBER = 3;
+    private java.lang.Object classname_;
+    /**
+     * <code>optional string classname = 3;</code>
+     */
+    public boolean hasClassname() {
+      return ((bitField0_ & 0x00000004) == 0x00000004);
+    }
+    /**
+     * <code>optional string classname = 3;</code>
+     */
+    public java.lang.String getClassname() {
+      java.lang.Object ref = classname_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          classname_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string classname = 3;</code>
+     */
+    public com.google.protobuf.ByteString
+        getClassnameBytes() {
+      java.lang.Object ref = classname_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        classname_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private void initFields() {
+      tag_ = 0L;
+      digest_ = "";
+      classname_ = "";
+    }
+    private byte memoizedIsInitialized = -1;
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized != -1) return isInitialized == 1;
+
+      if (!hasTag()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasDigest()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      getSerializedSize();
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        output.writeInt64(1, tag_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        output.writeBytes(2, getDigestBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        output.writeBytes(3, getClassnameBytes());
+      }
+      getUnknownFields().writeTo(output);
+    }
+
+    private int memoizedSerializedSize = -1;
+    public int getSerializedSize() {
+      int size = memoizedSerializedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (((bitField0_ & 0x00000001) == 0x00000001)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, tag_);
+      }
+      if (((bitField0_ & 0x00000002) == 0x00000002)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(2, getDigestBytes());
+      }
+      if (((bitField0_ & 0x00000004) == 0x00000004)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(3, getClassnameBytes());
+      }
+      size += getUnknownFields().getSerializedSize();
+      memoizedSerializedSize = size;
+      return size;
+    }
+
+    private static final long serialVersionUID = 0L;
+    @java.lang.Override
+    protected java.lang.Object writeReplace()
+        throws java.io.ObjectStreamException {
+      return super.writeReplace();
+    }
+
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseDelimitedFrom(input, extensionRegistry);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input);
+    }
+    public static org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return PARSER.parseFrom(input, extensionRegistry);
+    }
+
+    public static Builder newBuilder() { return Builder.create(); }
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder(org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap prototype) {
+      return newBuilder().mergeFrom(prototype);
+    }
+    public Builder toBuilder() { return newBuilder(this); }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code TagMap}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessage.Builder<Builder>
+       implements org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMapOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_TagMap_descriptor;
+      }
+
+      protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_TagMap_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap.class, org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap.Builder.class);
+      }
+
+      // Construct using org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessage.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessage.alwaysUseFieldBuilders) {
+        }
+      }
+      private static Builder create() {
+        return new Builder();
+      }
+
+      public Builder clear() {
+        super.clear();
+        tag_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000001);
+        digest_ = "";
+        bitField0_ = (bitField0_ & ~0x00000002);
+        classname_ = "";
+        bitField0_ = (bitField0_ & ~0x00000004);
+        return this;
+      }
+
+      public Builder clone() {
+        return create().mergeFrom(buildPartial());
+      }
+
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_TagMap_descriptor;
+      }
+
+      public org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap getDefaultInstanceForType() {
+        return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap.getDefaultInstance();
+      }
+
+      public org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap build() {
+        org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      public org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap buildPartial() {
+        org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap result = new org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap(this);
+        int from_bitField0_ = bitField0_;
+        int to_bitField0_ = 0;
+        if (((from_bitField0_ & 0x00000001) == 0x00000001)) {
+          to_bitField0_ |= 0x00000001;
+        }
+        result.tag_ = tag_;
+        if (((from_bitField0_ & 0x00000002) == 0x00000002)) {
+          to_bitField0_ |= 0x00000002;
+        }
+        result.digest_ = digest_;
+        if (((from_bitField0_ & 0x00000004) == 0x00000004)) {
+          to_bitField0_ |= 0x00000004;
+        }
+        result.classname_ = classname_;
+        result.bitField0_ = to_bitField0_;
+        onBuilt();
+        return result;
+      }
+
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap) {
+          return mergeFrom((org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap other) {
+        if (other == org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap.getDefaultInstance()) return this;
+        if (other.hasTag()) {
+          setTag(other.getTag());
+        }
+        if (other.hasDigest()) {
+          bitField0_ |= 0x00000002;
+          digest_ = other.digest_;
+          onChanged();
+        }
+        if (other.hasClassname()) {
+          bitField0_ |= 0x00000004;
+          classname_ = other.classname_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.getUnknownFields());
+        return this;
+      }
+
+      public final boolean isInitialized() {
+        if (!hasTag()) {
+          
+          return false;
+        }
+        if (!hasDigest()) {
+          
+          return false;
+        }
+        return true;
+      }
+
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMap) e.getUnfinishedMessage();
+          throw e;
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+      private int bitField0_;
+
+      // required int64 tag = 1;
+      private long tag_ ;
+      /**
+       * <code>required int64 tag = 1;</code>
+       */
+      public boolean hasTag() {
+        return ((bitField0_ & 0x00000001) == 0x00000001);
+      }
+      /**
+       * <code>required int64 tag = 1;</code>
+       */
+      public long getTag() {
+        return tag_;
+      }
+      /**
+       * <code>required int64 tag = 1;</code>
+       */
+      public Builder setTag(long value) {
+        bitField0_ |= 0x00000001;
+        tag_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int64 tag = 1;</code>
+       */
+      public Builder clearTag() {
+        bitField0_ = (bitField0_ & ~0x00000001);
+        tag_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // required string digest = 2;
+      private java.lang.Object digest_ = "";
+      /**
+       * <code>required string digest = 2;</code>
+       */
+      public boolean hasDigest() {
+        return ((bitField0_ & 0x00000002) == 0x00000002);
+      }
+      /**
+       * <code>required string digest = 2;</code>
+       */
+      public java.lang.String getDigest() {
+        java.lang.Object ref = digest_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          digest_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>required string digest = 2;</code>
+       */
+      public com.google.protobuf.ByteString
+          getDigestBytes() {
+        java.lang.Object ref = digest_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          digest_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>required string digest = 2;</code>
+       */
+      public Builder setDigest(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        digest_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string digest = 2;</code>
+       */
+      public Builder clearDigest() {
+        bitField0_ = (bitField0_ & ~0x00000002);
+        digest_ = getDefaultInstance().getDigest();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required string digest = 2;</code>
+       */
+      public Builder setDigestBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000002;
+        digest_ = value;
+        onChanged();
+        return this;
+      }
+
+      // optional string classname = 3;
+      private java.lang.Object classname_ = "";
+      /**
+       * <code>optional string classname = 3;</code>
+       */
+      public boolean hasClassname() {
+        return ((bitField0_ & 0x00000004) == 0x00000004);
+      }
+      /**
+       * <code>optional string classname = 3;</code>
+       */
+      public java.lang.String getClassname() {
+        java.lang.Object ref = classname_;
+        if (!(ref instanceof java.lang.String)) {
+          java.lang.String s = ((com.google.protobuf.ByteString) ref)
+              .toStringUtf8();
+          classname_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string classname = 3;</code>
+       */
+      public com.google.protobuf.ByteString
+          getClassnameBytes() {
+        java.lang.Object ref = classname_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          classname_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string classname = 3;</code>
+       */
+      public Builder setClassname(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        classname_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string classname = 3;</code>
+       */
+      public Builder clearClassname() {
+        bitField0_ = (bitField0_ & ~0x00000004);
+        classname_ = getDefaultInstance().getClassname();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string classname = 3;</code>
+       */
+      public Builder setClassnameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000004;
+        classname_ = value;
+        onChanged();
+        return this;
+      }
+
+      // @@protoc_insertion_point(builder_scope:TagMap)
+    }
+
+    static {
+      defaultInstance = new TagMap(true);
+      defaultInstance.initFields();
+    }
+
+    // @@protoc_insertion_point(class_scope:TagMap)
+  }
+
   private static com.google.protobuf.Descriptors.Descriptor
     internal_static_ObjectLifetime_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_ObjectLifetime_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_EqualsRelation_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_EqualsRelation_fieldAccessorTable;
+  private static com.google.protobuf.Descriptors.Descriptor
+    internal_static_TagMap_descriptor;
+  private static
+    com.google.protobuf.GeneratedMessage.FieldAccessorTable
+      internal_static_TagMap_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -844,8 +2265,12 @@ public final class TrackingProtocolBuffers {
       "\n\024objectLifetime.proto\"n\n\016ObjectLifetime" +
       "\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\020\n\010ctorTim" +
       "e\030\003 \002(\003\022\020\n\010dtorTime\030\004 \001(\003\022\033\n\023measuredSiz" +
-      "eInBytes\030\005 \001(\003B=\n\"org.eclipse.imp.pdb.fa" +
-      "cts.trackingB\027TrackingProtocolBuffers"
+      "eInBytes\030\005 \001(\003\"O\n\016EqualsRelation\022\014\n\004tag1" +
+      "\030\001 \002(\003\022\014\n\004tag2\030\002 \002(\003\022\016\n\006result\030\003 \001(\010\022\021\n\t" +
+      "deepCount\030\004 \001(\005\"8\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016" +
+      "\n\006digest\030\002 \002(\t\022\021\n\tclassname\030\003 \001(\tB=\n\"org" +
+      ".eclipse.imp.pdb.facts.trackingB\027Trackin" +
+      "gProtocolBuffers"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -858,6 +2283,18 @@ public final class TrackingProtocolBuffers {
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ObjectLifetime_descriptor,
               new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", });
+          internal_static_EqualsRelation_descriptor =
+            getDescriptor().getMessageTypes().get(1);
+          internal_static_EqualsRelation_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_EqualsRelation_descriptor,
+              new java.lang.String[] { "Tag1", "Tag2", "Result", "DeepCount", });
+          internal_static_TagMap_descriptor =
+            getDescriptor().getMessageTypes().get(2);
+          internal_static_TagMap_fieldAccessorTable = new
+            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+              internal_static_TagMap_descriptor,
+              new java.lang.String[] { "Tag", "Digest", "Classname", });
           return null;
         }
       };
