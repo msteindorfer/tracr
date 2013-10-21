@@ -2,3 +2,8 @@ target/
 project/target/
 
 .idea/workspace.xml
+
+*.dat
+.R*
+result-*
+*.swp
