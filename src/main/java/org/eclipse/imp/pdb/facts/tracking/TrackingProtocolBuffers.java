@@ -21,17 +21,17 @@ public final class TrackingProtocolBuffers {
      */
     long getTag();
 
-    // required string digest = 2;
+    // optional string digest = 2;
     /**
-     * <code>required string digest = 2;</code>
+     * <code>optional string digest = 2;</code>
      */
     boolean hasDigest();
     /**
-     * <code>required string digest = 2;</code>
+     * <code>optional string digest = 2;</code>
      */
     java.lang.String getDigest();
     /**
-     * <code>required string digest = 2;</code>
+     * <code>optional string digest = 2;</code>
      */
     com.google.protobuf.ByteString
         getDigestBytes();
@@ -198,17 +198,17 @@ public final class TrackingProtocolBuffers {
       return tag_;
     }
 
-    // required string digest = 2;
+    // optional string digest = 2;
     public static final int DIGEST_FIELD_NUMBER = 2;
     private java.lang.Object digest_;
     /**
-     * <code>required string digest = 2;</code>
+     * <code>optional string digest = 2;</code>
      */
     public boolean hasDigest() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required string digest = 2;</code>
+     * <code>optional string digest = 2;</code>
      */
     public java.lang.String getDigest() {
       java.lang.Object ref = digest_;
@@ -225,7 +225,7 @@ public final class TrackingProtocolBuffers {
       }
     }
     /**
-     * <code>required string digest = 2;</code>
+     * <code>optional string digest = 2;</code>
      */
     public com.google.protobuf.ByteString
         getDigestBytes() {
@@ -302,10 +302,6 @@ public final class TrackingProtocolBuffers {
       if (isInitialized != -1) return isInitialized == 1;
 
       if (!hasTag()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasDigest()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -580,10 +576,6 @@ public final class TrackingProtocolBuffers {
           
           return false;
         }
-        if (!hasDigest()) {
-          
-          return false;
-        }
         if (!hasCtorTime()) {
           
           return false;
@@ -643,16 +635,16 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // required string digest = 2;
+      // optional string digest = 2;
       private java.lang.Object digest_ = "";
       /**
-       * <code>required string digest = 2;</code>
+       * <code>optional string digest = 2;</code>
        */
       public boolean hasDigest() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required string digest = 2;</code>
+       * <code>optional string digest = 2;</code>
        */
       public java.lang.String getDigest() {
         java.lang.Object ref = digest_;
@@ -666,7 +658,7 @@ public final class TrackingProtocolBuffers {
         }
       }
       /**
-       * <code>required string digest = 2;</code>
+       * <code>optional string digest = 2;</code>
        */
       public com.google.protobuf.ByteString
           getDigestBytes() {
@@ -682,7 +674,7 @@ public final class TrackingProtocolBuffers {
         }
       }
       /**
-       * <code>required string digest = 2;</code>
+       * <code>optional string digest = 2;</code>
        */
       public Builder setDigest(
           java.lang.String value) {
@@ -695,7 +687,7 @@ public final class TrackingProtocolBuffers {
         return this;
       }
       /**
-       * <code>required string digest = 2;</code>
+       * <code>optional string digest = 2;</code>
        */
       public Builder clearDigest() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -704,7 +696,7 @@ public final class TrackingProtocolBuffers {
         return this;
       }
       /**
-       * <code>required string digest = 2;</code>
+       * <code>optional string digest = 2;</code>
        */
       public Builder setDigestBytes(
           com.google.protobuf.ByteString value) {
@@ -877,6 +869,26 @@ public final class TrackingProtocolBuffers {
      * </pre>
      */
     int getDeepCount();
+
+    // required int64 timestamp = 5;
+    /**
+     * <code>required int64 timestamp = 5;</code>
+     */
+    boolean hasTimestamp();
+    /**
+     * <code>required int64 timestamp = 5;</code>
+     */
+    long getTimestamp();
+
+    // optional int64 deepTime = 6;
+    /**
+     * <code>optional int64 deepTime = 6;</code>
+     */
+    boolean hasDeepTime();
+    /**
+     * <code>optional int64 deepTime = 6;</code>
+     */
+    long getDeepTime();
   }
   /**
    * Protobuf type {@code EqualsRelation}
@@ -947,6 +959,16 @@ public final class TrackingProtocolBuffers {
             case 32: {
               bitField0_ |= 0x00000008;
               deepCount_ = input.readInt32();
+              break;
+            }
+            case 40: {
+              bitField0_ |= 0x00000010;
+              timestamp_ = input.readInt64();
+              break;
+            }
+            case 48: {
+              bitField0_ |= 0x00000020;
+              deepTime_ = input.readInt64();
               break;
             }
           }
@@ -1061,11 +1083,45 @@ public final class TrackingProtocolBuffers {
       return deepCount_;
     }
 
+    // required int64 timestamp = 5;
+    public static final int TIMESTAMP_FIELD_NUMBER = 5;
+    private long timestamp_;
+    /**
+     * <code>required int64 timestamp = 5;</code>
+     */
+    public boolean hasTimestamp() {
+      return ((bitField0_ & 0x00000010) == 0x00000010);
+    }
+    /**
+     * <code>required int64 timestamp = 5;</code>
+     */
+    public long getTimestamp() {
+      return timestamp_;
+    }
+
+    // optional int64 deepTime = 6;
+    public static final int DEEPTIME_FIELD_NUMBER = 6;
+    private long deepTime_;
+    /**
+     * <code>optional int64 deepTime = 6;</code>
+     */
+    public boolean hasDeepTime() {
+      return ((bitField0_ & 0x00000020) == 0x00000020);
+    }
+    /**
+     * <code>optional int64 deepTime = 6;</code>
+     */
+    public long getDeepTime() {
+      return deepTime_;
+    }
+
     private void initFields() {
       tag1_ = 0L;
       tag2_ = 0L;
       result_ = false;
       deepCount_ = 0;
+      timestamp_ = 0L;
+      deepTime_ = 0L;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1077,6 +1133,10 @@ public final class TrackingProtocolBuffers {
         return false;
       }
       if (!hasTag2()) {
+        memoizedIsInitialized = 0;
+        return false;
+      }
+      if (!hasTimestamp()) {
         memoizedIsInitialized = 0;
         return false;
       }
@@ -1098,6 +1158,12 @@ public final class TrackingProtocolBuffers {
       }
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         output.writeInt32(4, deepCount_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        output.writeInt64(5, timestamp_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        output.writeInt64(6, deepTime_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -1123,6 +1189,14 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000008) == 0x00000008)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(4, deepCount_);
+      }
+      if (((bitField0_ & 0x00000010) == 0x00000010)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(5, timestamp_);
+      }
+      if (((bitField0_ & 0x00000020) == 0x00000020)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(6, deepTime_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1248,6 +1322,10 @@ public final class TrackingProtocolBuffers {
         bitField0_ = (bitField0_ & ~0x00000004);
         deepCount_ = 0;
         bitField0_ = (bitField0_ & ~0x00000008);
+        timestamp_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000010);
+        deepTime_ = 0L;
+        bitField0_ = (bitField0_ & ~0x00000020);
         return this;
       }
 
@@ -1292,6 +1370,14 @@ public final class TrackingProtocolBuffers {
           to_bitField0_ |= 0x00000008;
         }
         result.deepCount_ = deepCount_;
+        if (((from_bitField0_ & 0x00000010) == 0x00000010)) {
+          to_bitField0_ |= 0x00000010;
+        }
+        result.timestamp_ = timestamp_;
+        if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
+          to_bitField0_ |= 0x00000020;
+        }
+        result.deepTime_ = deepTime_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1320,6 +1406,12 @@ public final class TrackingProtocolBuffers {
         if (other.hasDeepCount()) {
           setDeepCount(other.getDeepCount());
         }
+        if (other.hasTimestamp()) {
+          setTimestamp(other.getTimestamp());
+        }
+        if (other.hasDeepTime()) {
+          setDeepTime(other.getDeepTime());
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -1330,6 +1422,10 @@ public final class TrackingProtocolBuffers {
           return false;
         }
         if (!hasTag2()) {
+          
+          return false;
+        }
+        if (!hasTimestamp()) {
           
           return false;
         }
@@ -1499,6 +1595,72 @@ public final class TrackingProtocolBuffers {
       public Builder clearDeepCount() {
         bitField0_ = (bitField0_ & ~0x00000008);
         deepCount_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // required int64 timestamp = 5;
+      private long timestamp_ ;
+      /**
+       * <code>required int64 timestamp = 5;</code>
+       */
+      public boolean hasTimestamp() {
+        return ((bitField0_ & 0x00000010) == 0x00000010);
+      }
+      /**
+       * <code>required int64 timestamp = 5;</code>
+       */
+      public long getTimestamp() {
+        return timestamp_;
+      }
+      /**
+       * <code>required int64 timestamp = 5;</code>
+       */
+      public Builder setTimestamp(long value) {
+        bitField0_ |= 0x00000010;
+        timestamp_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>required int64 timestamp = 5;</code>
+       */
+      public Builder clearTimestamp() {
+        bitField0_ = (bitField0_ & ~0x00000010);
+        timestamp_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional int64 deepTime = 6;
+      private long deepTime_ ;
+      /**
+       * <code>optional int64 deepTime = 6;</code>
+       */
+      public boolean hasDeepTime() {
+        return ((bitField0_ & 0x00000020) == 0x00000020);
+      }
+      /**
+       * <code>optional int64 deepTime = 6;</code>
+       */
+      public long getDeepTime() {
+        return deepTime_;
+      }
+      /**
+       * <code>optional int64 deepTime = 6;</code>
+       */
+      public Builder setDeepTime(long value) {
+        bitField0_ |= 0x00000020;
+        deepTime_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int64 deepTime = 6;</code>
+       */
+      public Builder clearDeepTime() {
+        bitField0_ = (bitField0_ & ~0x00000020);
+        deepTime_ = 0L;
         onChanged();
         return this;
       }
@@ -2263,14 +2425,15 @@ public final class TrackingProtocolBuffers {
   static {
     java.lang.String[] descriptorData = {
       "\n\024objectLifetime.proto\"n\n\016ObjectLifetime" +
-      "\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\020\n\010ctorTim" +
+      "\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \001(\t\022\020\n\010ctorTim" +
       "e\030\003 \002(\003\022\020\n\010dtorTime\030\004 \001(\003\022\033\n\023measuredSiz" +
-      "eInBytes\030\005 \001(\003\"O\n\016EqualsRelation\022\014\n\004tag1" +
+      "eInBytes\030\005 \001(\003\"t\n\016EqualsRelation\022\014\n\004tag1" +
       "\030\001 \002(\003\022\014\n\004tag2\030\002 \002(\003\022\016\n\006result\030\003 \001(\010\022\021\n\t" +
-      "deepCount\030\004 \001(\005\"8\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016" +
-      "\n\006digest\030\002 \002(\t\022\021\n\tclassname\030\003 \001(\tB=\n\"org" +
-      ".eclipse.imp.pdb.facts.trackingB\027Trackin" +
-      "gProtocolBuffers"
+      "deepCount\030\004 \001(\005\022\021\n\ttimestamp\030\005 \002(\003\022\020\n\010de" +
+      "epTime\030\006 \001(\003\"8\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006d" +
+      "igest\030\002 \002(\t\022\021\n\tclassname\030\003 \001(\tB=\n\"org.ec" +
+      "lipse.imp.pdb.facts.trackingB\027TrackingPr" +
+      "otocolBuffers"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2288,7 +2451,7 @@ public final class TrackingProtocolBuffers {
           internal_static_EqualsRelation_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_EqualsRelation_descriptor,
-              new java.lang.String[] { "Tag1", "Tag2", "Result", "DeepCount", });
+              new java.lang.String[] { "Tag1", "Tag2", "Result", "DeepCount", "Timestamp", "DeepTime", });
           internal_static_TagMap_descriptor =
             getDescriptor().getMessageTypes().get(2);
           internal_static_TagMap_fieldAccessorTable = new
