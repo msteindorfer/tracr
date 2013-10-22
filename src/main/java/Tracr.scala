@@ -198,11 +198,11 @@ object Tracr extends App {
     }
   }
 
-  val equalsRelation: GenSet[EqualsCall] = time("Deserialize equals relation from Google Protocol Buffers") {
+  val equalsRelation: GenSeq[EqualsCall] = time("Deserialize equals relation from Google Protocol Buffers") {
     /*
      * Read-in equals relation.
      */
-    val equalsRelationBuilder = Set.newBuilder[EqualsCall]
+    val equalsRelationBuilder = Vector.newBuilder[EqualsCall]
 
     {
       val protoInputStream = new FileInputStream(path + "_equals_relation.bin")
@@ -258,36 +258,55 @@ object Tracr extends App {
 //      writer.close
 //
 //    }
-//
-//    time ("Project equals/isEqual calls [min]") {
-////      projectEqualsProperty("equalCall-min.dat", equalsRelation, timestampRange)
-//    }
 
-//    def projectEqualsProperty(filename: String, sortedRelation: Vector[EqualsCall], timestampRange: NumericRange[Long])
-//                             (accumulatorProperty: EqualsCall => Long) {
-//      var idx = 0;
-//      var sum = BigInt(0);
-//
-//      time("Iterate and project") {
-//        val outputFile = new File(filename)
-//        val writer = new BufferedWriter(new FileWriter(outputFile))
-//
-//        for (call <- sortedRelation) {
-//          sum = 0
-//
-//          while (idx < sortedRelation.length && sortedRelation(idx).timestamp <= ) {
-//            sum += accumulatorProperty(ctorSorted(idx))
-//            idx += 1
-//          }
-//          //        println(s"ctorSum: $ctorSum")
-//
-//          writer.write(s"$timestamp ${sum - dtorSum}"); writer.newLine
-//        }
-//        writer.flush
-//        writer.close
-//      }
-//    }
+    time ("Project equals/isEqual calls [min]") {
+      projectEqualsProperty("equalCalls.dat", equalsRelation, timestampRange, stepSize)
+    }
 
+    def projectEqualsProperty(filename: String, sortedRelation: GenSeq[EqualsCall], timestampRange: NumericRange[Long], stepSize: Long) {
+      val summarized = equalsRelation.groupBy(_.timestamp).mapValues {
+        case callsByTimestamp => {
+          val sumCount = callsByTimestamp.map(_.deepCount).sum
+          val sumTime  = callsByTimestamp.map(_.deepTime ).sum
+          (sumCount, sumTime)
+        }
+      }
+
+      val outputFile = new File(filename)
+      val writer = new BufferedWriter(new FileWriter(outputFile))
+
+      var lastTimestamp = 0L;
+      var stepCntr = 0L;
+
+      var (sumCount, sumTime) = (BigInt(0), BigInt(0));
+      var (runningSumCount, runningSumTime) = (BigInt(0), BigInt(0));
+
+      for (timestamp <- timestampRange) {
+        lastTimestamp = timestamp
+        stepCntr += 1
+
+        summarized get timestamp match {
+          case Some((count: Int, time: Long)) => {
+            sumCount += count
+            sumTime += time
+            runningSumCount += count
+            runningSumTime += time
+          }
+          case _ => ()
+        }
+
+        if (stepCntr % stepSize == 0) {
+          writer.write(s"$timestamp ${sumCount} ${sumTime} ${runningSumCount} ${runningSumTime}"); writer.newLine
+          sumCount = BigInt(0)
+          sumTime  = BigInt(0)
+        }
+      }
+
+
+      writer.flush
+      writer.close
+
+    }
 }
 
 object TracrUtil {
