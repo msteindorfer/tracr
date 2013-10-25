@@ -5,13 +5,13 @@ import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
 import scala.Some
 
-case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long) {
+case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, deepEqualsEstimate: Int) {
   require(ctorTime >= 0)
   require(!dtorTime.isDefined || dtorTime.get >= 0)
   require(measuredSizeInBytes >= 0)
 }
 
-case class EqualsCall(tag1: Long, tag2: Long, result: Boolean, deepCount: Int, deepTime: Long, timestamp: Long)
+case class EqualsCall(tag1: Long, tag2: Long, result: Boolean, deepCount: Int, deepTime: Long, timestamp: Long, isHashLookup: Boolean)
 case class TagInfo(digest: String, classname: String)
 
 object Tracr extends App {
@@ -95,8 +95,9 @@ object Tracr extends App {
           val ctorTime = protoObjectLifetime.getCtorTime
           val dtorTime = objectFreeMap.get(tag)
           val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
+          val deepEqualsEstimate = protoObjectLifetime.getDeepEqualsEstimate
 
-          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes)
+          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, deepEqualsEstimate)
         }
       } catch {
         case _: Exception => {}
@@ -167,7 +168,8 @@ object Tracr extends App {
       ctorTime = overlap.map(_.ctorTime).min
       dtorTime = overlap.map(_.dtorTime).max
       size = overlap.head.measuredSizeInBytes
-    } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size)
+      deepEqualsEstimate = overlap.head.deepEqualsEstimate
+    } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, deepEqualsEstimate)
   };
 
   /*
@@ -196,6 +198,13 @@ object Tracr extends App {
     time ("Project Object Count [min]") {
       projectProperty("objectCount-min.dat", ctorMinSorted, dtorMinSorted, timestampRange, stepSize)(_ => 1)
     }
+
+    // TODO: only execute when NOT running in shared mode
+    time ("Project equals/isEqual calls [internal]") {
+      val replacementsSorted = replacements.toVector sortWith (_.ctorTime < _.ctorTime)
+
+      projectExpectedEqualsCall("equalCalls-est.dat", replacementsSorted, timestampRange, stepSize)
+    }
   }
 
   val equalsRelation: GenSeq[EqualsCall] = time("Deserialize equals relation from Google Protocol Buffers") {
@@ -216,7 +225,8 @@ object Tracr extends App {
             protoEqualsCall.getResult,
             protoEqualsCall.getDeepCount,
             protoEqualsCall.getDeepTime,
-            protoEqualsCall.getTimestamp
+            protoEqualsCall.getTimestamp,
+            protoEqualsCall.getIsHashLookup
           )
         }
       } catch {
@@ -259,16 +269,24 @@ object Tracr extends App {
 //
 //    }
 
-    time ("Project equals/isEqual calls [min]") {
-      projectEqualsProperty("equalCalls.dat", equalsRelation, timestampRange, stepSize)
-    }
+  time ("Project equals/isEqual calls [external]") {
+    projectEqualsProperty("equalCalls-ext.dat", equalsRelation filter { !_.isHashLookup }, timestampRange, stepSize)
+  }
 
-    def projectEqualsProperty(filename: String, sortedRelation: GenSeq[EqualsCall], timestampRange: NumericRange[Long], stepSize: Long) {
-      val summarized = equalsRelation.groupBy(_.timestamp).mapValues {
+  // TODO: only execute when running in shared mode
+  time ("Project equals/isEqual calls [internal]") {
+    projectEqualsProperty("equalCalls-int.dat", equalsRelation filter { _.isHashLookup }, timestampRange, stepSize)
+  }
+
+  def projectEqualsProperty(filename: String, sortedRelation: GenSeq[EqualsCall], timestampRange: NumericRange[Long], stepSize: Long) {
+      val summarized = sortedRelation.groupBy(_.timestamp).mapValues {
         case callsByTimestamp => {
           val sumCount = callsByTimestamp.map(_.deepCount).sum
           val sumTime  = callsByTimestamp.map(_.deepTime ).sum
-          (sumCount, sumTime)
+          val size     = callsByTimestamp.size
+//          println(callsByTimestamp)
+//          println((sumCount, sumTime, size))
+          (sumCount, sumTime, size)
         }
       }
 
@@ -281,32 +299,86 @@ object Tracr extends App {
       var (sumCount, sumTime) = (BigInt(0), BigInt(0));
       var (runningSumCount, runningSumTime) = (BigInt(0), BigInt(0));
 
+      var sumSize = BigInt(0)
+      var runningSumSize = BigInt(0)
+
       for (timestamp <- timestampRange) {
         lastTimestamp = timestamp
         stepCntr += 1
 
         summarized get timestamp match {
-          case Some((count: Int, time: Long)) => {
+          case Some((count: Int, time: Long, size: Int)) => {
             sumCount += count
             sumTime += time
+            sumSize += size
             runningSumCount += count
             runningSumTime += time
+            runningSumSize += size
           }
           case _ => ()
         }
 
         if (stepCntr % stepSize == 0) {
-          writer.write(s"$timestamp ${sumCount} ${sumTime} ${runningSumCount} ${runningSumTime}"); writer.newLine
+          writer.write(s"$timestamp ${sumCount} ${runningSumCount} ${sumTime} ${runningSumTime} ${sumSize} ${runningSumSize}"); writer.newLine
           sumCount = BigInt(0)
           sumTime  = BigInt(0)
+          sumSize  = BigInt(0)
         }
       }
 
+      if (stepCntr % stepSize != 0) {
+        writer.write(s"$lastTimestamp ${sumCount} ${runningSumCount} ${sumTime} ${runningSumTime} ${sumSize} ${runningSumSize}"); writer.newLine
+      }
 
       writer.flush
       writer.close
-
     }
+
+  /*
+   * Note: Does not print begin of data, first print is first accumulation.
+   */
+  def projectExpectedEqualsCall(filename: String, ctorSorted: Vector[ObjectLifetime], timestampRange: NumericRange[Long], stepSize: Long) {
+    var sumCount = BigInt(0)
+    var runningSumCount = BigInt(0)
+
+    var lastTimestamp = 0L
+
+    var stepCntr = 0L
+
+    var ctorIdx = 0
+
+    time("Iterate and project") {
+      val outputFile = new File(filename)
+      val writer = new BufferedWriter(new FileWriter(outputFile))
+
+      for (timestamp <- timestampRange) {
+        lastTimestamp = timestamp
+        stepCntr += 1
+
+        while (ctorIdx < ctorSorted.length && ctorSorted(ctorIdx).ctorTime <= timestamp) {
+          val count = ctorSorted(ctorIdx).deepEqualsEstimate
+
+          sumCount += count
+          runningSumCount += count
+
+          ctorIdx += 1
+        }
+
+        if (stepCntr % stepSize == 0) {
+          writer.write(s"$timestamp ${sumCount}"); writer.newLine // ${runningSumCount}
+          sumCount = BigInt(0)
+        }
+      }
+
+      if (stepCntr % stepSize != 0) {
+        writer.write(s"$lastTimestamp ${sumCount}"); writer.newLine // ${runningSumCount}
+      }
+
+      writer.flush
+      writer.close
+    }
+  }
+
 }
 
 object TracrUtil {
@@ -377,7 +449,7 @@ object TracrUtil {
   }
 
   /*
-   * Note: Does not print begin and end of data up to step size.
+   * Note: Does not print begin of data, first print is first accumulation.
    */
   def projectProperty(filename: String, ctorSorted: Vector[ObjectLifetime], dtorSorted: Vector[ObjectLifetime], timestampRange: NumericRange[Long], stepSize: Long)
                      (accumulatorProperty: ObjectLifetime => Long) {
@@ -418,6 +490,11 @@ object TracrUtil {
           writer.write(s"$timestamp ${ctorSum - dtorSum}"); writer.newLine
         }
       }
+
+      if (stepCntr % stepSize != 0) {
+        writer.write(s"$lastTimestamp ${ctorSum - dtorSum}"); writer.newLine
+      }
+
       writer.flush
       writer.close
     }
