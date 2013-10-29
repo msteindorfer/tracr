@@ -5,7 +5,7 @@ import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
 import scala.Some
 
-case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, deepEqualsEstimate: Int) {
+case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, deepEqualsEstimate: Int, hashTableOverhead: Long) {
   require(ctorTime >= 0)
   require(!dtorTime.isDefined || dtorTime.get >= 0)
   require(measuredSizeInBytes >= 0)
@@ -98,8 +98,9 @@ object Tracr extends App {
           val dtorTime = objectFreeMap.get(tag)
           val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
           val deepEqualsEstimate = protoObjectLifetime.getDeepEqualsEstimate
+          val hashTableOverhead = protoObjectLifetime.getHashTableOverhead
 
-          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, deepEqualsEstimate)
+          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, deepEqualsEstimate, hashTableOverhead)
         }
       } catch {
         case _: Exception => {}
@@ -159,6 +160,16 @@ object Tracr extends App {
       val filename = if (isSharingEnabled) "objectCount-sha.dat" else "objectCount-nom.dat"
       projectProperty(filename, ctorSorted, dtorSorted, timestampRange, stepSize)(_ => 1)
     }
+
+    /*
+     * TODO: current implementation only works, if hash size is calculated after each object allocation.
+     * This is very expensive.
+     */
+    if (isSharingEnabled) {
+      time ("Sample HashTable Size") {
+        sampleProperty("hashTableSize-sha.dat", ctorSorted, timestampRange, stepSize)(_.hashTableOverhead)
+      }
+    }
   }
 
   if (!isSharingEnabled) {
@@ -174,7 +185,7 @@ object Tracr extends App {
         dtorTime = overlap.map(_.dtorTime).max
         size = overlap.head.measuredSizeInBytes
         deepEqualsEstimate = overlap.head.deepEqualsEstimate
-      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, deepEqualsEstimate)
+      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, deepEqualsEstimate, 0)
     };
 
     /*
@@ -528,6 +539,46 @@ object TracrUtil {
     }
 
     builder.result
+  }
+
+  /*
+   * TODO: current implementation only works, if hash size is calculated after each object allocation.
+   * This is very expensive.
+   */
+  def sampleProperty(filename: String, universeSorted: Vector[ObjectLifetime], timestampRange: NumericRange[Long], stepSize: Long)
+                     (sampleProperty: ObjectLifetime => Long) {
+    var idx = 0;
+
+    var lastValue = 0L;
+    var lastTimestamp = 0L;
+
+    var stepCntr = 0L;
+
+    time("Iterate and sample") {
+      val outputFile = new File(filename)
+      val writer = new BufferedWriter(new FileWriter(outputFile))
+
+      for (timestamp <- timestampRange) {
+        lastTimestamp = timestamp
+        stepCntr += 1
+
+        while (idx < universeSorted.length && universeSorted(idx).ctorTime <= timestamp) {
+          lastValue = sampleProperty(universeSorted(idx))
+          idx += 1
+        }
+
+        if (stepCntr % stepSize == 0) {
+          writer.write(s"$timestamp ${lastValue}"); writer.newLine
+        }
+      }
+
+      if (stepCntr % stepSize != 0) {
+        writer.write(s"$lastTimestamp ${lastValue}"); writer.newLine
+      }
+
+      writer.flush
+      writer.close
+    }
   }
 
   /*

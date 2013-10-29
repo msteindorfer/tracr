@@ -7,9 +7,14 @@ ocSha <- read.csv("objectCount-sha.dat", sep=" ", header=FALSE)
 hsNom <- read.csv("heapSizes-nom.dat", sep=" ", header=FALSE)
 hsMin <- read.csv("heapSizes-min.dat", sep=" ", header=FALSE)
 hsSha <- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
-# hsEst <- c(hsMin$V1, hsMin$V2+(ocMin$V2*8)) # maximal sharing prognosis: min + 8 byte per hashtable record
-hsEst <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*8)) # maximal sharing prognosis: min + 8 byte per hashtable record
+# maximal sharing prognosis: min + 86 bytes per hashtable record
+# NOTE: 86 bytes was measured with measured on average for WeakHashMap(key, new WeakReference(key))
+hsEst <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*86))
 names(hsEst) <- c('V1', 'V2')
+
+hashTableSizeSha <- read.csv("hashTableSize-sha.dat", sep=" ", header=FALSE)
+
+meanOverheadPerEntry <- mean((hashTableSizeSha/ocMin)$V2)
 
 #diff <- (hsNom$V2-hsEst$V2)
 percEst <- (hsNom$V2-hsEst$V2)*100/hsNom$V2
@@ -23,11 +28,11 @@ plot(hsMin, type='n', ylim=range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2))
 lines(hsNom, col='green')
 lines(hsMin, col='blue', lty=3)
 lines(hsEst, col='purple', lty=2)
-lines(hsSha, col='red)
+lines(hsSha, col='red') # TODO: add hashTableSizeSha
 # add a title and subtitle 
 title("Heap Evolution")
 
-#plot(diff, type='l')
+# plot(diff, type='l')
 max <- range(percEst, percSha)
 range <- range(-max, max)
 plot(percEst, type='n', xlab='event counter', ylab='savings (in %)', ylim=range)
@@ -46,25 +51,25 @@ eqCallsShaInt <- read.csv("equalCalls-sha-int.dat", sep=" ", header=FALSE)
 
 eqCallsNom <- read.csv("equalCalls-nom.dat", sep=" ", header=FALSE)
 eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE)
-eqCallsEst <- data.frame(eqCallsTmp$V1, cumsum(eqCallsTmp$V2))
+eqCallsEst <- data.frame(eqCallsTmp$V1, cumsum(eqCallsTmp$V2) + eqCallsNom$V7)
 names(eqCallsEst) <- c('V1', 'V2')
 
-plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsShaExt$V7+eqCallsShaInt$V7), type='n')
+plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsShaExt$V3+eqCallsShaInt$V3), type='n')
 #par(new=T)
 lines(eqCallsNom$V3, col='green')                 # = ProgramEquals
 lines(eqCallsEst$V2, col='purple', lty=2)
 lines(eqCallsNom$V7, col='blue', lty=3)           # = MinAmount
 
-#lines(eqCallsShaInt$V7, col='red', lty=3)
-#lines(eqCallsShaExt$V7, col='red', lty=3)
-lines(eqCallsShaExt$V7+eqCallsShaInt$V7, col='red')
+#lines(eqCallsShaInt$V3, col='red', lty=3)
+#lines(eqCallsShaExt$V3, col='red', lty=3)
+lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red')
 title("Equal Calls Forecast (Count)")
 
-plot(eqCallsNom$V3, ylim=range(eqCallsShaExt$V7,eqCallsShaInt$V7), type='n')
+plot(eqCallsNom$V3, ylim=range(eqCallsShaExt$V3,eqCallsShaInt$V3), type='n')
 #par(new=T)
-lines(eqCallsShaInt$V7, col='red', lty=3)
-lines(eqCallsShaExt$V7, col='red', lty=3)
-#lines(eqCallsShaExt$V7+eqCallsShaInt$V7, col='red', lty=3)
+lines(eqCallsShaInt$V3, col='red', lty=3)
+lines(eqCallsShaExt$V3, col='red', lty=3)
+#lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red', lty=3)
 title("Equals in Maximal Sharing (Count)")
 
 
