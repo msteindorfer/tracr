@@ -16,6 +16,8 @@ case class TagInfo(digest: String, classname: String)
 
 object Tracr extends App {
 
+  val isSharingEnabled: Boolean = args.contains("sharingEnabled")
+
   import TracrUtil._
 
   //  val filename = "/Users/Michael/Dropbox/Research/ObjectLifetime/ActualRun/target/universe"
@@ -149,63 +151,69 @@ object Tracr extends App {
     val dtorSorted: Vector[ObjectLifetime] = time("dtorSorted") { universeList   filter (_.dtorTime.isDefined) sortWith (_.dtorTime.get < _.dtorTime.get) }
 
     time ("Project Heap Size") {
-      projectProperty("heapSizes-nom.dat", ctorSorted, dtorSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
+      val filename = if (isSharingEnabled) "heapSizes-sha.dat" else "heapSizes-nom.dat"
+      projectProperty(filename, ctorSorted, dtorSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
     }
 
     time ("Project Object Size") {
-      projectProperty("objectCount-nom.dat", ctorSorted, dtorSorted, timestampRange, stepSize)(_ => 1)
+      val filename = if (isSharingEnabled) "objectCount-sha.dat" else "objectCount-nom.dat"
+      projectProperty(filename, ctorSorted, dtorSorted, timestampRange, stepSize)(_ => 1)
     }
   }
 
-  /*
-   * Suggest optimistic heap history.
-   */
-  val replacements: GenIterable[ObjectLifetime] = time ("Suggest optimistic heap history.") {
-    for {
-      overlaps <- overlapStatistics.values
-      overlap <- overlaps
-      digest = overlap.head.digest
-      ctorTime = overlap.map(_.ctorTime).min
-      dtorTime = overlap.map(_.dtorTime).max
-      size = overlap.head.measuredSizeInBytes
-      deepEqualsEstimate = overlap.head.deepEqualsEstimate
-    } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, deepEqualsEstimate)
-  };
+  if (!isSharingEnabled) {
+    /*
+     * Suggest optimistic heap history.
+     */
+    val replacements: GenIterable[ObjectLifetime] = time ("Suggest optimistic heap history.") {
+      for {
+        overlaps <- overlapStatistics.values
+        overlap <- overlaps
+        digest = overlap.head.digest
+        ctorTime = overlap.map(_.ctorTime).min
+        dtorTime = overlap.map(_.dtorTime).max
+        size = overlap.head.measuredSizeInBytes
+        deepEqualsEstimate = overlap.head.deepEqualsEstimate
+      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, deepEqualsEstimate)
+    };
 
-  /*
-   * There are hardly any differences in size. It's neglectable.
-   */
-  // for (overlaps <- overlapStatistics.values; overlap: GenSeq[ObjectLifetime] <- overlaps) {
-  //   val sizeSet = overlap.map(_.measuredSizeInBytes).toSet
-  //     if (sizeSet.size > 1)
-  //       println(sizeSet)
-  // }
+    /*
+     * There are hardly any differences in size. It's neglectable.
+     */
+    // for (overlaps <- overlapStatistics.values; overlap: GenSeq[ObjectLifetime] <- overlaps) {
+    //   val sizeSet = overlap.map(_.measuredSizeInBytes).toSet
+    //     if (sizeSet.size > 1)
+    //       println(sizeSet)
+    // }
 
-  assert (replacements.size == overlapStatistics.values.flatten.size)
+    assert (replacements.size == overlapStatistics.values.flatten.size)
 
-  val operlapsMin = overlapStatistics.values.flatten.flatten
-  val universeMin = (sortedUniverse.toSet union replacements.toSet) diff operlapsMin.toSet
+    val overlapsMin = overlapStatistics.values.flatten.flatten
+    val universeMin = (sortedUniverse.toSet union replacements.toSet) diff overlapsMin.toSet
 
-  {
-    val universeMinList = time("set to list") { universeMin.toVector }
-    val ctorMinSorted: Vector[ObjectLifetime] = time("ctorSorted") { universeMinList sortWith (_.ctorTime < _.ctorTime) }
-    val dtorMinSorted: Vector[ObjectLifetime] = time("dtorSorted") { universeMinList   filter (_.dtorTime.isDefined) sortWith (_.dtorTime.get < _.dtorTime.get) }
+    {
+      val universeMinList = time("set to list") { universeMin.toVector }
+      val ctorMinSorted: Vector[ObjectLifetime] = time("ctorSorted") { universeMinList sortWith (_.ctorTime < _.ctorTime) }
+      val dtorMinSorted: Vector[ObjectLifetime] = time("dtorSorted") { universeMinList   filter (_.dtorTime.isDefined) sortWith (_.dtorTime.get < _.dtorTime.get) }
 
-    time ("Project Heap Size [min]") {
-      projectProperty("heapSizes-min.dat", ctorMinSorted, dtorMinSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
-    }
+      time ("Project Heap Size [min]") {
+        projectProperty("heapSizes-min.dat", ctorMinSorted, dtorMinSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
+      }
 
-    time ("Project Object Count [min]") {
-      projectProperty("objectCount-min.dat", ctorMinSorted, dtorMinSorted, timestampRange, stepSize)(_ => 1)
-    }
+      time ("Project Object Count [min]") {
+        projectProperty("objectCount-min.dat", ctorMinSorted, dtorMinSorted, timestampRange, stepSize)(_ => 1)
+      }
 
-    // TODO: only execute when NOT running in shared mode
-    time ("Project equals/isEqual calls [internal]") {
-      val replacementsSorted = replacements.toVector sortWith (_.ctorTime < _.ctorTime)
+      // TODO: only execute when NOT running in shared mode
+      time ("Project equals/isEqual calls [internal]") {
+        val callWithCacheHit = overlapStatistics.values.flatten.map(_.tail).flatten
+          .toVector sortWith (_.ctorTime < _.ctorTime)
 
-      projectExpectedEqualsCall("equalCalls-est.dat", replacementsSorted, timestampRange, stepSize)
+        projectExpectedEqualsCall("equalCalls-est.dat", callWithCacheHit, timestampRange, stepSize)
+      }
     }
   }
+
 
   val equalsRelation: GenSeq[EqualsCall] = time("Deserialize equals relation from Google Protocol Buffers") {
     /*
@@ -269,13 +277,19 @@ object Tracr extends App {
 //
 //    }
 
-  time ("Project equals/isEqual calls [external]") {
-    projectEqualsProperty("equalCalls-ext.dat", equalsRelation filter { !_.isHashLookup }, timestampRange, stepSize)
-  }
+  if (isSharingEnabled) {
+    time ("Project equals/isEqual calls [external]") {
+      projectEqualsProperty("equalCalls-sha-ext.dat", equalsRelation filter { !_.isHashLookup }, timestampRange, stepSize)
+    }
 
-  // TODO: only execute when running in shared mode
-  time ("Project equals/isEqual calls [internal]") {
-    projectEqualsProperty("equalCalls-int.dat", equalsRelation filter { _.isHashLookup }, timestampRange, stepSize)
+    // TODO: only execute when running in shared mode
+    time ("Project equals/isEqual calls [internal]") {
+      projectEqualsProperty("equalCalls-sha-int.dat", equalsRelation filter { _.isHashLookup }, timestampRange, stepSize)
+    }
+  } else {
+    time ("Project equals/isEqual calls [external]") {
+      projectEqualsProperty("equalCalls-nom.dat", equalsRelation filter { !_.isHashLookup }, timestampRange, stepSize)
+    }
   }
 
   def projectEqualsProperty(filename: String, sortedRelation: GenSeq[EqualsCall], timestampRange: NumericRange[Long], stepSize: Long) {

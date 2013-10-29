@@ -2,63 +2,100 @@ setwd("~/Development/rascal-devel/tracr")
 
 ocNom <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
 ocMin <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
+ocSha <- read.csv("objectCount-sha.dat", sep=" ", header=FALSE)
 
 hsNom <- read.csv("heapSizes-nom.dat", sep=" ", header=FALSE)
 hsMin <- read.csv("heapSizes-min.dat", sep=" ", header=FALSE)
-# hsAvg <- c(hsMin$V1, hsMin$V2+(ocMin$V2*8)) # maximal sharing prognosis: min + 8 byte per hashtable record
-hsAvg <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*8)) # maximal sharing prognosis: min + 8 byte per hashtable record
-names(hsAvg) <- c('V1', 'V2')
+hsSha <- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
+# hsEst <- c(hsMin$V1, hsMin$V2+(ocMin$V2*8)) # maximal sharing prognosis: min + 8 byte per hashtable record
+hsEst <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*8)) # maximal sharing prognosis: min + 8 byte per hashtable record
+names(hsEst) <- c('V1', 'V2')
 
-diff <- (hsNom$V2-hsAvg$V2)
-perc <- (hsNom$V2-hsAvg$V2)*100/hsNom$V2
+#diff <- (hsNom$V2-hsEst$V2)
+percEst <- (hsNom$V2-hsEst$V2)*100/hsNom$V2
+percSha <- (hsNom$V2-hsSha$V2)*100/hsNom$V2
 
 #pdf("r-graph.pdf")
-par(mfrow=c(3,1))
+par(mfrow=c(2,2))
 
-plot(hsMin, type='n', ylim=range(hsNom$V2, hsMin$V2, hsAvg$V2))
+plot(hsMin, type='n', ylim=range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2))
 #par(new=T)
 lines(hsNom, col='green')
 lines(hsMin, col='blue', lty=3)
-lines(hsAvg, col='purple', lty=2)
+lines(hsEst, col='purple', lty=2)
+lines(hsSha, col='red)
 # add a title and subtitle 
 title("Heap Evolution")
 
 #plot(diff, type='l')
-max <- range(perc)
+max <- range(percEst, percSha)
 range <- range(-max, max)
-plot(perc, type='l', col='red', xlab='event counter', ylab='savings (in %)', ylim=range)
-abline(h=0, lty=3)
-#lmfit <- lm(perc ~ 1)
+plot(percEst, type='n', xlab='event counter', ylab='savings (in %)', ylim=range)
+lines(percEst, col='purple', lty=2)
+lines(percSha, col='red')
+abline(h=0)
+#lmfit <- lm(percEst ~ 1)
 #abline(lmfit)
 title("Memory Savings Prognosis (in %)")
 
 ###
 # Equal Calls
 ##
-eqCallsExt <- read.csv("equalCalls-ext.dat", sep=" ", header=FALSE)
-eqCallsInt <- read.csv("equalCalls-int.dat", sep=" ", header=FALSE)
+eqCallsShaExt <- read.csv("equalCalls-sha-ext.dat", sep=" ", header=FALSE)
+eqCallsShaInt <- read.csv("equalCalls-sha-int.dat", sep=" ", header=FALSE)
 
+eqCallsNom <- read.csv("equalCalls-nom.dat", sep=" ", header=FALSE)
 eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE)
 eqCallsEst <- data.frame(eqCallsTmp$V1, cumsum(eqCallsTmp$V2))
 names(eqCallsEst) <- c('V1', 'V2')
 
-plot(eqCallsExt$V3, ylim=range(eqCallsInt$V3,eqCallsExt$V3,eqCallsEst$V2), type='n')
+plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsShaExt$V7+eqCallsShaInt$V7), type='n')
 #par(new=T)
-lines(eqCallsExt$V3, col='green')                 # = ProgramEquals
-lines(eqCallsInt$V3, col='red')                   # = UniverseHashTableEquals (+MaxSharingForecastEquals?)
+lines(eqCallsNom$V3, col='green')                 # = ProgramEquals
 lines(eqCallsEst$V2, col='purple', lty=2)
-lines(eqCallsExt$V7, col='blue', lty=3)           # = MinAmount
-title("Equal Calls (Count)")
+lines(eqCallsNom$V7, col='blue', lty=3)           # = MinAmount
 
-#plot(eqCallsExt$V5, ylim=range(eqCallsInt$V5,eqCallsExt$V5), type='n')
+#lines(eqCallsShaInt$V7, col='red', lty=3)
+#lines(eqCallsShaExt$V7, col='red', lty=3)
+lines(eqCallsShaExt$V7+eqCallsShaInt$V7, col='red')
+title("Equal Calls Forecast (Count)")
+
+plot(eqCallsNom$V3, ylim=range(eqCallsShaExt$V7,eqCallsShaInt$V7), type='n')
+#par(new=T)
+lines(eqCallsShaInt$V7, col='red', lty=3)
+lines(eqCallsShaExt$V7, col='red', lty=3)
+#lines(eqCallsShaExt$V7+eqCallsShaInt$V7, col='red', lty=3)
+title("Equals in Maximal Sharing (Count)")
+
+
+
+
+eqPercEst <- (eqCallsNom$V7-eqCallsEst$V2)*100/eqCallsNom$V7
+eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
+ 
+# barplot(eqCallsNom$V7, eqCallsEst$V2, eqCallsShaInt$V7, eqCallsShaExt$V7)
+
+# #plot(diff, type='l')
+# max <- range(eqPercEst, eqPercSha)
+# range <- range(-max, max)
+# plot(eqPercEst, type='l', col='purple', xlab='event counter', ylab='savings (in %)', ylim=range)
+# lines(eqPercSha, col='red')
+# abline(h=0, lty=3)
+# #lmfit <- lm(percEst ~ 1)
+# #abline(lmfit)
+# title("Equal Call Savings Prognosis (in %)")
+
+
+#plot(eqCallsNom$V5, ylim=range(eqCallsInt$V5,eqCallsNom$V5), type='n')
 ##par(new=T)
-#lines(eqCallsExt$V5, col='green')
+#lines(eqCallsNom$V5, col='green')
 #lines(eqCallsInt$V5, col='red')
 #title("Equal Calls (Time)")
 
-#hist(eqCallsExt[,2])
+#hist(eqCallsNom[,2])
 #title("Equals Call Count per Deep Equals")
 
-#hist(eqCallsExt[,3]/1000000) # in ms
+#hist(eqCallsNom[,3]/1000000) # in ms
 #title("Equals Call Time per Deep Equals (ms)")
 #dev.off()
+
