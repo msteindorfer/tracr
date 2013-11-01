@@ -984,23 +984,39 @@ public final class TrackingProtocolBuffers {
   public interface EqualsRelationOrBuilder
       extends com.google.protobuf.MessageOrBuilder {
 
-    // required int64 tag1 = 1;
+    // optional int64 tag1 = 1;
     /**
-     * <code>required int64 tag1 = 1;</code>
+     * <code>optional int64 tag1 = 1;</code>
+     *
+     * <pre>
+     * used to be required
+     * </pre>
      */
     boolean hasTag1();
     /**
-     * <code>required int64 tag1 = 1;</code>
+     * <code>optional int64 tag1 = 1;</code>
+     *
+     * <pre>
+     * used to be required
+     * </pre>
      */
     long getTag1();
 
-    // required int64 tag2 = 2;
+    // optional int64 tag2 = 2;
     /**
-     * <code>required int64 tag2 = 2;</code>
+     * <code>optional int64 tag2 = 2;</code>
+     *
+     * <pre>
+     * used to be required	
+     * </pre>
      */
     boolean hasTag2();
     /**
-     * <code>required int64 tag2 = 2;</code>
+     * <code>optional int64 tag2 = 2;</code>
+     *
+     * <pre>
+     * used to be required	
+     * </pre>
      */
     long getTag2();
 
@@ -1188,33 +1204,49 @@ public final class TrackingProtocolBuffers {
     }
 
     private int bitField0_;
-    // required int64 tag1 = 1;
+    // optional int64 tag1 = 1;
     public static final int TAG1_FIELD_NUMBER = 1;
     private long tag1_;
     /**
-     * <code>required int64 tag1 = 1;</code>
+     * <code>optional int64 tag1 = 1;</code>
+     *
+     * <pre>
+     * used to be required
+     * </pre>
      */
     public boolean hasTag1() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
-     * <code>required int64 tag1 = 1;</code>
+     * <code>optional int64 tag1 = 1;</code>
+     *
+     * <pre>
+     * used to be required
+     * </pre>
      */
     public long getTag1() {
       return tag1_;
     }
 
-    // required int64 tag2 = 2;
+    // optional int64 tag2 = 2;
     public static final int TAG2_FIELD_NUMBER = 2;
     private long tag2_;
     /**
-     * <code>required int64 tag2 = 2;</code>
+     * <code>optional int64 tag2 = 2;</code>
+     *
+     * <pre>
+     * used to be required	
+     * </pre>
      */
     public boolean hasTag2() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
-     * <code>required int64 tag2 = 2;</code>
+     * <code>optional int64 tag2 = 2;</code>
+     *
+     * <pre>
+     * used to be required	
+     * </pre>
      */
     public long getTag2() {
       return tag2_;
@@ -1322,14 +1354,6 @@ public final class TrackingProtocolBuffers {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized != -1) return isInitialized == 1;
 
-      if (!hasTag1()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
-      if (!hasTag2()) {
-        memoizedIsInitialized = 0;
-        return false;
-      }
       if (!hasTimestamp()) {
         memoizedIsInitialized = 0;
         return false;
@@ -1627,14 +1651,6 @@ public final class TrackingProtocolBuffers {
       }
 
       public final boolean isInitialized() {
-        if (!hasTag1()) {
-          
-          return false;
-        }
-        if (!hasTag2()) {
-          
-          return false;
-        }
         if (!hasTimestamp()) {
           
           return false;
@@ -1661,22 +1677,34 @@ public final class TrackingProtocolBuffers {
       }
       private int bitField0_;
 
-      // required int64 tag1 = 1;
+      // optional int64 tag1 = 1;
       private long tag1_ ;
       /**
-       * <code>required int64 tag1 = 1;</code>
+       * <code>optional int64 tag1 = 1;</code>
+       *
+       * <pre>
+       * used to be required
+       * </pre>
        */
       public boolean hasTag1() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
-       * <code>required int64 tag1 = 1;</code>
+       * <code>optional int64 tag1 = 1;</code>
+       *
+       * <pre>
+       * used to be required
+       * </pre>
        */
       public long getTag1() {
         return tag1_;
       }
       /**
-       * <code>required int64 tag1 = 1;</code>
+       * <code>optional int64 tag1 = 1;</code>
+       *
+       * <pre>
+       * used to be required
+       * </pre>
        */
       public Builder setTag1(long value) {
         bitField0_ |= 0x00000001;
@@ -1685,7 +1713,11 @@ public final class TrackingProtocolBuffers {
         return this;
       }
       /**
-       * <code>required int64 tag1 = 1;</code>
+       * <code>optional int64 tag1 = 1;</code>
+       *
+       * <pre>
+       * used to be required
+       * </pre>
        */
       public Builder clearTag1() {
         bitField0_ = (bitField0_ & ~0x00000001);
@@ -1694,22 +1726,34 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // required int64 tag2 = 2;
+      // optional int64 tag2 = 2;
       private long tag2_ ;
       /**
-       * <code>required int64 tag2 = 2;</code>
+       * <code>optional int64 tag2 = 2;</code>
+       *
+       * <pre>
+       * used to be required	
+       * </pre>
        */
       public boolean hasTag2() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
-       * <code>required int64 tag2 = 2;</code>
+       * <code>optional int64 tag2 = 2;</code>
+       *
+       * <pre>
+       * used to be required	
+       * </pre>
        */
       public long getTag2() {
         return tag2_;
       }
       /**
-       * <code>required int64 tag2 = 2;</code>
+       * <code>optional int64 tag2 = 2;</code>
+       *
+       * <pre>
+       * used to be required	
+       * </pre>
        */
       public Builder setTag2(long value) {
         bitField0_ |= 0x00000002;
@@ -1718,7 +1762,11 @@ public final class TrackingProtocolBuffers {
         return this;
       }
       /**
-       * <code>required int64 tag2 = 2;</code>
+       * <code>optional int64 tag2 = 2;</code>
+       *
+       * <pre>
+       * used to be required	
+       * </pre>
        */
       public Builder clearTag2() {
         bitField0_ = (bitField0_ & ~0x00000002);
@@ -2672,7 +2720,7 @@ public final class TrackingProtocolBuffers {
       "me\030\003 \002(\003\022\020\n\010dtorTime\030\004 \001(\003\022\033\n\023measuredSi" +
       "zeInBytes\030\005 \001(\003\022\032\n\022deepEqualsEstimate\030\006 " +
       "\001(\005\022\031\n\021hashTableOverhead\030\007 \001(\003\"\212\001\n\016Equal" +
-      "sRelation\022\014\n\004tag1\030\001 \002(\003\022\014\n\004tag2\030\002 \002(\003\022\016\n" +
+      "sRelation\022\014\n\004tag1\030\001 \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016\n" +
       "\006result\030\003 \001(\010\022\021\n\tdeepCount\030\004 \001(\005\022\021\n\ttime" +
       "stamp\030\005 \002(\003\022\020\n\010deepTime\030\006 \001(\003\022\024\n\014isHashL" +
       "ookup\030\007 \001(\010\"8\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006di" +

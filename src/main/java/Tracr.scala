@@ -1,5 +1,6 @@
 import java.io._
 import java.nio.{ByteOrder, ByteBuffer}
+import java.util.zip.GZIPInputStream
 import org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers
 import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
@@ -25,7 +26,9 @@ object Tracr extends App {
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe-SingleElementSetJUnitBenchmark"
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values/target/universe"
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe"
-  val path = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/"
+  //  val path = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/"
+
+  val path = s"/Users/Michael/Development/rascal-devel/rascal-shell/target/_${if (isSharingEnabled) "b" else "a"}/"
 
   val tagMap: GenMap[Long, TagInfo] = time("Deserialize tag map from Google Protocol Buffers") {
     /*
@@ -34,7 +37,7 @@ object Tracr extends App {
     val tagMapBuilder = Map.newBuilder[Long, TagInfo]
 
     {
-      val protoInputStream = new FileInputStream(path + "_tag_map.bin")
+      val protoInputStream = new GZIPInputStream(new FileInputStream(path + "_tag_map.bin.gz"))
       try {
         while (true) {
           val proto = TrackingProtocolBuffers.TagMap.parseDelimitedFrom(protoInputStream)
@@ -87,7 +90,7 @@ object Tracr extends App {
     val universeBuilder = Vector.newBuilder[ObjectLifetime]
 
     {
-      val protoInputStream = new FileInputStream(path + "_allocation_relation.bin")
+      val protoInputStream = new GZIPInputStream(new FileInputStream(path + "_allocation_relation.bin.gz"))
       try {
         while (true) {
           val protoObjectLifetime = TrackingProtocolBuffers.ObjectLifetime.parseDelimitedFrom(protoInputStream)
@@ -114,14 +117,19 @@ object Tracr extends App {
     valueOverlapStatistics(sortedUniverse)
   }
 
-//  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
+  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
 //    println(s"${runs.length} runs for $digest")
-//
-//    for (run <- runs) {
+
+    for (run <- runs) {
 //      println("A RUN")
 //      run.foreach(println)
-//    }
-//  }
+
+      val sizes = run.map(_.measuredSizeInBytes).toSet
+      if (sizes.size > 1) {
+        println(s"${run.head.digest}, $sizes")
+      }
+    }
+  }
 
   /*
    * Replay heap size history.
@@ -144,7 +152,7 @@ object Tracr extends App {
   }
 
   val timestampRange = tsMin to tsMax
-  var stepSize = math.max(1, (timestampRange.size / (300 * 4 * 2.5)).toLong)
+  var stepSize  = math.max(1, (timestampRange.size / stepCount).toLong)
 
   {
     val universeList = time("set to list") { sortedUniverse.toVector }
@@ -233,7 +241,7 @@ object Tracr extends App {
     val equalsRelationBuilder = Vector.newBuilder[EqualsCall]
 
     {
-      val protoInputStream = new FileInputStream(path + "_equals_relation.bin")
+      val protoInputStream = new GZIPInputStream(new FileInputStream(path + "_equals_relation.bin.gz"))
       try {
         while (true) {
           val protoEqualsCall = TrackingProtocolBuffers.EqualsRelation.parseDelimitedFrom(protoInputStream)
@@ -319,6 +327,7 @@ object Tracr extends App {
       val writer = new BufferedWriter(new FileWriter(outputFile))
 
       var lastTimestamp = 0L;
+      var timestampCntr = 0L
       var stepCntr = 0L;
 
       var (sumCount, sumTime) = (BigInt(0), BigInt(0));
@@ -329,7 +338,7 @@ object Tracr extends App {
 
       for (timestamp <- timestampRange) {
         lastTimestamp = timestamp
-        stepCntr += 1
+        timestampCntr += 1
 
         summarized get timestamp match {
           case Some((count: Int, time: Long, size: Int)) => {
@@ -343,15 +352,16 @@ object Tracr extends App {
           case _ => ()
         }
 
-        if (stepCntr % stepSize == 0) {
+        if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
           writer.write(s"$timestamp ${sumCount} ${runningSumCount} ${sumTime} ${runningSumTime} ${sumSize} ${runningSumSize}"); writer.newLine
+          stepCntr += 1
           sumCount = BigInt(0)
           sumTime  = BigInt(0)
           sumSize  = BigInt(0)
         }
       }
 
-      if (stepCntr % stepSize != 0) {
+      if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
         writer.write(s"$lastTimestamp ${sumCount} ${runningSumCount} ${sumTime} ${runningSumTime} ${sumSize} ${runningSumSize}"); writer.newLine
       }
 
@@ -367,7 +377,7 @@ object Tracr extends App {
     var runningSumCount = BigInt(0)
 
     var lastTimestamp = 0L
-
+    var timestampCntr = 0L
     var stepCntr = 0L
 
     var ctorIdx = 0
@@ -378,7 +388,7 @@ object Tracr extends App {
 
       for (timestamp <- timestampRange) {
         lastTimestamp = timestamp
-        stepCntr += 1
+        timestampCntr += 1
 
         while (ctorIdx < ctorSorted.length && ctorSorted(ctorIdx).ctorTime <= timestamp) {
           val count = ctorSorted(ctorIdx).deepEqualsEstimate
@@ -389,13 +399,14 @@ object Tracr extends App {
           ctorIdx += 1
         }
 
-        if (stepCntr % stepSize == 0) {
+        if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
           writer.write(s"$timestamp ${sumCount}"); writer.newLine // ${runningSumCount}
+          stepCntr += 1
           sumCount = BigInt(0)
         }
       }
 
-      if (stepCntr % stepSize != 0) {
+      if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
         writer.write(s"$lastTimestamp ${sumCount}"); writer.newLine // ${runningSumCount}
       }
 
@@ -407,6 +418,8 @@ object Tracr extends App {
 }
 
 object TracrUtil {
+
+  val stepCount = (300 * 4 * 2.5).toLong
 
   def writePropertyHistory(filename: String, heapHistory: GenIterable[(Long, BigInt)]) {
     val outputFile = new File(filename)
@@ -485,7 +498,7 @@ object TracrUtil {
     var dtorSum = BigInt(0);
 
     var lastTimestamp = 0L;
-
+    var timestampCntr = 0L
     var stepCntr = 0L;
 
     time("Iterate and project") {
@@ -494,7 +507,7 @@ object TracrUtil {
 
       for (timestamp <- timestampRange) {
         lastTimestamp = timestamp
-        stepCntr += 1
+        timestampCntr += 1
 
         while (ctorIdx < ctorSorted.length && ctorSorted(ctorIdx).ctorTime <= timestamp) {
           ctorSum += accumulatorProperty(ctorSorted(ctorIdx))
@@ -511,12 +524,13 @@ object TracrUtil {
 
 //        println(s"deltSum: ${ctorSum - dtorSum}")
 
-        if (stepCntr % stepSize == 0) {
+        if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
           writer.write(s"$timestamp ${ctorSum - dtorSum}"); writer.newLine
+          stepCntr += 1
         }
       }
 
-      if (stepCntr % stepSize != 0) {
+      if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
         writer.write(s"$lastTimestamp ${ctorSum - dtorSum}"); writer.newLine
       }
 
@@ -551,7 +565,7 @@ object TracrUtil {
 
     var lastValue = 0L;
     var lastTimestamp = 0L;
-
+    var timestampCntr = 0L
     var stepCntr = 0L;
 
     time("Iterate and sample") {
@@ -560,19 +574,21 @@ object TracrUtil {
 
       for (timestamp <- timestampRange) {
         lastTimestamp = timestamp
-        stepCntr += 1
+        timestampCntr += 1
+
 
         while (idx < universeSorted.length && universeSorted(idx).ctorTime <= timestamp) {
           lastValue = sampleProperty(universeSorted(idx))
           idx += 1
         }
 
-        if (stepCntr % stepSize == 0) {
+        if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
           writer.write(s"$timestamp ${lastValue}"); writer.newLine
+          stepCntr += 1
         }
       }
 
-      if (stepCntr % stepSize != 0) {
+      if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
         writer.write(s"$lastTimestamp ${lastValue}"); writer.newLine
       }
 

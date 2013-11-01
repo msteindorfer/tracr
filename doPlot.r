@@ -23,12 +23,12 @@ percSha <- (hsNom$V2-hsSha$V2)*100/hsNom$V2
 #pdf("r-graph.pdf")
 par(mfrow=c(2,2))
 
-plot(hsMin, type='n', ylim=range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2))
+plot(hsMin$V2, type='n', ylim=range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2))
 #par(new=T)
-lines(hsNom, col='green')
-lines(hsMin, col='blue', lty=3)
-lines(hsEst, col='purple', lty=2)
-lines(hsSha, col='red') # TODO: add hashTableSizeSha
+lines(hsNom$V2, col='green')
+#lines(hsMin$V2, col='blue', lty=3)
+#lines(hsEst$V2, col='purple', lty=2)
+lines(hsSha$V2, col='red') # TODO: add hashTableSizeSha
 # add a title and subtitle 
 title("Heap Evolution")
 
@@ -36,7 +36,7 @@ title("Heap Evolution")
 max <- range(percEst, percSha)
 range <- range(-max, max)
 plot(percEst, type='n', xlab='event counter', ylab='savings (in %)', ylim=range)
-lines(percEst, col='purple', lty=2)
+#lines(percEst, col='purple', lty=2)
 lines(percSha, col='red')
 abline(h=0)
 #lmfit <- lm(percEst ~ 1)
