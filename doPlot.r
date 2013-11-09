@@ -25,21 +25,24 @@ xAxisPercentage <- function() {
   axis(1, x <- seq(from=0, to=3000, by=600), labels = paste(x*100/3000, "%", sep = ""))
 }
 
-#pdf("r-graph.pdf")
-par(mfrow=c(2,2))
+ 
+#par(mfrow=c(2,2))
 
-heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
-plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", yaxt = "n")
-#par(new=T)
+pdf("_heap-evolution.pdf")
+  heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
+  plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", xlab = "Program Progress", yaxt = "n", ylab = "Memory Usage")
+  #par(new=T)
+  
+  lines(hsNom$V2, col='green')
+  lines(hsMin$V2, col='blue', lty=3)
+  lines(hsEst$V2, col='purple', lty=2)
+  lines(hsSha$V2, col='red') # TODO: add hashTableSizeSha
+  # add a title and subtitle 
+  xAxisPercentage()
+  axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
+  title("Heap Evolution")
+dev.off()
 
-lines(hsNom$V2, col='green')
-lines(hsMin$V2, col='blue', lty=3)
-lines(hsEst$V2, col='purple', lty=2)
-lines(hsSha$V2, col='red') # TODO: add hashTableSizeSha
-# add a title and subtitle 
-xAxisPercentage()
-axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
-title("Heap Evolution")
 
 # plot(diff, type='l')
 max <- range(percEst, percSha)
@@ -64,28 +67,29 @@ eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE)
 eqCallsEst <- data.frame(eqCallsTmp$V1, cumsum(eqCallsTmp$V2) + eqCallsNom$V7)
 names(eqCallsEst) <- c('V1', 'V2')
 
-plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsShaExt$V3+eqCallsShaInt$V3), type='n', xaxt = "n")
-#par(new=T)
-xAxisPercentage()
-lines(eqCallsNom$V3, col='green')                 # = ProgramEquals
-lines(eqCallsEst$V2, col='purple', lty=2)
-lines(eqCallsNom$V7, col='blue', lty=3)           # = MinAmount
+pdf("_equal-calls.pdf")
+  plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsShaExt$V3+eqCallsShaInt$V3), type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
+  #par(new=T)
+  xAxisPercentage()
+  lines(eqCallsNom$V3, col='green')                 # = ProgramEquals
+  lines(eqCallsEst$V2, col='purple', lty=2)
+  lines(eqCallsNom$V7, col='blue', lty=3)           # = MinAmount
+  
+  #lines(eqCallsShaInt$V3, col='red', lty=3)
+  #lines(eqCallsShaExt$V3, col='red', lty=3)
+  lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red')
+  title("Equal Calls Evolution") # Forecast (Count)
+dev.off()
 
-#lines(eqCallsShaInt$V3, col='red', lty=3)
-#lines(eqCallsShaExt$V3, col='red', lty=3)
-lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red')
-title("Equal Calls Forecast (Count)")
-
-plot(eqCallsNom$V3, ylim=range(eqCallsShaExt$V3,eqCallsShaInt$V3), type='n', xaxt = "n")
-#par(new=T)
-xAxisPercentage()
-lines(eqCallsShaInt$V3, col='red', lty=3)
-lines(eqCallsShaExt$V3, col='red', lty=3)
-#lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red', lty=3)
-title("Equals in Maximal Sharing (Count)")
-
-
-
+#pdf("_equal-calls-maximal-sharing.pdf")
+  plot(eqCallsNom$V3, ylim=range(eqCallsShaExt$V3,eqCallsShaInt$V3), type='n', xaxt = "n")
+  #par(new=T)
+  xAxisPercentage()
+  lines(eqCallsShaInt$V3, col='red', lty=3)
+  lines(eqCallsShaExt$V3, col='red', lty=3)
+  #lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red', lty=3)
+  title("Equals in Maximal Sharing (Count)")
+#dev.off()
 
 eqPercEst <- (eqCallsNom$V7-eqCallsEst$V2)*100/eqCallsNom$V7
 eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
