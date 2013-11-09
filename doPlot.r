@@ -20,10 +20,15 @@ meanOverheadPerEntry <- mean((hashTableSizeSha/ocMin)$V2)
 percEst <- (hsNom$V2-hsEst$V2)*100/hsNom$V2
 percSha <- (hsNom$V2-hsSha$V2)*100/hsNom$V2
 
+# y-Axis percentage setup 
+xAxisPercentage <- function() {
+  axis(1, x <- seq(from=0, to=3000, by=600), labels = paste(x*100/3000, "%", sep = ""))
+}
+
 #pdf("r-graph.pdf")
 par(mfrow=c(2,2))
 
-heapEvo_yRange = range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
+heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
 plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", yaxt = "n")
 #par(new=T)
 
@@ -32,15 +37,16 @@ lines(hsMin$V2, col='blue', lty=3)
 lines(hsEst$V2, col='purple', lty=2)
 lines(hsSha$V2, col='red') # TODO: add hashTableSizeSha
 # add a title and subtitle 
-axis(1, x <- seq(from=0, to=3000, by=600), labels = paste(x*100/3000, "%", sep = ""))
+xAxisPercentage()
 axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
 title("Heap Evolution")
 
 # plot(diff, type='l')
 max <- range(percEst, percSha)
 range <- range(-max, max)
-plot(percEst, type='n', xlab='event counter', ylab='savings (in %)', ylim=range)
-#lines(percEst, col='purple', lty=2)
+plot(percEst, type='n', xlab='event counter', ylab='savings (in %)', ylim=range, xaxt = "n")
+xAxisPercentage()
+lines(percEst, col='purple', lty=2)
 lines(percSha, col='red')
 abline(h=0)
 #lmfit <- lm(percEst ~ 1)
@@ -58,8 +64,9 @@ eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE)
 eqCallsEst <- data.frame(eqCallsTmp$V1, cumsum(eqCallsTmp$V2) + eqCallsNom$V7)
 names(eqCallsEst) <- c('V1', 'V2')
 
-plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsShaExt$V3+eqCallsShaInt$V3), type='n')
+plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsShaExt$V3+eqCallsShaInt$V3), type='n', xaxt = "n")
 #par(new=T)
+xAxisPercentage()
 lines(eqCallsNom$V3, col='green')                 # = ProgramEquals
 lines(eqCallsEst$V2, col='purple', lty=2)
 lines(eqCallsNom$V7, col='blue', lty=3)           # = MinAmount
@@ -69,8 +76,9 @@ lines(eqCallsNom$V7, col='blue', lty=3)           # = MinAmount
 lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red')
 title("Equal Calls Forecast (Count)")
 
-plot(eqCallsNom$V3, ylim=range(eqCallsShaExt$V3,eqCallsShaInt$V3), type='n')
+plot(eqCallsNom$V3, ylim=range(eqCallsShaExt$V3,eqCallsShaInt$V3), type='n', xaxt = "n")
 #par(new=T)
+xAxisPercentage()
 lines(eqCallsShaInt$V3, col='red', lty=3)
 lines(eqCallsShaExt$V3, col='red', lty=3)
 #lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red', lty=3)
