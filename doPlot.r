@@ -23,13 +23,17 @@ percSha <- (hsNom$V2-hsSha$V2)*100/hsNom$V2
 #pdf("r-graph.pdf")
 par(mfrow=c(2,2))
 
-plot(hsMin$V2, type='n', ylim=range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2))
+heapEvo_yRange = range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
+plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", yaxt = "n")
 #par(new=T)
+
 lines(hsNom$V2, col='green')
-#lines(hsMin$V2, col='blue', lty=3)
-#lines(hsEst$V2, col='purple', lty=2)
+lines(hsMin$V2, col='blue', lty=3)
+lines(hsEst$V2, col='purple', lty=2)
 lines(hsSha$V2, col='red') # TODO: add hashTableSizeSha
 # add a title and subtitle 
+axis(1, x <- seq(from=0, to=3000, by=600), labels = paste(x*100/3000, "%", sep = ""))
+axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
 title("Heap Evolution")
 
 # plot(diff, type='l')
