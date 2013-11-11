@@ -25,7 +25,7 @@ xAxisPercentage <- function() {
   axis(1, x <- seq(from=0, to=3000, by=600), labels = paste(x*100/3000, "%", sep = ""))
 }
 
- 
+
 #par(mfrow=c(2,2))
 
 pdf("_heap-evolution.pdf")
@@ -120,3 +120,44 @@ eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
 #title("Equals Call Time per Deep Equals (ms)")
 #dev.off()
 
+
+### Create Overlap Statistic Plot
+pdf("_overlap-example.pdf")
+  plot(0, 0, xlim=range(0, 10), ylim=range(0,7), type = 'n', xaxt='n', xlab='Object Lifetime', ylab='Unique Object ID')
+  axis(1, at = seq(0, 10, by = 1))
+
+  xCoord1 = c(0, 3)
+  yCoord1 = c(1, 1)
+  lines(xCoord1, yCoord1, lwd=5)
+  xCoord2 = c(2, 6)
+  yCoord2 = c(2, 2)
+  lines(xCoord2, yCoord2, lwd=5)
+  xCoord3 = c(4, 5)
+  yCoord3 = c(3, 3)
+  lines(xCoord3, yCoord3, lwd=5)
+  xCoord4 = c(7, 9)
+  yCoord4 = c(4, 4)
+  lines(xCoord4, yCoord4, lwd=5)
+  xCoord5 = c(8, 10)
+  yCoord5 = c(5, 5)
+  lines(xCoord5, yCoord5, lwd=5)
+
+  xCoord6 = c(0, 6)
+  yCoord6 = c(6, 6)
+  lines(xCoord6, yCoord6, lwd=5, col='red')
+
+  xCoord7 = c(7, 10)
+  yCoord7 = c(7, 7)
+  lines(xCoord7, yCoord7, lwd=5, col='red')
+
+  overlapFingerprintLabel <- '04DA...9A22'
+  text((xCoord1[2] - xCoord1[1]) / 2 + xCoord1[1], yCoord1[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord2[2] - xCoord2[1]) / 2 + xCoord2[1], yCoord2[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord3[2] - xCoord3[1]) / 2 + xCoord3[1], yCoord3[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord4[2] - xCoord4[1]) / 2 + xCoord4[1], yCoord4[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord5[2] - xCoord5[1]) / 2 + xCoord5[1], yCoord5[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord6[2] - xCoord6[1]) / 2 + xCoord6[1], yCoord6[2], overlapFingerprintLabel, pos = 1, col = 'red')
+  text((xCoord7[2] - xCoord7[1]) / 2 + xCoord7[1], yCoord7[2], overlapFingerprintLabel, pos = 1, col = 'red')
+
+  grid(NULL, NA)
+dev.off()
