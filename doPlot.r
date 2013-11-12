@@ -9,7 +9,7 @@ hsMin <- read.csv("heapSizes-min.dat", sep=" ", header=FALSE)
 hsSha <- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
 # maximal sharing prognosis: min + 86 bytes per hashtable record
 # NOTE: 86 bytes was measured with measured on average for WeakHashMap(key, new WeakReference(key))
-hsEst <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*86))
+hsEst <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*42))
 names(hsEst) <- c('V1', 'V2')
 
 hashTableSizeSha <- read.csv("hashTableSize-sha.dat", sep=" ", header=FALSE)
@@ -34,9 +34,9 @@ pdf("_heap-evolution.pdf")
   #par(new=T)
   
   lines(hsNom$V2, col='green')
-  lines(hsMin$V2, col='blue', lty=3)
+  #lines(hsMin$V2, col='blue', lty=3)
   lines(hsEst$V2, col='purple', lty=2)
-  lines(hsSha$V2, col='red') # TODO: add hashTableSizeSha
+  #lines(hsSha$V2, col='red') # TODO: add hashTableSizeSha
   # add a title and subtitle 
   xAxisPercentage()
   axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
