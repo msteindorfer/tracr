@@ -9,7 +9,7 @@ hsNom     <- read.csv("heapSizes-nom.dat", sep=" ", header=FALSE)
 hsMin     <- read.csv("heapSizes-min.dat", sep=" ", header=FALSE)
 hsShaPure <- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
 # maximal sharing prognosis: min + bytesPerRecordOverhead
-bytesPerRecordOverhead <- 42
+bytesPerRecordOverhead <- 42 # TODO: solve(bytesPerRecordOverhead) to know max overhead per record to benefit
 #
 hsEst <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*bytesPerRecordOverhead))
 names(hsEst) <- c('V1', 'V2')
@@ -17,9 +17,6 @@ names(hsEst) <- c('V1', 'V2')
 hsSha <- data.frame(hsShaPure$V1, hsShaPure$V2+(ocShaMin$V2*bytesPerRecordOverhead))
 names(hsSha) <- c('V1', 'V2')
 
-hashTableSizeSha <- read.csv("hashTableSize-sha.dat", sep=" ", header=FALSE)
-
-meanOverheadPerEntry <- mean((hashTableSizeSha/ocMin)$V2)
 
 #diff <- (hsNom$V2-hsEst$V2)
 percEst <- (hsNom$V2-hsEst$V2)*100/hsNom$V2
@@ -41,7 +38,8 @@ pdf("_heap-evolution.pdf")
   lines(hsNom$V2, col='green')
   #lines(hsMin$V2, col='blue', lty=3)
   lines(hsEst$V2, col='purple', lty=2)
-  #lines(hsSha$V2, col='red') # TODO: add hashTableSizeSha
+  #lines(hsSha$V2, col='red')
+  #lines(hsShaPure$V2, col='red', lty=3)
   # add a title and subtitle 
   xAxisPercentage()
   axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
@@ -166,3 +164,11 @@ pdf("_overlap-example.pdf")
 
   grid(NULL, NA)
 dev.off()
+
+print("Summary:")
+
+print("Mean [Estimated Savings]")
+print(mean(percEst))
+
+print("Mean [Real Sharing Savings]")
+print(mean(percSha))
