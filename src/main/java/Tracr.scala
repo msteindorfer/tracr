@@ -6,7 +6,7 @@ import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
 import scala.Some
 
-case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, deepEqualsEstimate: Int, hashTableOverhead: Long) {
+case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, deepEqualsEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean) {
   require(ctorTime >= 0)
   require(!dtorTime.isDefined || dtorTime.get >= 0)
   require(measuredSizeInBytes >= 0)
@@ -28,6 +28,7 @@ object Tracr extends App {
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe"
   //  val path = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/"
 
+  // val path = s"/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/_${if (isSharingEnabled) "b" else "a"}/"
   val path = s"/Users/Michael/Development/rascal-devel/rascal-shell/target/_${if (isSharingEnabled) "b" else "a"}/"
 
   val tagMap: GenMap[Long, TagInfo] = time("Deserialize tag map from Google Protocol Buffers") {
@@ -102,8 +103,9 @@ object Tracr extends App {
           val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
           val deepEqualsEstimate = protoObjectLifetime.getDeepEqualsEstimate
           val hashTableOverhead = protoObjectLifetime.getHashTableOverhead
+          val isRedundant = false // protoObjectLifetime.getRedundant
 
-          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, deepEqualsEstimate, hashTableOverhead)
+          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, deepEqualsEstimate, hashTableOverhead, isRedundant)
         }
       } catch {
         case _: Exception => {}
@@ -178,6 +180,16 @@ object Tracr extends App {
         sampleProperty("hashTableSize-sha.dat", ctorSorted, timestampRange, stepSize)(_.hashTableOverhead)
       }
     }
+
+    /*
+     * Remove redundant, short-living, objects.
+     */
+    if (isSharingEnabled) {
+      time ("Project Object Size [sha-min]") {
+        projectProperty("objectCount-sha-min.dat", ctorSorted.filter(!_.isRedundant), dtorSorted.filter(!_.isRedundant), timestampRange, stepSize)(_ => 1)
+      }
+
+    }
   }
 
   if (!isSharingEnabled) {
@@ -193,7 +205,7 @@ object Tracr extends App {
         dtorTime = overlap.map(_.dtorTime).max
         size = overlap.head.measuredSizeInBytes
         deepEqualsEstimate = overlap.head.deepEqualsEstimate
-      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, deepEqualsEstimate, 0)
+      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, deepEqualsEstimate, 0, false)
     };
 
     /*

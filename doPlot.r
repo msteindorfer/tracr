@@ -1,16 +1,21 @@
 setwd("~/Development/rascal-devel/tracr")
 
-ocNom <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
-ocMin <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
-ocSha <- read.csv("objectCount-sha.dat", sep=" ", header=FALSE)
+ocNom    <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
+ocMin    <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
+ocSha    <- read.csv("objectCount-sha.dat", sep=" ", header=FALSE)
+ocShaMin <- read.csv("objectCount-sha-min.dat", sep=" ", header=FALSE)
 
-hsNom <- read.csv("heapSizes-nom.dat", sep=" ", header=FALSE)
-hsMin <- read.csv("heapSizes-min.dat", sep=" ", header=FALSE)
-hsSha <- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
-# maximal sharing prognosis: min + 86 bytes per hashtable record
-# NOTE: 86 bytes was measured with measured on average for WeakHashMap(key, new WeakReference(key))
-hsEst <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*42))
+hsNom     <- read.csv("heapSizes-nom.dat", sep=" ", header=FALSE)
+hsMin     <- read.csv("heapSizes-min.dat", sep=" ", header=FALSE)
+hsShaPure <- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
+# maximal sharing prognosis: min + bytesPerRecordOverhead
+bytesPerRecordOverhead <- 42
+#
+hsEst <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*bytesPerRecordOverhead))
 names(hsEst) <- c('V1', 'V2')
+#
+hsSha <- data.frame(hsShaPure$V1, hsShaPure$V2+(ocShaMin$V2*bytesPerRecordOverhead))
+names(hsSha) <- c('V1', 'V2')
 
 hashTableSizeSha <- read.csv("hashTableSize-sha.dat", sep=" ", header=FALSE)
 
@@ -26,7 +31,7 @@ xAxisPercentage <- function() {
 }
 
 
-#par(mfrow=c(2,2))
+par(mfrow=c(2,1))
 
 pdf("_heap-evolution.pdf")
   heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
