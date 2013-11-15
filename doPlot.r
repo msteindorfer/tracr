@@ -66,7 +66,7 @@ eqCallsShaExt <- read.csv("equalCalls-sha-ext.dat", sep=" ", header=FALSE)
 eqCallsShaInt <- read.csv("equalCalls-sha-int.dat", sep=" ", header=FALSE)
 
 eqCallsNom <- read.csv("equalCalls-nom.dat", sep=" ", header=FALSE)
-eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE)
+eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE) # = deepEqualsEstimate for all cache hits
 eqCallsEst <- data.frame(eqCallsTmp$V1, cumsum(eqCallsTmp$V2) + eqCallsNom$V7)
 names(eqCallsEst) <- c('V1', 'V2')
 
@@ -172,3 +172,15 @@ print(mean(percEst))
 
 print("Mean [Real Sharing Savings]")
 print(mean(percSha))
+
+print("Equal Calls [Count] in Program [removed]")
+print(sum(eqCallsNom$V2))
+
+print("Equal Calls [Time] in Program [removed]")
+print(round(sum(eqCallsNom$V4)/1000000, 2)); print("ms") # in milli-seconds
+
+print("Replaced by Reference Comparisions in Program [introduced]") # equals number of deep equals
+print(sum(eqCallsNom$V6))
+
+print("Average Number of Nested Equal Calls")
+print(round((sum(eqCallsNom$V2) / sum(eqCallsNom$V6)) - 1, digits=2))
