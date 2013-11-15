@@ -85,6 +85,16 @@ public final class TrackingProtocolBuffers {
      * <code>optional int64 hashTableOverhead = 7;</code>
      */
     long getHashTableOverhead();
+
+    // optional bool isRedundant = 8;
+    /**
+     * <code>optional bool isRedundant = 8;</code>
+     */
+    boolean hasIsRedundant();
+    /**
+     * <code>optional bool isRedundant = 8;</code>
+     */
+    boolean getIsRedundant();
   }
   /**
    * Protobuf type {@code ObjectLifetime}
@@ -170,6 +180,11 @@ public final class TrackingProtocolBuffers {
             case 56: {
               bitField0_ |= 0x00000040;
               hashTableOverhead_ = input.readInt64();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000080;
+              isRedundant_ = input.readBool();
               break;
             }
           }
@@ -351,6 +366,22 @@ public final class TrackingProtocolBuffers {
       return hashTableOverhead_;
     }
 
+    // optional bool isRedundant = 8;
+    public static final int ISREDUNDANT_FIELD_NUMBER = 8;
+    private boolean isRedundant_;
+    /**
+     * <code>optional bool isRedundant = 8;</code>
+     */
+    public boolean hasIsRedundant() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional bool isRedundant = 8;</code>
+     */
+    public boolean getIsRedundant() {
+      return isRedundant_;
+    }
+
     private void initFields() {
       tag_ = 0L;
       digest_ = "";
@@ -359,6 +390,7 @@ public final class TrackingProtocolBuffers {
       measuredSizeInBytes_ = 0L;
       deepEqualsEstimate_ = 0;
       hashTableOverhead_ = 0L;
+      isRedundant_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -401,6 +433,9 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeInt64(7, hashTableOverhead_);
       }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeBool(8, isRedundant_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -437,6 +472,10 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(7, hashTableOverhead_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(8, isRedundant_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -568,6 +607,8 @@ public final class TrackingProtocolBuffers {
         bitField0_ = (bitField0_ & ~0x00000020);
         hashTableOverhead_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000040);
+        isRedundant_ = false;
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -624,6 +665,10 @@ public final class TrackingProtocolBuffers {
           to_bitField0_ |= 0x00000040;
         }
         result.hashTableOverhead_ = hashTableOverhead_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.isRedundant_ = isRedundant_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -662,6 +707,9 @@ public final class TrackingProtocolBuffers {
         }
         if (other.hasHashTableOverhead()) {
           setHashTableOverhead(other.getHashTableOverhead());
+        }
+        if (other.hasIsRedundant()) {
+          setIsRedundant(other.getIsRedundant());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -966,6 +1014,39 @@ public final class TrackingProtocolBuffers {
       public Builder clearHashTableOverhead() {
         bitField0_ = (bitField0_ & ~0x00000040);
         hashTableOverhead_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      // optional bool isRedundant = 8;
+      private boolean isRedundant_ ;
+      /**
+       * <code>optional bool isRedundant = 8;</code>
+       */
+      public boolean hasIsRedundant() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional bool isRedundant = 8;</code>
+       */
+      public boolean getIsRedundant() {
+        return isRedundant_;
+      }
+      /**
+       * <code>optional bool isRedundant = 8;</code>
+       */
+      public Builder setIsRedundant(boolean value) {
+        bitField0_ |= 0x00000080;
+        isRedundant_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool isRedundant = 8;</code>
+       */
+      public Builder clearIsRedundant() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        isRedundant_ = false;
         onChanged();
         return this;
       }
@@ -2715,18 +2796,18 @@ public final class TrackingProtocolBuffers {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\024objectLifetime.proto\"\245\001\n\016ObjectLifetim" +
+      "\n\024objectLifetime.proto\"\272\001\n\016ObjectLifetim" +
       "e\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \001(\t\022\020\n\010ctorTi" +
       "me\030\003 \002(\003\022\020\n\010dtorTime\030\004 \001(\003\022\033\n\023measuredSi" +
       "zeInBytes\030\005 \001(\003\022\032\n\022deepEqualsEstimate\030\006 " +
-      "\001(\005\022\031\n\021hashTableOverhead\030\007 \001(\003\"\212\001\n\016Equal" +
-      "sRelation\022\014\n\004tag1\030\001 \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016\n" +
-      "\006result\030\003 \001(\010\022\021\n\tdeepCount\030\004 \001(\005\022\021\n\ttime" +
-      "stamp\030\005 \002(\003\022\020\n\010deepTime\030\006 \001(\003\022\024\n\014isHashL" +
-      "ookup\030\007 \001(\010\"8\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006di" +
-      "gest\030\002 \002(\t\022\021\n\tclassname\030\003 \001(\tB=\n\"org.ecl",
-      "ipse.imp.pdb.facts.trackingB\027TrackingPro" +
-      "tocolBuffers"
+      "\001(\005\022\031\n\021hashTableOverhead\030\007 \001(\003\022\023\n\013isRedu" +
+      "ndant\030\010 \001(\010\"\212\001\n\016EqualsRelation\022\014\n\004tag1\030\001" +
+      " \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016\n\006result\030\003 \001(\010\022\021\n\tde" +
+      "epCount\030\004 \001(\005\022\021\n\ttimestamp\030\005 \002(\003\022\020\n\010deep" +
+      "Time\030\006 \001(\003\022\024\n\014isHashLookup\030\007 \001(\010\"8\n\006TagM" +
+      "ap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\021\n\tclass",
+      "name\030\003 \001(\tB=\n\"org.eclipse.imp.pdb.facts." +
+      "trackingB\027TrackingProtocolBuffers"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2738,7 +2819,7 @@ public final class TrackingProtocolBuffers {
           internal_static_ObjectLifetime_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ObjectLifetime_descriptor,
-              new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "DeepEqualsEstimate", "HashTableOverhead", });
+              new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "DeepEqualsEstimate", "HashTableOverhead", "IsRedundant", });
           internal_static_EqualsRelation_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_EqualsRelation_fieldAccessorTable = new

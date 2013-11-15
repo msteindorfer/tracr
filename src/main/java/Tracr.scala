@@ -103,7 +103,7 @@ object Tracr extends App {
           val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
           val deepEqualsEstimate = protoObjectLifetime.getDeepEqualsEstimate
           val hashTableOverhead = protoObjectLifetime.getHashTableOverhead
-          val isRedundant = false // protoObjectLifetime.getRedundant
+          val isRedundant = protoObjectLifetime.getIsRedundant
 
           universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, deepEqualsEstimate, hashTableOverhead, isRedundant)
         }
