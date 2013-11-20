@@ -67,16 +67,17 @@ eqCallsShaExt <- read.csv("equalCalls-sha-ext.dat", sep=" ", header=FALSE)
 eqCallsShaInt <- read.csv("equalCalls-sha-int.dat", sep=" ", header=FALSE)
 
 eqCallsNom <- read.csv("equalCalls-nom.dat", sep=" ", header=FALSE)
-eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE) # = deepEqualsEstimate for all cache hits
-eqCallsEst <- data.frame(eqCallsTmp$V1, cumsum(eqCallsTmp$V2) + eqCallsNom$V7)
-names(eqCallsEst) <- c('V1', 'V2')
+eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE) # = deepEqualsEstimate, shallowEqualsEstimate for all cache hits
+eqCallsEst <- data.frame(eqCallsTmp$V1, cumsum(eqCallsTmp$V2) + eqCallsNom$V7, cumsum(eqCallsTmp$V3) + eqCallsNom$V7) 
+names(eqCallsEst) <- c('V1', 'V2', 'V3')
 
 pdf("_equal-calls.pdf")
-  plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsShaExt$V3+eqCallsShaInt$V3), type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
+  plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsEst$V3,eqCallsShaExt$V3+eqCallsShaInt$V3), type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
   #par(new=T)
   xAxisPercentage()
   lines(eqCallsNom$V3, col='green')                 # = ProgramEquals
   lines(eqCallsEst$V2, col='purple', lty=2)
+  lines(eqCallsEst$V3, col='purple', lty=2)
   lines(eqCallsNom$V7, col='blue', lty=3)           # = MinAmount
   
   #lines(eqCallsShaInt$V3, col='red', lty=3)
@@ -182,6 +183,9 @@ print(round(sum(eqCallsNom$V4)/1000000, 2)); print("ms") # in milli-seconds
 
 print("Replaced by Reference Comparisions in Program [introduced]") # equals number of deep equals
 print(sum(eqCallsNom$V6))
+
+print("Equal Calls [Count] in HashTable [introduced]")
+print(sum(eqCallsShaInt$V2))
 
 print("Average Number of Nested Equal Calls")
 print(round((sum(eqCallsNom$V2) / sum(eqCallsNom$V6)) - 1, digits=2))

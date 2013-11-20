@@ -386,7 +386,8 @@ object Tracr extends App {
    */
   def projectExpectedEqualsCall(filename: String, ctorSorted: Vector[ObjectLifetime], timestampRange: NumericRange[Long], stepSize: Long) {
     var sumCount = BigInt(0)
-    var runningSumCount = BigInt(0)
+//    var runningSumCount = BigInt(0)
+    var sumSize = BigInt(0)
 
     var lastTimestamp = 0L
     var timestampCntr = 0L
@@ -406,20 +407,22 @@ object Tracr extends App {
           val count = ctorSorted(ctorIdx).deepEqualsEstimate
 
           sumCount += count
-          runningSumCount += count
+//          runningSumCount += count
+          sumSize += 1
 
           ctorIdx += 1
         }
 
         if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
-          writer.write(s"$timestamp ${sumCount}"); writer.newLine // ${runningSumCount}
+          writer.write(s"$timestamp ${sumCount} ${sumSize}"); writer.newLine // ${runningSumCount}
           stepCntr += 1
           sumCount = BigInt(0)
+          sumSize  = BigInt(0)
         }
       }
 
       if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
-        writer.write(s"$lastTimestamp ${sumCount}"); writer.newLine // ${runningSumCount}
+        writer.write(s"$lastTimestamp ${sumCount} ${sumSize}"); writer.newLine // ${runningSumCount}
       }
 
       writer.flush
