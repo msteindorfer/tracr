@@ -6,13 +6,13 @@ import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
 import scala.Some
 
-case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, deepEqualsEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean) {
+case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean) {
   require(ctorTime >= 0)
   require(!dtorTime.isDefined || dtorTime.get >= 0)
   require(measuredSizeInBytes >= 0)
 }
 
-case class EqualsCall(tag1: Long, tag2: Long, result: Boolean, deepCount: Int, deepTime: Long, timestamp: Long, isHashLookup: Boolean)
+case class EqualsCall(tag1: Long, tag2: Long, result: Boolean, deepCount: Int, deepTime: Long, deepReferenceEqualityCount: Int, timestamp: Long, isHashLookup: Boolean)
 case class TagInfo(digest: String, classname: String)
 
 object Tracr extends App {
@@ -101,11 +101,11 @@ object Tracr extends App {
           val ctorTime = protoObjectLifetime.getCtorTime
           val dtorTime = objectFreeMap.get(tag)
           val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
-          val deepEqualsEstimate = protoObjectLifetime.getDeepEqualsEstimate
+          val recursiveReferenceEqualitiesEstimate = protoObjectLifetime.getRecursiveReferenceEqualitiesEstimate
           val hashTableOverhead = protoObjectLifetime.getHashTableOverhead
           val isRedundant = protoObjectLifetime.getIsRedundant
 
-          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, deepEqualsEstimate, hashTableOverhead, isRedundant)
+          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, recursiveReferenceEqualitiesEstimate, hashTableOverhead, isRedundant)
         }
       } catch {
         case _: Exception => {}
@@ -204,7 +204,7 @@ object Tracr extends App {
         ctorTime = overlap.map(_.ctorTime).min
         dtorTime = overlap.map(_.dtorTime).max
         size = overlap.head.measuredSizeInBytes
-        deepEqualsEstimate = overlap.head.deepEqualsEstimate
+        deepEqualsEstimate = overlap.head.recursiveReferenceEqualitiesEstimate
       } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, deepEqualsEstimate, 0, false)
     };
 
@@ -264,6 +264,7 @@ object Tracr extends App {
             protoEqualsCall.getResult,
             protoEqualsCall.getDeepCount,
             protoEqualsCall.getDeepTime,
+            protoEqualsCall.getDeepReferenceEqualityCount,
             protoEqualsCall.getTimestamp,
             protoEqualsCall.getIsHashLookup
           )
@@ -324,70 +325,77 @@ object Tracr extends App {
   }
 
   def projectEqualsProperty(filename: String, sortedRelation: GenSeq[EqualsCall], timestampRange: NumericRange[Long], stepSize: Long) {
-      val summarized = sortedRelation.groupBy(_.timestamp).mapValues {
-        case callsByTimestamp => {
-          val sumCount = callsByTimestamp.map(_.deepCount).sum
-          val sumTime  = callsByTimestamp.map(_.deepTime ).sum
-          val size     = callsByTimestamp.size
-//          println(callsByTimestamp)
-//          println((sumCount, sumTime, size))
-          (sumCount, sumTime, size)
-        }
+    /*
+     * The following shapes of equals/== are expected:
+     * * recursiveEquals == 0 && recursiveReferenceEqualities == 1
+     * * recursiveEquals >  0 && recursiveReferenceEqualities >= 0
+     */
+    val summarized = sortedRelation.groupBy(_.timestamp).mapValues {
+      case callsByTimestamp => {
+        val sumRecursiveEquals              = callsByTimestamp.map(_.deepCount).sum
+        val sumRecursiveReferenceEqualities = callsByTimestamp.map(_.deepReferenceEqualityCount).sum
+
+        val sumRootEquals                   = callsByTimestamp.filter(_.deepCount != 0).size
+        val sumRootReferenceEqualities      = callsByTimestamp.filter(_.deepCount == 0).size
+
+        (sumRootEquals, sumRecursiveEquals, sumRootReferenceEqualities, sumRecursiveReferenceEqualities)
       }
-
-      val outputFile = new File(filename)
-      val writer = new BufferedWriter(new FileWriter(outputFile))
-
-      var lastTimestamp = 0L;
-      var timestampCntr = 0L
-      var stepCntr = 0L;
-
-      var (sumCount, sumTime) = (BigInt(0), BigInt(0));
-      var (runningSumCount, runningSumTime) = (BigInt(0), BigInt(0));
-
-      var sumSize = BigInt(0)
-      var runningSumSize = BigInt(0)
-
-      for (timestamp <- timestampRange) {
-        lastTimestamp = timestamp
-        timestampCntr += 1
-
-        summarized get timestamp match {
-          case Some((count: Int, time: Long, size: Int)) => {
-            sumCount += count
-            sumTime += time
-            sumSize += size
-            runningSumCount += count
-            runningSumTime += time
-            runningSumSize += size
-          }
-          case _ => ()
-        }
-
-        if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
-          writer.write(s"$timestamp ${sumCount} ${runningSumCount} ${sumTime} ${runningSumTime} ${sumSize} ${runningSumSize}"); writer.newLine
-          stepCntr += 1
-          sumCount = BigInt(0)
-          sumTime  = BigInt(0)
-          sumSize  = BigInt(0)
-        }
-      }
-
-      if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
-        writer.write(s"$lastTimestamp ${sumCount} ${runningSumCount} ${sumTime} ${runningSumTime} ${sumSize} ${runningSumSize}"); writer.newLine
-      }
-
-      writer.flush
-      writer.close
     }
+
+    val outputFile = new File(filename)
+    val writer = new BufferedWriter(new FileWriter(outputFile))
+
+    var lastTimestamp = 0L;
+    var timestampCntr = 0L
+    var stepCntr = 0L;
+
+    var (sumRootEquals, sumRecursiveEquals) = (BigInt(0), BigInt(0));
+    var (sumRootReferenceEqualities, sumRecursiveReferenceEqualities) = (BigInt(0), BigInt(0));
+
+    for (timestamp <- timestampRange) {
+      lastTimestamp = timestamp
+      timestampCntr += 1
+
+      summarized get timestamp match {
+        case Some((tmpRootEquals, tmpRecursiveEquals, tmpRootReferenceEqualities, tmpRecursiveReferenceEqualities)) => {
+          sumRootEquals += tmpRootEquals
+          sumRecursiveEquals += tmpRecursiveEquals
+
+          sumRootReferenceEqualities += tmpRootReferenceEqualities
+          sumRecursiveReferenceEqualities += tmpRecursiveReferenceEqualities
+        }
+        case _ => ()
+      }
+
+      if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
+        writer.write(s"$timestamp $sumRootEquals $sumRecursiveEquals $sumRootReferenceEqualities $sumRecursiveReferenceEqualities")
+        writer.newLine
+
+        stepCntr += 1
+
+        // reset sums
+        sumRootEquals = BigInt(0)
+        sumRecursiveEquals = BigInt(0)
+        sumRootReferenceEqualities = BigInt(0)
+        sumRecursiveReferenceEqualities = BigInt(0)
+      }
+    }
+
+    if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
+      writer.write(s"$lastTimestamp $sumRootEquals $sumRecursiveEquals $sumRootReferenceEqualities $sumRecursiveReferenceEqualities")
+      writer.newLine
+    }
+
+    writer.flush
+    writer.close
+  }
 
   /*
    * Note: Does not print begin of data, first print is first accumulation.
    */
   def projectExpectedEqualsCall(filename: String, ctorSorted: Vector[ObjectLifetime], timestampRange: NumericRange[Long], stepSize: Long) {
-    var sumCount = BigInt(0)
-//    var runningSumCount = BigInt(0)
-    var sumSize = BigInt(0)
+    var sumRecursiveEquals = BigInt(0)
+    var sumRecursiveReferenceEqualities = BigInt(0)
 
     var lastTimestamp = 0L
     var timestampCntr = 0L
@@ -404,25 +412,29 @@ object Tracr extends App {
         timestampCntr += 1
 
         while (ctorIdx < ctorSorted.length && ctorSorted(ctorIdx).ctorTime <= timestamp) {
-          val count = ctorSorted(ctorIdx).deepEqualsEstimate
+          val count = ctorSorted(ctorIdx).recursiveReferenceEqualitiesEstimate
 
-          sumCount += count
-//          runningSumCount += count
-          sumSize += 1
+          sumRecursiveEquals += 1
+          sumRecursiveReferenceEqualities += count
 
           ctorIdx += 1
         }
 
         if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
-          writer.write(s"$timestamp ${sumCount} ${sumSize}"); writer.newLine // ${runningSumCount}
+          writer.write(s"$timestamp ${sumRecursiveEquals} ${sumRecursiveReferenceEqualities}")
+          writer.newLine
+
           stepCntr += 1
-          sumCount = BigInt(0)
-          sumSize  = BigInt(0)
+
+          // reset sums
+          sumRecursiveEquals = BigInt(0)
+          sumRecursiveReferenceEqualities = BigInt(0)
         }
       }
 
       if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
-        writer.write(s"$lastTimestamp ${sumCount} ${sumSize}"); writer.newLine // ${runningSumCount}
+        writer.write(s"$lastTimestamp ${sumRecursiveEquals} ${sumRecursiveReferenceEqualities}")
+        writer.newLine
       }
 
       writer.flush

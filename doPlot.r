@@ -64,36 +64,47 @@ dev.off()
 # Equal Calls
 ##
 eqCallsShaExt <- read.csv("equalCalls-sha-ext.dat", sep=" ", header=FALSE)
+names(eqCallsShaExt) <- c('timestamp', 'rootEquals', 'recursiveEquals', 'rootReferenceEqualities',  'recursiveReferenceEqualities')
 eqCallsShaInt <- read.csv("equalCalls-sha-int.dat", sep=" ", header=FALSE)
+names(eqCallsShaInt) <- c('timestamp', 'rootEquals', 'recursiveEquals', 'rootReferenceEqualities',  'recursiveReferenceEqualities')
 
 eqCallsNom <- read.csv("equalCalls-nom.dat", sep=" ", header=FALSE)
-eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE) # = deepEqualsEstimate, shallowEqualsEstimate for all cache hits
-eqCallsEst <- data.frame(eqCallsTmp$V1, cumsum(eqCallsTmp$V2) + eqCallsNom$V7, cumsum(eqCallsTmp$V3) + eqCallsNom$V7) 
-names(eqCallsEst) <- c('V1', 'V2', 'V3')
+names(eqCallsNom) <- c('timestamp', 'rootEquals', 'recursiveEquals', 'rootReferenceEqualities',  'recursiveReferenceEqualities')
 
-pdf("_equal-calls.pdf")
-  plot(eqCallsNom$V3, ylim=range(eqCallsNom$V3,eqCallsEst$V2,eqCallsEst$V3,eqCallsShaExt$V3+eqCallsShaInt$V3), type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
+# data for all cache hits
+eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE)
+names(eqCallsTmp) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEqualities')
+# do estimation
+eqCallsEst <- data.frame(eqCallsTmp$timestamp, 
+                         eqCallsTmp$recursiveEquals, 
+                         eqCallsTmp$recursiveReferenceEqualities + eqCallsNom$rootEquals)
+names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEqualities')
+
+#pdf("_equal-calls.pdf")
+  plot(cumsum(eqCallsNom$recursiveEquals), 
+       ylim = range(cumsum(eqCallsNom$recursiveEquals),
+                    cumsum(eqCallsEst$recursiveEquals),
+                    cumsum(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals)), 
+       type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
   #par(new=T)
   xAxisPercentage()
-  lines(eqCallsNom$V3, col='green')                 # = ProgramEquals
-  lines(eqCallsEst$V2, col='purple', lty=2)
-  lines(eqCallsEst$V3, col='purple', lty=2)
-  lines(eqCallsNom$V7, col='blue', lty=3)           # = MinAmount
-  
-  #lines(eqCallsShaInt$V3, col='red', lty=3)
-  #lines(eqCallsShaExt$V3, col='red', lty=3)
-  lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red')
+  lines(cumsum(eqCallsNom$recursiveEquals), col='green')
+  lines(cumsum(eqCallsEst$recursiveEquals), col='purple', lty=2)
+  lines(cumsum(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), col='red')
   title("Equal Calls Evolution") # Forecast (Count)
-dev.off()
+#dev.off()
 
-#pdf("_equal-calls-maximal-sharing.pdf")
-  plot(eqCallsNom$V3, ylim=range(eqCallsShaExt$V3,eqCallsShaInt$V3), type='n', xaxt = "n")
-  #par(new=T)
+#pdf("reference-equality-calls.pdf")
+plot(cumsum(eqCallsNom$recursiveEquals), 
+     ylim = range(cumsum(eqCallsEst$recursiveReferenceEqualities),
+                  cumsum(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities)), 
+     type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Reference Equality Checks")
+#par(new=T)
   xAxisPercentage()
-  lines(eqCallsShaInt$V3, col='red', lty=3)
-  lines(eqCallsShaExt$V3, col='red', lty=3)
-  #lines(eqCallsShaExt$V3+eqCallsShaInt$V3, col='red', lty=3)
-  title("Equals in Maximal Sharing (Count)")
+  lines(cumsum(eqCallsEst$recursiveReferenceEqualities), col='purple', lty=2)
+  lines(cumsum(eqCallsTmp$recursiveReferenceEqualities), col='purple', lty=2)
+  lines(cumsum(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities), col='red')
+  title("Reference Equality Evolution") # Forecast (Count)
 #dev.off()
 
 eqPercEst <- (eqCallsNom$V7-eqCallsEst$V2)*100/eqCallsNom$V7

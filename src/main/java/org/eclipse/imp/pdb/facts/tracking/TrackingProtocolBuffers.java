@@ -66,15 +66,15 @@ public final class TrackingProtocolBuffers {
      */
     long getMeasuredSizeInBytes();
 
-    // optional int32 deepEqualsEstimate = 6;
+    // optional int32 recursiveReferenceEqualitiesEstimate = 6;
     /**
-     * <code>optional int32 deepEqualsEstimate = 6;</code>
+     * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
      */
-    boolean hasDeepEqualsEstimate();
+    boolean hasRecursiveReferenceEqualitiesEstimate();
     /**
-     * <code>optional int32 deepEqualsEstimate = 6;</code>
+     * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
      */
-    int getDeepEqualsEstimate();
+    int getRecursiveReferenceEqualitiesEstimate();
 
     // optional int64 hashTableOverhead = 7;
     /**
@@ -95,6 +95,16 @@ public final class TrackingProtocolBuffers {
      * <code>optional bool isRedundant = 8;</code>
      */
     boolean getIsRedundant();
+
+    // optional int32 deepReferenceEqualityEstimate = 9;
+    /**
+     * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
+     */
+    boolean hasDeepReferenceEqualityEstimate();
+    /**
+     * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
+     */
+    int getDeepReferenceEqualityEstimate();
   }
   /**
    * Protobuf type {@code ObjectLifetime}
@@ -174,7 +184,7 @@ public final class TrackingProtocolBuffers {
             }
             case 48: {
               bitField0_ |= 0x00000020;
-              deepEqualsEstimate_ = input.readInt32();
+              recursiveReferenceEqualitiesEstimate_ = input.readInt32();
               break;
             }
             case 56: {
@@ -185,6 +195,11 @@ public final class TrackingProtocolBuffers {
             case 64: {
               bitField0_ |= 0x00000080;
               isRedundant_ = input.readBool();
+              break;
+            }
+            case 72: {
+              bitField0_ |= 0x00000100;
+              deepReferenceEqualityEstimate_ = input.readInt32();
               break;
             }
           }
@@ -334,20 +349,20 @@ public final class TrackingProtocolBuffers {
       return measuredSizeInBytes_;
     }
 
-    // optional int32 deepEqualsEstimate = 6;
-    public static final int DEEPEQUALSESTIMATE_FIELD_NUMBER = 6;
-    private int deepEqualsEstimate_;
+    // optional int32 recursiveReferenceEqualitiesEstimate = 6;
+    public static final int RECURSIVEREFERENCEEQUALITIESESTIMATE_FIELD_NUMBER = 6;
+    private int recursiveReferenceEqualitiesEstimate_;
     /**
-     * <code>optional int32 deepEqualsEstimate = 6;</code>
+     * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
      */
-    public boolean hasDeepEqualsEstimate() {
+    public boolean hasRecursiveReferenceEqualitiesEstimate() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
-     * <code>optional int32 deepEqualsEstimate = 6;</code>
+     * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
      */
-    public int getDeepEqualsEstimate() {
-      return deepEqualsEstimate_;
+    public int getRecursiveReferenceEqualitiesEstimate() {
+      return recursiveReferenceEqualitiesEstimate_;
     }
 
     // optional int64 hashTableOverhead = 7;
@@ -382,15 +397,32 @@ public final class TrackingProtocolBuffers {
       return isRedundant_;
     }
 
+    // optional int32 deepReferenceEqualityEstimate = 9;
+    public static final int DEEPREFERENCEEQUALITYESTIMATE_FIELD_NUMBER = 9;
+    private int deepReferenceEqualityEstimate_;
+    /**
+     * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
+     */
+    public boolean hasDeepReferenceEqualityEstimate() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
+     */
+    public int getDeepReferenceEqualityEstimate() {
+      return deepReferenceEqualityEstimate_;
+    }
+
     private void initFields() {
       tag_ = 0L;
       digest_ = "";
       ctorTime_ = 0L;
       dtorTime_ = 0L;
       measuredSizeInBytes_ = 0L;
-      deepEqualsEstimate_ = 0;
+      recursiveReferenceEqualitiesEstimate_ = 0;
       hashTableOverhead_ = 0L;
       isRedundant_ = false;
+      deepReferenceEqualityEstimate_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -428,13 +460,16 @@ public final class TrackingProtocolBuffers {
         output.writeInt64(5, measuredSizeInBytes_);
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
-        output.writeInt32(6, deepEqualsEstimate_);
+        output.writeInt32(6, recursiveReferenceEqualitiesEstimate_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeInt64(7, hashTableOverhead_);
       }
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeBool(8, isRedundant_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeInt32(9, deepReferenceEqualityEstimate_);
       }
       getUnknownFields().writeTo(output);
     }
@@ -467,7 +502,7 @@ public final class TrackingProtocolBuffers {
       }
       if (((bitField0_ & 0x00000020) == 0x00000020)) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(6, deepEqualsEstimate_);
+          .computeInt32Size(6, recursiveReferenceEqualitiesEstimate_);
       }
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
@@ -476,6 +511,10 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(8, isRedundant_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(9, deepReferenceEqualityEstimate_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -603,12 +642,14 @@ public final class TrackingProtocolBuffers {
         bitField0_ = (bitField0_ & ~0x00000008);
         measuredSizeInBytes_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000010);
-        deepEqualsEstimate_ = 0;
+        recursiveReferenceEqualitiesEstimate_ = 0;
         bitField0_ = (bitField0_ & ~0x00000020);
         hashTableOverhead_ = 0L;
         bitField0_ = (bitField0_ & ~0x00000040);
         isRedundant_ = false;
         bitField0_ = (bitField0_ & ~0x00000080);
+        deepReferenceEqualityEstimate_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -660,7 +701,7 @@ public final class TrackingProtocolBuffers {
         if (((from_bitField0_ & 0x00000020) == 0x00000020)) {
           to_bitField0_ |= 0x00000020;
         }
-        result.deepEqualsEstimate_ = deepEqualsEstimate_;
+        result.recursiveReferenceEqualitiesEstimate_ = recursiveReferenceEqualitiesEstimate_;
         if (((from_bitField0_ & 0x00000040) == 0x00000040)) {
           to_bitField0_ |= 0x00000040;
         }
@@ -669,6 +710,10 @@ public final class TrackingProtocolBuffers {
           to_bitField0_ |= 0x00000080;
         }
         result.isRedundant_ = isRedundant_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.deepReferenceEqualityEstimate_ = deepReferenceEqualityEstimate_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -702,14 +747,17 @@ public final class TrackingProtocolBuffers {
         if (other.hasMeasuredSizeInBytes()) {
           setMeasuredSizeInBytes(other.getMeasuredSizeInBytes());
         }
-        if (other.hasDeepEqualsEstimate()) {
-          setDeepEqualsEstimate(other.getDeepEqualsEstimate());
+        if (other.hasRecursiveReferenceEqualitiesEstimate()) {
+          setRecursiveReferenceEqualitiesEstimate(other.getRecursiveReferenceEqualitiesEstimate());
         }
         if (other.hasHashTableOverhead()) {
           setHashTableOverhead(other.getHashTableOverhead());
         }
         if (other.hasIsRedundant()) {
           setIsRedundant(other.getIsRedundant());
+        }
+        if (other.hasDeepReferenceEqualityEstimate()) {
+          setDeepReferenceEqualityEstimate(other.getDeepReferenceEqualityEstimate());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -952,35 +1000,35 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int32 deepEqualsEstimate = 6;
-      private int deepEqualsEstimate_ ;
+      // optional int32 recursiveReferenceEqualitiesEstimate = 6;
+      private int recursiveReferenceEqualitiesEstimate_ ;
       /**
-       * <code>optional int32 deepEqualsEstimate = 6;</code>
+       * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
        */
-      public boolean hasDeepEqualsEstimate() {
+      public boolean hasRecursiveReferenceEqualitiesEstimate() {
         return ((bitField0_ & 0x00000020) == 0x00000020);
       }
       /**
-       * <code>optional int32 deepEqualsEstimate = 6;</code>
+       * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
        */
-      public int getDeepEqualsEstimate() {
-        return deepEqualsEstimate_;
+      public int getRecursiveReferenceEqualitiesEstimate() {
+        return recursiveReferenceEqualitiesEstimate_;
       }
       /**
-       * <code>optional int32 deepEqualsEstimate = 6;</code>
+       * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
        */
-      public Builder setDeepEqualsEstimate(int value) {
+      public Builder setRecursiveReferenceEqualitiesEstimate(int value) {
         bitField0_ |= 0x00000020;
-        deepEqualsEstimate_ = value;
+        recursiveReferenceEqualitiesEstimate_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional int32 deepEqualsEstimate = 6;</code>
+       * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
        */
-      public Builder clearDeepEqualsEstimate() {
+      public Builder clearRecursiveReferenceEqualitiesEstimate() {
         bitField0_ = (bitField0_ & ~0x00000020);
-        deepEqualsEstimate_ = 0;
+        recursiveReferenceEqualitiesEstimate_ = 0;
         onChanged();
         return this;
       }
@@ -1047,6 +1095,39 @@ public final class TrackingProtocolBuffers {
       public Builder clearIsRedundant() {
         bitField0_ = (bitField0_ & ~0x00000080);
         isRedundant_ = false;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 deepReferenceEqualityEstimate = 9;
+      private int deepReferenceEqualityEstimate_ ;
+      /**
+       * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
+       */
+      public boolean hasDeepReferenceEqualityEstimate() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
+       */
+      public int getDeepReferenceEqualityEstimate() {
+        return deepReferenceEqualityEstimate_;
+      }
+      /**
+       * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
+       */
+      public Builder setDeepReferenceEqualityEstimate(int value) {
+        bitField0_ |= 0x00000100;
+        deepReferenceEqualityEstimate_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
+       */
+      public Builder clearDeepReferenceEqualityEstimate() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        deepReferenceEqualityEstimate_ = 0;
         onChanged();
         return this;
       }
@@ -1158,6 +1239,24 @@ public final class TrackingProtocolBuffers {
      * <code>optional bool isHashLookup = 7;</code>
      */
     boolean getIsHashLookup();
+
+    // optional int32 deepReferenceEqualityCount = 8;
+    /**
+     * <code>optional int32 deepReferenceEqualityCount = 8;</code>
+     *
+     * <pre>
+     * number of reference equality checks in deep callstack (including top level call)
+     * </pre>
+     */
+    boolean hasDeepReferenceEqualityCount();
+    /**
+     * <code>optional int32 deepReferenceEqualityCount = 8;</code>
+     *
+     * <pre>
+     * number of reference equality checks in deep callstack (including top level call)
+     * </pre>
+     */
+    int getDeepReferenceEqualityCount();
   }
   /**
    * Protobuf type {@code EqualsRelation}
@@ -1243,6 +1342,11 @@ public final class TrackingProtocolBuffers {
             case 56: {
               bitField0_ |= 0x00000040;
               isHashLookup_ = input.readBool();
+              break;
+            }
+            case 64: {
+              bitField0_ |= 0x00000080;
+              deepReferenceEqualityCount_ = input.readInt32();
               break;
             }
           }
@@ -1421,6 +1525,30 @@ public final class TrackingProtocolBuffers {
       return isHashLookup_;
     }
 
+    // optional int32 deepReferenceEqualityCount = 8;
+    public static final int DEEPREFERENCEEQUALITYCOUNT_FIELD_NUMBER = 8;
+    private int deepReferenceEqualityCount_;
+    /**
+     * <code>optional int32 deepReferenceEqualityCount = 8;</code>
+     *
+     * <pre>
+     * number of reference equality checks in deep callstack (including top level call)
+     * </pre>
+     */
+    public boolean hasDeepReferenceEqualityCount() {
+      return ((bitField0_ & 0x00000080) == 0x00000080);
+    }
+    /**
+     * <code>optional int32 deepReferenceEqualityCount = 8;</code>
+     *
+     * <pre>
+     * number of reference equality checks in deep callstack (including top level call)
+     * </pre>
+     */
+    public int getDeepReferenceEqualityCount() {
+      return deepReferenceEqualityCount_;
+    }
+
     private void initFields() {
       tag1_ = 0L;
       tag2_ = 0L;
@@ -1429,6 +1557,7 @@ public final class TrackingProtocolBuffers {
       timestamp_ = 0L;
       deepTime_ = 0L;
       isHashLookup_ = false;
+      deepReferenceEqualityCount_ = 0;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1467,6 +1596,9 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         output.writeBool(7, isHashLookup_);
       }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        output.writeInt32(8, deepReferenceEqualityCount_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1503,6 +1635,10 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000040) == 0x00000040)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(7, isHashLookup_);
+      }
+      if (((bitField0_ & 0x00000080) == 0x00000080)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(8, deepReferenceEqualityCount_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1634,6 +1770,8 @@ public final class TrackingProtocolBuffers {
         bitField0_ = (bitField0_ & ~0x00000020);
         isHashLookup_ = false;
         bitField0_ = (bitField0_ & ~0x00000040);
+        deepReferenceEqualityCount_ = 0;
+        bitField0_ = (bitField0_ & ~0x00000080);
         return this;
       }
 
@@ -1690,6 +1828,10 @@ public final class TrackingProtocolBuffers {
           to_bitField0_ |= 0x00000040;
         }
         result.isHashLookup_ = isHashLookup_;
+        if (((from_bitField0_ & 0x00000080) == 0x00000080)) {
+          to_bitField0_ |= 0x00000080;
+        }
+        result.deepReferenceEqualityCount_ = deepReferenceEqualityCount_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1726,6 +1868,9 @@ public final class TrackingProtocolBuffers {
         }
         if (other.hasIsHashLookup()) {
           setIsHashLookup(other.getIsHashLookup());
+        }
+        if (other.hasDeepReferenceEqualityCount()) {
+          setDeepReferenceEqualityCount(other.getDeepReferenceEqualityCount());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2033,6 +2178,55 @@ public final class TrackingProtocolBuffers {
       public Builder clearIsHashLookup() {
         bitField0_ = (bitField0_ & ~0x00000040);
         isHashLookup_ = false;
+        onChanged();
+        return this;
+      }
+
+      // optional int32 deepReferenceEqualityCount = 8;
+      private int deepReferenceEqualityCount_ ;
+      /**
+       * <code>optional int32 deepReferenceEqualityCount = 8;</code>
+       *
+       * <pre>
+       * number of reference equality checks in deep callstack (including top level call)
+       * </pre>
+       */
+      public boolean hasDeepReferenceEqualityCount() {
+        return ((bitField0_ & 0x00000080) == 0x00000080);
+      }
+      /**
+       * <code>optional int32 deepReferenceEqualityCount = 8;</code>
+       *
+       * <pre>
+       * number of reference equality checks in deep callstack (including top level call)
+       * </pre>
+       */
+      public int getDeepReferenceEqualityCount() {
+        return deepReferenceEqualityCount_;
+      }
+      /**
+       * <code>optional int32 deepReferenceEqualityCount = 8;</code>
+       *
+       * <pre>
+       * number of reference equality checks in deep callstack (including top level call)
+       * </pre>
+       */
+      public Builder setDeepReferenceEqualityCount(int value) {
+        bitField0_ |= 0x00000080;
+        deepReferenceEqualityCount_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional int32 deepReferenceEqualityCount = 8;</code>
+       *
+       * <pre>
+       * number of reference equality checks in deep callstack (including top level call)
+       * </pre>
+       */
+      public Builder clearDeepReferenceEqualityCount() {
+        bitField0_ = (bitField0_ & ~0x00000080);
+        deepReferenceEqualityCount_ = 0;
         onChanged();
         return this;
       }
@@ -2796,18 +2990,21 @@ public final class TrackingProtocolBuffers {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\024objectLifetime.proto\"\272\001\n\016ObjectLifetim" +
+      "\n\024objectLifetime.proto\"\363\001\n\016ObjectLifetim" +
       "e\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \001(\t\022\020\n\010ctorTi" +
       "me\030\003 \002(\003\022\020\n\010dtorTime\030\004 \001(\003\022\033\n\023measuredSi" +
-      "zeInBytes\030\005 \001(\003\022\032\n\022deepEqualsEstimate\030\006 " +
-      "\001(\005\022\031\n\021hashTableOverhead\030\007 \001(\003\022\023\n\013isRedu" +
-      "ndant\030\010 \001(\010\"\212\001\n\016EqualsRelation\022\014\n\004tag1\030\001" +
-      " \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016\n\006result\030\003 \001(\010\022\021\n\tde" +
-      "epCount\030\004 \001(\005\022\021\n\ttimestamp\030\005 \002(\003\022\020\n\010deep" +
-      "Time\030\006 \001(\003\022\024\n\014isHashLookup\030\007 \001(\010\"8\n\006TagM" +
-      "ap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\021\n\tclass",
-      "name\030\003 \001(\tB=\n\"org.eclipse.imp.pdb.facts." +
-      "trackingB\027TrackingProtocolBuffers"
+      "zeInBytes\030\005 \001(\003\022,\n$recursiveReferenceEqu" +
+      "alitiesEstimate\030\006 \001(\005\022\031\n\021hashTableOverhe" +
+      "ad\030\007 \001(\003\022\023\n\013isRedundant\030\010 \001(\010\022%\n\035deepRef" +
+      "erenceEqualityEstimate\030\t \001(\005\"\256\001\n\016EqualsR" +
+      "elation\022\014\n\004tag1\030\001 \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016\n\006r" +
+      "esult\030\003 \001(\010\022\021\n\tdeepCount\030\004 \001(\005\022\021\n\ttimest" +
+      "amp\030\005 \002(\003\022\020\n\010deepTime\030\006 \001(\003\022\024\n\014isHashLoo",
+      "kup\030\007 \001(\010\022\"\n\032deepReferenceEqualityCount\030" +
+      "\010 \001(\005\"8\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002" +
+      " \002(\t\022\021\n\tclassname\030\003 \001(\tB=\n\"org.eclipse.i" +
+      "mp.pdb.facts.trackingB\027TrackingProtocolB" +
+      "uffers"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -2819,13 +3016,13 @@ public final class TrackingProtocolBuffers {
           internal_static_ObjectLifetime_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_ObjectLifetime_descriptor,
-              new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "DeepEqualsEstimate", "HashTableOverhead", "IsRedundant", });
+              new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "RecursiveReferenceEqualitiesEstimate", "HashTableOverhead", "IsRedundant", "DeepReferenceEqualityEstimate", });
           internal_static_EqualsRelation_descriptor =
             getDescriptor().getMessageTypes().get(1);
           internal_static_EqualsRelation_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_EqualsRelation_descriptor,
-              new java.lang.String[] { "Tag1", "Tag2", "Result", "DeepCount", "Timestamp", "DeepTime", "IsHashLookup", });
+              new java.lang.String[] { "Tag1", "Tag2", "Result", "DeepCount", "Timestamp", "DeepTime", "IsHashLookup", "DeepReferenceEqualityCount", });
           internal_static_TagMap_descriptor =
             getDescriptor().getMessageTypes().get(2);
           internal_static_TagMap_fieldAccessorTable = new
