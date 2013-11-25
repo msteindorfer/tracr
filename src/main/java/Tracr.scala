@@ -317,7 +317,7 @@ object Tracr extends App {
 
     // TODO: only execute when running in shared mode
     time ("Project equals/isEqual calls [internal]") {
-      projectEqualsProperty("equalCalls-sha-int.dat", equalsRelation filter { eq => (eq.isHashLookup && eq.result) }, timestampRange, stepSize)
+      projectEqualsProperty("equalCalls-sha-int.dat", equalsRelation filter { eq => (eq.isHashLookup && eq.result && eq.tag1 != eq.tag2) }, timestampRange, stepSize) // && eq.result && eq.tag1 != eq.tag2
     }
   } else {
     time ("Project equals/isEqual calls [external]") {
