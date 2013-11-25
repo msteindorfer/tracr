@@ -28,14 +28,17 @@ xAxisPercentage <- function() {
 }
 
 
-par(mfrow=c(2,1))
+par(mfrow=c(2,2))
 
 pdf("_heap-evolution.pdf")
   heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
   plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", xlab = "Program Progress", yaxt = "n", ylab = "Memory Usage")
   #par(new=T)
   
-  lines(hsNom$V2, col='green')
+  legend('topleft', c('measured heap size', 'simulated maximaly shared heap size'), 
+       lty=1, col=c('black', 'purple'), bty='n', cex=.75)
+
+  lines(hsNom$V2, col='black')
   #lines(hsMin$V2, col='blue', lty=3)
   lines(hsEst$V2, col='purple', lty=2)
   #lines(hsSha$V2, col='red')
@@ -50,14 +53,18 @@ pdf("_memory_savings.pdf")
   # plot(diff, type='l')
   max <- range(percEst, percSha)
   range <- range(-max, max)
-  plot(percEst, type='n', xlab='event counter', ylab='savings (in %)', ylim=range, xaxt = "n")
+  plot(percEst, type='n', xlab='Program Progress', ylab='Savings (in %)', ylim=range, xaxt = "n")
   xAxisPercentage()
+
+  legend('bottomleft', c('simulated savings', 'validated savings with maximal sharing'), 
+       lty=1, col=c('purple', 'red'), bty='n', cex=.75)
+
   lines(percEst, col='purple', lty=2)
   lines(percSha, col='red')
   abline(h=0)
   #lmfit <- lm(percEst ~ 1)
   #abline(lmfit)
-  title("Memory Savings Prognosis (in %)")
+  title("Memory Savings")
 dev.off()
 
 ###
@@ -80,31 +87,65 @@ eqCallsEst <- data.frame(eqCallsTmp$timestamp,
                          eqCallsTmp$recursiveReferenceEqualities + eqCallsNom$rootEquals)
 names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEqualities')
 
-#pdf("_equal-calls.pdf")
+pdf("_equal-calls.pdf")
   plot(cumsum(eqCallsNom$recursiveEquals), 
        ylim = range(cumsum(eqCallsNom$recursiveEquals),
                     cumsum(eqCallsEst$recursiveEquals),
                     cumsum(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals)), 
-       type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
+       type='n', xaxt = "n", xlab = "Program Progress", ylab = "Total of Equality Checks")
   #par(new=T)
   xAxisPercentage()
-  lines(cumsum(eqCallsNom$recursiveEquals), col='green')
-  lines(cumsum(eqCallsEst$recursiveEquals), col='purple', lty=2)
-  lines(cumsum(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), col='red')
+
+  legend('bottomright', c('program equals calls', 'estimated equals calls in sharing impl.', 'validated equals in sharing impl.'), 
+       lty=1, col=c('black', 'purple', 'red'), bty='n', cex=.75)
+
+  lines(cumsum(eqCallsNom$recursiveEquals), type='s', col='black')
+  lines(cumsum(eqCallsEst$recursiveEquals), type='s', col='purple', lty=2)
+  #lines(cumsum(eqCallsTmp$recursiveEquals), type='s', col='purple', lty=2)
+  lines(cumsum(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), type='s', col='red')
   title("Equal Calls Evolution") # Forecast (Count)
-#dev.off()
+dev.off()
 
 #pdf("reference-equality-calls.pdf")
 plot(cumsum(eqCallsNom$recursiveEquals), 
      ylim = range(cumsum(eqCallsEst$recursiveReferenceEqualities),
                   cumsum(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities)), 
-     type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Reference Equality Checks")
+     type='n', xaxt = "n", xlab = "Program Progress", ylab = "Total of Reference Equality Checks")
 #par(new=T)
   xAxisPercentage()
   lines(cumsum(eqCallsEst$recursiveReferenceEqualities), col='purple', lty=2)
   lines(cumsum(eqCallsTmp$recursiveReferenceEqualities), col='purple', lty=2)
   lines(cumsum(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities), col='red')
   title("Reference Equality Evolution") # Forecast (Count)
+#dev.off()
+
+#pdf("_equal-calls.pdf")
+plot(eqCallsNom$recursiveEquals, 
+     ylim = range(eqCallsNom$recursiveEquals,
+                  eqCallsEst$recursiveEquals,
+                  eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), 
+     type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
+  #par(new=T)
+  xAxisPercentage()
+  #abline(lm(eqCallsEst$recursiveEquals ~ eqCallsNom$recursiveEquals), col='green')
+  #abline(lm(eqCallsNom$recursiveEquals ~ eqCallsNom$timestamp), col='green')
+  lines(eqCallsNom$recursiveEquals, type='s', col='green')
+  lines(eqCallsEst$recursiveEquals, type='s', col='purple', lty=2)
+  lines(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals, type='s', col='red')
+  title("Equal Calls Evolution") # Forecast (Count)
+#dev.off()
+
+#pdf("reference-equality-calls.pdf")
+plot(eqCallsNom$recursiveEquals, 
+     ylim = range(eqCallsEst$recursiveReferenceEqualities,
+                  eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities), 
+     type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Reference Equality Checks")
+#par(new=T)
+xAxisPercentage()
+lines(eqCallsEst$recursiveReferenceEqualities, col='purple', lty=2)
+lines(eqCallsTmp$recursiveReferenceEqualities, col='purple', lty=2)
+lines(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities, col='red')
+title("Reference Equality Evolution") # Forecast (Count)
 #dev.off()
 
 eqPercEst <- (eqCallsNom$V7-eqCallsEst$V2)*100/eqCallsNom$V7
@@ -140,6 +181,11 @@ eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
 ### Create Overlap Statistic Plot
 pdf("_overlap-example.pdf")
   plot(0, 0, xlim=range(0, 10), ylim=range(0,7), type = 'n', xaxt='n', xlab='Object Lifetime', ylab='Unique Object ID')
+  title("Lifetime Overlaps for Objects with Fingerprint 04DA...9A22")  
+
+  legend('bottomright', c('measured objects', 'replacement objects'), 
+       lty=1, col=c('black', 'purple'), bty='n', cex=.75)
+
   axis(1, at = seq(0, 10, by = 1))
 
   xCoord1 = c(0, 3)
@@ -160,11 +206,11 @@ pdf("_overlap-example.pdf")
 
   xCoord6 = c(0, 6)
   yCoord6 = c(6, 6)
-  lines(xCoord6, yCoord6, lwd=5, col='red')
+  lines(xCoord6, yCoord6, lwd=5, col='purple', lty=1)
 
   xCoord7 = c(7, 10)
   yCoord7 = c(7, 7)
-  lines(xCoord7, yCoord7, lwd=5, col='red')
+  lines(xCoord7, yCoord7, lwd=5, col='purple', lty=1)
 
   overlapFingerprintLabel <- '04DA...9A22'
   text((xCoord1[2] - xCoord1[1]) / 2 + xCoord1[1], yCoord1[2], overlapFingerprintLabel, pos = 1)
@@ -172,8 +218,8 @@ pdf("_overlap-example.pdf")
   text((xCoord3[2] - xCoord3[1]) / 2 + xCoord3[1], yCoord3[2], overlapFingerprintLabel, pos = 1)
   text((xCoord4[2] - xCoord4[1]) / 2 + xCoord4[1], yCoord4[2], overlapFingerprintLabel, pos = 1)
   text((xCoord5[2] - xCoord5[1]) / 2 + xCoord5[1], yCoord5[2], overlapFingerprintLabel, pos = 1)
-  text((xCoord6[2] - xCoord6[1]) / 2 + xCoord6[1], yCoord6[2], overlapFingerprintLabel, pos = 1, col = 'red')
-  text((xCoord7[2] - xCoord7[1]) / 2 + xCoord7[1], yCoord7[2], overlapFingerprintLabel, pos = 1, col = 'red')
+  text((xCoord6[2] - xCoord6[1]) / 2 + xCoord6[1], yCoord6[2], overlapFingerprintLabel, pos = 1, col = 'purple')
+  text((xCoord7[2] - xCoord7[1]) / 2 + xCoord7[1], yCoord7[2], overlapFingerprintLabel, pos = 1, col = 'purple')
 
   grid(NULL, NA)
 dev.off()
@@ -200,3 +246,8 @@ print(sum(eqCallsShaInt$V2))
 
 print("Average Number of Nested Equal Calls")
 print(round((sum(eqCallsNom$V2) / sum(eqCallsNom$V6)) - 1, digits=2))
+
+print("Max. # of objects at min - sha - nom")
+print(max(ocMin$V2))
+print(max(ocSha$V2))
+print(max(ocNom$V2))

@@ -204,8 +204,8 @@ object Tracr extends App {
         ctorTime = overlap.map(_.ctorTime).min
         dtorTime = overlap.map(_.dtorTime).max
         size = overlap.head.measuredSizeInBytes
-        deepEqualsEstimate = overlap.head.recursiveReferenceEqualitiesEstimate
-      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, deepEqualsEstimate, 0, false)
+        recursiveReferenceEqualitiesEstimate = overlap.head.recursiveReferenceEqualitiesEstimate
+      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, recursiveReferenceEqualitiesEstimate, 0, false)
     };
 
     /*
@@ -237,6 +237,7 @@ object Tracr extends App {
 
       // TODO: only execute when NOT running in shared mode
       time ("Project equals/isEqual calls [internal]") {
+        // val tmp = overlapStatistics.values.flatten.map(_.tail)
         val callWithCacheHit = overlapStatistics.values.flatten.map(_.tail).flatten
           .toVector sortWith (_.ctorTime < _.ctorTime)
 
@@ -311,16 +312,16 @@ object Tracr extends App {
 
   if (isSharingEnabled) {
     time ("Project equals/isEqual calls [external]") {
-      projectEqualsProperty("equalCalls-sha-ext.dat", equalsRelation filter { !_.isHashLookup }, timestampRange, stepSize)
+      projectEqualsProperty("equalCalls-sha-ext.dat", equalsRelation filter { eq => (!eq.isHashLookup) }, timestampRange, stepSize)
     }
 
     // TODO: only execute when running in shared mode
     time ("Project equals/isEqual calls [internal]") {
-      projectEqualsProperty("equalCalls-sha-int.dat", equalsRelation filter { _.isHashLookup }, timestampRange, stepSize)
+      projectEqualsProperty("equalCalls-sha-int.dat", equalsRelation filter { eq => (eq.isHashLookup && eq.result) }, timestampRange, stepSize)
     }
   } else {
     time ("Project equals/isEqual calls [external]") {
-      projectEqualsProperty("equalCalls-nom.dat", equalsRelation filter { !_.isHashLookup }, timestampRange, stepSize)
+      projectEqualsProperty("equalCalls-nom.dat", equalsRelation, timestampRange, stepSize)
     }
   }
 
@@ -412,10 +413,8 @@ object Tracr extends App {
         timestampCntr += 1
 
         while (ctorIdx < ctorSorted.length && ctorSorted(ctorIdx).ctorTime <= timestamp) {
-          val count = ctorSorted(ctorIdx).recursiveReferenceEqualitiesEstimate
-
           sumRecursiveEquals += 1
-          sumRecursiveReferenceEqualities += count
+          sumRecursiveReferenceEqualities += ctorSorted(ctorIdx).recursiveReferenceEqualitiesEstimate
 
           ctorIdx += 1
         }
