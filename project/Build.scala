@@ -25,7 +25,7 @@ object ApplicationBuild extends Build {
       fork := true,
       javaHome := Some(file("/Library/Java/JavaVirtualMachines/jdk1.7.0.jdk/Contents/Home")),
       scalaVersion := "2.10.3",
-      javaOptions in run += "-Xmx12G",
+      javaOptions in run += "-Xmx24G",
       resolvers ++= localRepo ++ sonatypeRepo ++ mandubianRepo,
       libraryDependencies ++= Seq(
         "play" %% "play-json" % "2.2-SNAPSHOT",

@@ -119,19 +119,19 @@ object Tracr extends App {
     valueOverlapStatistics(sortedUniverse)
   }
 
-  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
-//    println(s"${runs.length} runs for $digest")
-
-    for (run <- runs) {
-//      println("A RUN")
-//      run.foreach(println)
-
-      val sizes = run.map(_.measuredSizeInBytes).toSet
-      if (sizes.size > 1) {
-        println(s"${run.head.digest}, $sizes")
-      }
-    }
-  }
+//  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
+////    println(s"${runs.length} runs for $digest")
+//
+//    for (run <- runs) {
+////      println("A RUN")
+////      run.foreach(println)
+//
+//      val sizes = run.map(_.measuredSizeInBytes).toSet
+//      if (sizes.size > 1) {
+//        println(s"${run.head.digest}, $sizes")
+//      }
+//    }
+//  }
 
   /*
    * Replay heap size history.
@@ -242,6 +242,7 @@ object Tracr extends App {
           .toVector sortWith (_.ctorTime < _.ctorTime)
 
         projectExpectedEqualsCall("equalCalls-est.dat", callWithCacheHit, timestampRange, stepSize)
+        println(s"Calls with CacheHit: ${callWithCacheHit.size}")
       }
     }
   }

@@ -49,7 +49,7 @@ pdf("_heap-evolution.pdf")
   title("Heap Evolution")
 dev.off()
 
-#pdf("_heap-evolution-with-validation.pdf")
+pdf("_heap-evolution-with-validation.pdf")
   heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
   plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", xlab = "Program Progress", yaxt = "n", ylab = "Memory Usage")
   #par(new=T)
@@ -66,7 +66,7 @@ dev.off()
   xAxisPercentage()
   axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
   title("Heap Evolution (incl. Validation)")
-#dev.off()
+dev.off()
 
 pdf("_memory_savings.pdf")
   # plot(diff, type='l')
@@ -106,7 +106,7 @@ eqCallsEst <- data.frame(eqCallsTmp$timestamp,
                          eqCallsTmp$recursiveReferenceEqualities + eqCallsNom$rootEquals)
 names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEqualities')
 
-pdf("_equal-calls.pdf")
+pdf("_equality-equals-total.pdf")
   plot(cumsum(eqCallsNom$recursiveEquals), 
        ylim = range(cumsum(eqCallsNom$recursiveEquals),
                     cumsum(eqCallsEst$recursiveEquals),
@@ -125,21 +125,21 @@ pdf("_equal-calls.pdf")
   title("Equal Calls Evolution") # Forecast (Count)
 dev.off()
 
-#pdf("reference-equality-calls.pdf")
-plot(cumsum(eqCallsNom$recursiveEquals), 
+pdf("_equality-reference-calls-total.pdf")
+  plot(cumsum(eqCallsNom$recursiveEquals), 
      ylim = range(cumsum(eqCallsEst$recursiveReferenceEqualities),
                   cumsum(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities)), 
      type='n', xaxt = "n", xlab = "Program Progress", ylab = "Total of Reference Equality Checks")
-#par(new=T)
+  #par(new=T)
   xAxisPercentage()
   lines(cumsum(eqCallsEst$recursiveReferenceEqualities), col='purple', lty=2)
-  lines(cumsum(eqCallsTmp$recursiveReferenceEqualities), col='purple', lty=2)
+  #lines(cumsum(eqCallsTmp$recursiveReferenceEqualities), col='purple', lty=2)
   lines(cumsum(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities), col='red')
   title("Reference Equality Evolution") # Forecast (Count)
-#dev.off()
+dev.off()
 
-#pdf("_equal-calls.pdf")
-plot(eqCallsNom$recursiveEquals, 
+pdf("_equality-equals-timely.pdf")
+  plot(eqCallsNom$recursiveEquals, 
      ylim = range(eqCallsNom$recursiveEquals,
                   eqCallsEst$recursiveEquals,
                   eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), 
@@ -148,24 +148,24 @@ plot(eqCallsNom$recursiveEquals,
   xAxisPercentage()
   #abline(lm(eqCallsEst$recursiveEquals ~ eqCallsNom$recursiveEquals), col='green')
   #abline(lm(eqCallsNom$recursiveEquals ~ eqCallsNom$timestamp), col='green')
-  lines(eqCallsNom$recursiveEquals, type='s', col='green')
+  lines(eqCallsNom$recursiveEquals, type='s', col='black')
   lines(eqCallsEst$recursiveEquals, type='s', col='purple', lty=2)
   lines(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals, type='s', col='red')
   title("Equal Calls Evolution") # Forecast (Count)
-#dev.off()
+dev.off()
 
-#pdf("reference-equality-calls.pdf")
-plot(eqCallsNom$recursiveEquals, 
-     ylim = range(eqCallsEst$recursiveReferenceEqualities,
-                  eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities), 
-     type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Reference Equality Checks")
-#par(new=T)
-xAxisPercentage()
-lines(eqCallsEst$recursiveReferenceEqualities, col='purple', lty=2)
-lines(eqCallsTmp$recursiveReferenceEqualities, col='purple', lty=2)
-lines(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities, col='red')
-title("Reference Equality Evolution") # Forecast (Count)
-#dev.off()
+pdf("_equality-reference-calls-timely.pdf")
+  plot(eqCallsNom$recursiveEquals, 
+       ylim = range(eqCallsEst$recursiveReferenceEqualities,
+                    eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities), 
+       type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Reference Equality Checks")
+  #par(new=T)
+  xAxisPercentage()
+  lines(eqCallsEst$recursiveReferenceEqualities, col='purple', lty=2)
+  #lines(eqCallsTmp$recursiveReferenceEqualities, col='purple', lty=2)
+  lines(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities, col='red')
+  title("Reference Equality Evolution") # Forecast (Count)
+dev.off()
 
 eqPercEst <- (eqCallsNom$V7-eqCallsEst$V2)*100/eqCallsNom$V7
 eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
@@ -198,7 +198,7 @@ eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
 
 
 ### Create Overlap Statistic Plot
-pdf("_overlap-example.pdf")
+#pdf("_overlap-example.pdf")
   plot(0, 0, xlim=range(0, 10), ylim=range(0,7), type = 'n', xaxt='n', xlab='Object Lifetime', ylab='Unique Object ID')
   title("Lifetime Overlaps for Objects with Fingerprint 04DA...9A22")  
 
@@ -241,7 +241,7 @@ pdf("_overlap-example.pdf")
   text((xCoord7[2] - xCoord7[1]) / 2 + xCoord7[1], yCoord7[2], overlapFingerprintLabel, pos = 1, col = 'purple')
 
   grid(NULL, NA)
-dev.off()
+#dev.off()
 
 print("Summary:")
 
