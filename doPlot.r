@@ -49,6 +49,25 @@ pdf("_heap-evolution.pdf")
   title("Heap Evolution")
 dev.off()
 
+#pdf("_heap-evolution-with-validation.pdf")
+  heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
+  plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", xlab = "Program Progress", yaxt = "n", ylab = "Memory Usage")
+  #par(new=T)
+  
+  legend('topleft', c('measured heap size', 'simulated maximaly shared heap size', 'measured maximaly shared heap size'), 
+         lty=1, col=c('black', 'purple', 'red'), bty='n', cex=.75)
+  
+  lines(hsNom$V2, col='black')
+  #lines(hsMin$V2, col='blue', lty=3)
+  lines(hsEst$V2, col='purple', lty=2)
+  lines(hsSha$V2, col='red')
+  #lines(hsShaPure$V2, col='red', lty=3)
+  # add a title and subtitle 
+  xAxisPercentage()
+  axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
+  title("Heap Evolution (incl. Validation)")
+#dev.off()
+
 pdf("_memory_savings.pdf")
   # plot(diff, type='l')
   max <- range(percEst, percSha)
@@ -91,7 +110,7 @@ pdf("_equal-calls.pdf")
   plot(cumsum(eqCallsNom$recursiveEquals), 
        ylim = range(cumsum(eqCallsNom$recursiveEquals),
                     cumsum(eqCallsEst$recursiveEquals),
-                    cumsum(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals)), 
+                    cumsum(eqCallsShaInt$recursiveEquals)), # +eqCallsShaExt$recursiveEquals not needed
        type='n', xaxt = "n", xlab = "Program Progress", ylab = "Total of Equality Checks")
   #par(new=T)
   xAxisPercentage()
@@ -102,7 +121,7 @@ pdf("_equal-calls.pdf")
   lines(cumsum(eqCallsNom$recursiveEquals), type='s', col='black')
   lines(cumsum(eqCallsEst$recursiveEquals), type='s', col='purple', lty=2)
   #lines(cumsum(eqCallsTmp$recursiveEquals), type='s', col='purple', lty=2)
-  lines(cumsum(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), type='s', col='red')
+  lines(cumsum(eqCallsShaInt$recursiveEquals), type='s', col='red') # +eqCallsShaExt$recursiveEquals not needed
   title("Equal Calls Evolution") # Forecast (Count)
 dev.off()
 
@@ -251,3 +270,10 @@ print("Max. # of objects at min - sha - nom")
 print(max(ocMin$V2))
 print(max(ocSha$V2))
 print(max(ocNom$V2))
+
+print("Expected cache hits vs measured cache hits")
+print(max(cumsum(eqCallsEst$recursiveEquals)))
+print(max(cumsum(eqCallsShaInt$recursiveEquals)))
+
+print(max(cumsum(eqCallsShaExt$recursiveEquals)))
+print(max(cumsum(eqCallsNom$recursiveEquals)))
