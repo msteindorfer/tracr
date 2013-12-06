@@ -12,7 +12,7 @@ case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dto
   require(measuredSizeInBytes >= 0)
 }
 
-case class EqualsCall(tag1: Long, tag2: Long, result: Boolean, deepCount: Int, deepTime: Long, deepReferenceEqualityCount: Int, timestamp: Long, isHashLookup: Boolean)
+case class EqualsCall(tag1: Long, tag2: Long, result: Boolean, deepCount: Int, deepTime: Long, deepReferenceEqualityCount: Int, timestamp: Long, isHashLookup: Boolean, isStructuralEquality: Boolean)
 case class TagInfo(digest: String, classname: String)
 
 object Tracr extends App {
@@ -28,8 +28,9 @@ object Tracr extends App {
   //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe"
   //  val path = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/"
 
-  // val path = s"/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/_${if (isSharingEnabled) "b" else "a"}/"
-  val path = s"/Users/Michael/Development/rascal-devel/rascal-shell/target/_${if (isSharingEnabled) "b" else "a"}/"
+  //  val path = s"/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/_${if (isSharingEnabled) "b" else "a"}/"
+  //  val path = s"/Users/Michael/Development/rascal-devel/rascal-shell/target/_${if (isSharingEnabled) "b" else "a"}/"
+  val path = s"/Users/Michael/Development/rascal-devel/rascal/target/_${if (isSharingEnabled) "b" else "a"}/"
 
   val tagMap: GenMap[Long, TagInfo] = time("Deserialize tag map from Google Protocol Buffers") {
     /*
@@ -120,16 +121,16 @@ object Tracr extends App {
   }
 
 //  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
-////    println(s"${runs.length} runs for $digest")
+//    println(s"${runs.length} runs for $digest")
 //
 //    for (run <- runs) {
-////      println("A RUN")
-////      run.foreach(println)
+//      println("A RUN")
+//      run.foreach(println)
 //
-//      val sizes = run.map(_.measuredSizeInBytes).toSet
-//      if (sizes.size > 1) {
-//        println(s"${run.head.digest}, $sizes")
-//      }
+////      val sizes = run.map(_.measuredSizeInBytes).toSet
+////      if (sizes.size > 1) {
+////        println(s"${run.head.digest}, $sizes")
+////      }
 //    }
 //  }
 
@@ -154,7 +155,8 @@ object Tracr extends App {
   }
 
   val timestampRange = tsMin to tsMax
-  var stepSize  = math.max(1, (timestampRange.size / stepCount).toLong)
+  val stepCountCopy = stepCount
+  var stepSize = math.max(1, math.ceil(timestampRange.size / stepCountCopy.toFloat).toLong)
 
   {
     val universeList = time("set to list") { sortedUniverse.toVector }
@@ -268,7 +270,8 @@ object Tracr extends App {
             protoEqualsCall.getDeepTime,
             protoEqualsCall.getDeepReferenceEqualityCount,
             protoEqualsCall.getTimestamp,
-            protoEqualsCall.getIsHashLookup
+            protoEqualsCall.getIsHashLookup,
+            protoEqualsCall.getIsStructuralEquality
           )
         }
       } catch {
@@ -318,7 +321,7 @@ object Tracr extends App {
 
     // TODO: only execute when running in shared mode
     time ("Project equals/isEqual calls [internal]") {
-      projectEqualsProperty("equalCalls-sha-int.dat", equalsRelation filter { eq => (eq.isHashLookup && eq.result) }, timestampRange, stepSize) // && eq.result && eq.tag1 != eq.tag2
+      projectEqualsProperty("equalCalls-sha-int.dat", equalsRelation filter { eq => (eq.isHashLookup && eq.result) }, timestampRange, stepSize) // && eq.result && eq.result && eq.tag1 != eq.tag2
     }
   } else {
     time ("Project equals/isEqual calls [external]") {
@@ -334,13 +337,17 @@ object Tracr extends App {
      */
     val summarized = sortedRelation.groupBy(_.timestamp).mapValues {
       case callsByTimestamp => {
-        val sumRecursiveEquals              = callsByTimestamp.map(_.deepCount).sum
-        val sumRecursiveReferenceEqualities = callsByTimestamp.map(_.deepReferenceEqualityCount).sum
+        val (structuralEquals, logicalEquals) = callsByTimestamp.partition(_.isStructuralEquality)
 
-        val sumRootEquals                   = callsByTimestamp.filter(_.deepCount != 0).size
-        val sumRootReferenceEqualities      = callsByTimestamp.filter(_.deepCount == 0).size
+        val sumRecursiveEquals              = structuralEquals.map(_.deepCount).sum
+        val sumRecursiveReferenceEqualities = structuralEquals.map(_.deepReferenceEqualityCount).sum
+        val sumRecursiveLogicalEquals       = logicalEquals.map(_.deepCount).sum
 
-        (sumRootEquals, sumRecursiveEquals, sumRootReferenceEqualities, sumRecursiveReferenceEqualities)
+        val sumRootEquals                   = structuralEquals.filter(_.deepCount != 0).size
+        val sumRootReferenceEqualities      = structuralEquals.filter(_.deepCount == 0).size
+        val sumRootLogicalEquals            = logicalEquals.filter(_.deepCount != 0).size
+
+        (sumRootEquals, sumRecursiveEquals, sumRootReferenceEqualities, sumRecursiveReferenceEqualities, sumRootLogicalEquals, sumRecursiveLogicalEquals)
       }
     }
 
@@ -353,24 +360,28 @@ object Tracr extends App {
 
     var (sumRootEquals, sumRecursiveEquals) = (BigInt(0), BigInt(0));
     var (sumRootReferenceEqualities, sumRecursiveReferenceEqualities) = (BigInt(0), BigInt(0));
+    var (sumRootLogicalEquals, sumRecursiveLogicalEquals) = (BigInt(0), BigInt(0));
 
     for (timestamp <- timestampRange) {
       lastTimestamp = timestamp
       timestampCntr += 1
 
       summarized get timestamp match {
-        case Some((tmpRootEquals, tmpRecursiveEquals, tmpRootReferenceEqualities, tmpRecursiveReferenceEqualities)) => {
+        case Some((tmpRootEquals, tmpRecursiveEquals, tmpRootReferenceEqualities, tmpRecursiveReferenceEqualities, tmpRootLogicalEquals, tmpRecursiveLogicalEquals)) => {
           sumRootEquals += tmpRootEquals
           sumRecursiveEquals += tmpRecursiveEquals
 
           sumRootReferenceEqualities += tmpRootReferenceEqualities
           sumRecursiveReferenceEqualities += tmpRecursiveReferenceEqualities
+
+          sumRootLogicalEquals += tmpRootLogicalEquals
+          sumRecursiveLogicalEquals += tmpRecursiveLogicalEquals
         }
         case _ => ()
       }
 
       if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
-        writer.write(s"$timestamp $sumRootEquals $sumRecursiveEquals $sumRootReferenceEqualities $sumRecursiveReferenceEqualities")
+        writer.write(s"$timestamp $sumRootEquals $sumRecursiveEquals $sumRootReferenceEqualities $sumRecursiveReferenceEqualities $sumRootLogicalEquals $sumRecursiveLogicalEquals")
         writer.newLine
 
         stepCntr += 1
@@ -380,11 +391,13 @@ object Tracr extends App {
         sumRecursiveEquals = BigInt(0)
         sumRootReferenceEqualities = BigInt(0)
         sumRecursiveReferenceEqualities = BigInt(0)
+        sumRootLogicalEquals = BigInt(0)
+        sumRecursiveLogicalEquals = BigInt(0)
       }
     }
 
     if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
-      writer.write(s"$lastTimestamp $sumRootEquals $sumRecursiveEquals $sumRootReferenceEqualities $sumRecursiveReferenceEqualities")
+      writer.write(s"$lastTimestamp $sumRootEquals $sumRecursiveEquals $sumRootReferenceEqualities $sumRecursiveReferenceEqualities $sumRootLogicalEquals $sumRecursiveLogicalEquals")
       writer.newLine
     }
 

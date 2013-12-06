@@ -1257,6 +1257,16 @@ public final class TrackingProtocolBuffers {
      * </pre>
      */
     int getDeepReferenceEqualityCount();
+
+    // optional bool isStructuralEquality = 9;
+    /**
+     * <code>optional bool isStructuralEquality = 9;</code>
+     */
+    boolean hasIsStructuralEquality();
+    /**
+     * <code>optional bool isStructuralEquality = 9;</code>
+     */
+    boolean getIsStructuralEquality();
   }
   /**
    * Protobuf type {@code EqualsRelation}
@@ -1347,6 +1357,11 @@ public final class TrackingProtocolBuffers {
             case 64: {
               bitField0_ |= 0x00000080;
               deepReferenceEqualityCount_ = input.readInt32();
+              break;
+            }
+            case 72: {
+              bitField0_ |= 0x00000100;
+              isStructuralEquality_ = input.readBool();
               break;
             }
           }
@@ -1549,6 +1564,22 @@ public final class TrackingProtocolBuffers {
       return deepReferenceEqualityCount_;
     }
 
+    // optional bool isStructuralEquality = 9;
+    public static final int ISSTRUCTURALEQUALITY_FIELD_NUMBER = 9;
+    private boolean isStructuralEquality_;
+    /**
+     * <code>optional bool isStructuralEquality = 9;</code>
+     */
+    public boolean hasIsStructuralEquality() {
+      return ((bitField0_ & 0x00000100) == 0x00000100);
+    }
+    /**
+     * <code>optional bool isStructuralEquality = 9;</code>
+     */
+    public boolean getIsStructuralEquality() {
+      return isStructuralEquality_;
+    }
+
     private void initFields() {
       tag1_ = 0L;
       tag2_ = 0L;
@@ -1558,6 +1589,7 @@ public final class TrackingProtocolBuffers {
       deepTime_ = 0L;
       isHashLookup_ = false;
       deepReferenceEqualityCount_ = 0;
+      isStructuralEquality_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -1599,6 +1631,9 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         output.writeInt32(8, deepReferenceEqualityCount_);
       }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        output.writeBool(9, isStructuralEquality_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -1639,6 +1674,10 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000080) == 0x00000080)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(8, deepReferenceEqualityCount_);
+      }
+      if (((bitField0_ & 0x00000100) == 0x00000100)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(9, isStructuralEquality_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -1772,6 +1811,8 @@ public final class TrackingProtocolBuffers {
         bitField0_ = (bitField0_ & ~0x00000040);
         deepReferenceEqualityCount_ = 0;
         bitField0_ = (bitField0_ & ~0x00000080);
+        isStructuralEquality_ = false;
+        bitField0_ = (bitField0_ & ~0x00000100);
         return this;
       }
 
@@ -1832,6 +1873,10 @@ public final class TrackingProtocolBuffers {
           to_bitField0_ |= 0x00000080;
         }
         result.deepReferenceEqualityCount_ = deepReferenceEqualityCount_;
+        if (((from_bitField0_ & 0x00000100) == 0x00000100)) {
+          to_bitField0_ |= 0x00000100;
+        }
+        result.isStructuralEquality_ = isStructuralEquality_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -1871,6 +1916,9 @@ public final class TrackingProtocolBuffers {
         }
         if (other.hasDeepReferenceEqualityCount()) {
           setDeepReferenceEqualityCount(other.getDeepReferenceEqualityCount());
+        }
+        if (other.hasIsStructuralEquality()) {
+          setIsStructuralEquality(other.getIsStructuralEquality());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -2227,6 +2275,39 @@ public final class TrackingProtocolBuffers {
       public Builder clearDeepReferenceEqualityCount() {
         bitField0_ = (bitField0_ & ~0x00000080);
         deepReferenceEqualityCount_ = 0;
+        onChanged();
+        return this;
+      }
+
+      // optional bool isStructuralEquality = 9;
+      private boolean isStructuralEquality_ ;
+      /**
+       * <code>optional bool isStructuralEquality = 9;</code>
+       */
+      public boolean hasIsStructuralEquality() {
+        return ((bitField0_ & 0x00000100) == 0x00000100);
+      }
+      /**
+       * <code>optional bool isStructuralEquality = 9;</code>
+       */
+      public boolean getIsStructuralEquality() {
+        return isStructuralEquality_;
+      }
+      /**
+       * <code>optional bool isStructuralEquality = 9;</code>
+       */
+      public Builder setIsStructuralEquality(boolean value) {
+        bitField0_ |= 0x00000100;
+        isStructuralEquality_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool isStructuralEquality = 9;</code>
+       */
+      public Builder clearIsStructuralEquality() {
+        bitField0_ = (bitField0_ & ~0x00000100);
+        isStructuralEquality_ = false;
         onChanged();
         return this;
       }
@@ -2996,15 +3077,15 @@ public final class TrackingProtocolBuffers {
       "zeInBytes\030\005 \001(\003\022,\n$recursiveReferenceEqu" +
       "alitiesEstimate\030\006 \001(\005\022\031\n\021hashTableOverhe" +
       "ad\030\007 \001(\003\022\023\n\013isRedundant\030\010 \001(\010\022%\n\035deepRef" +
-      "erenceEqualityEstimate\030\t \001(\005\"\256\001\n\016EqualsR" +
+      "erenceEqualityEstimate\030\t \001(\005\"\314\001\n\016EqualsR" +
       "elation\022\014\n\004tag1\030\001 \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016\n\006r" +
       "esult\030\003 \001(\010\022\021\n\tdeepCount\030\004 \001(\005\022\021\n\ttimest" +
       "amp\030\005 \002(\003\022\020\n\010deepTime\030\006 \001(\003\022\024\n\014isHashLoo",
       "kup\030\007 \001(\010\022\"\n\032deepReferenceEqualityCount\030" +
-      "\010 \001(\005\"8\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002" +
-      " \002(\t\022\021\n\tclassname\030\003 \001(\tB=\n\"org.eclipse.i" +
-      "mp.pdb.facts.trackingB\027TrackingProtocolB" +
-      "uffers"
+      "\010 \001(\005\022\034\n\024isStructuralEquality\030\t \001(\010\"8\n\006T" +
+      "agMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\021\n\tcl" +
+      "assname\030\003 \001(\tB=\n\"org.eclipse.imp.pdb.fac" +
+      "ts.trackingB\027TrackingProtocolBuffers"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
       new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
@@ -3022,7 +3103,7 @@ public final class TrackingProtocolBuffers {
           internal_static_EqualsRelation_fieldAccessorTable = new
             com.google.protobuf.GeneratedMessage.FieldAccessorTable(
               internal_static_EqualsRelation_descriptor,
-              new java.lang.String[] { "Tag1", "Tag2", "Result", "DeepCount", "Timestamp", "DeepTime", "IsHashLookup", "DeepReferenceEqualityCount", });
+              new java.lang.String[] { "Tag1", "Tag2", "Result", "DeepCount", "Timestamp", "DeepTime", "IsHashLookup", "DeepReferenceEqualityCount", "IsStructuralEquality", });
           internal_static_TagMap_descriptor =
             getDescriptor().getMessageTypes().get(2);
           internal_static_TagMap_fieldAccessorTable = new
