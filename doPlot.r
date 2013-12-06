@@ -103,12 +103,12 @@ names(eqCallsTmp) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEquali
 # do estimation
 eqCallsEst <- data.frame(eqCallsTmp$timestamp, 
                          eqCallsTmp$recursiveEquals, 
-                         eqCallsTmp$recursiveReferenceEqualities + eqCallsNom$rootEquals)
+                         eqCallsTmp$recursiveReferenceEqualities + eqCallsNom$rootEquals + eqCallsNom$rootReferenceEqualities)
 names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEqualities')
 
 #pdf("_equality-equals-total.pdf")
   plot(cumsum(eqCallsNom$recursiveEquals), 
-       ylim = range(cumsum(eqCallsNom$recursiveEquals),
+       ylim = range(#cumsum(eqCallsNom$recursiveEquals),
                     cumsum(eqCallsEst$recursiveEquals),
                     cumsum(eqCallsShaInt$recursiveEquals)), # +eqCallsShaExt$recursiveEquals not needed
        type='n', xaxt = "n", xlab = "Program Progress", ylab = "Total of Equality Checks")
@@ -118,8 +118,8 @@ names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEquali
   legend('bottomright', c('program equals calls', 'estimated equals calls in sharing impl.', 'validated equals in sharing impl.'), 
        lty=1, col=c('black', 'purple', 'red'), bty='n', cex=.75)
 
-  lines(cumsum(eqCallsNom$recursiveEquals), type='s', col='black')
-  lines(cumsum(eqCallsNom$recursiveLogicalEquals), type='s', col='blue')
+  #lines(cumsum(eqCallsNom$recursiveEquals), type='s', col='black')
+  #lines(cumsum(eqCallsNom$recursiveLogicalEquals), type='s', col='blue')
   lines(cumsum(eqCallsEst$recursiveEquals), type='s', col='purple', lty=2)
   #lines(cumsum(eqCallsTmp$recursiveEquals), type='s', col='purple', lty=2)
   lines(cumsum(eqCallsShaInt$recursiveEquals), type='s', col='red') # +eqCallsShaExt$recursiveEquals not needed
@@ -141,16 +141,14 @@ names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEquali
 
 #pdf("_equality-equals-timely.pdf")
   plot(eqCallsNom$recursiveEquals, 
-     ylim = range(eqCallsNom$recursiveEquals,
+     ylim = range(#eqCallsNom$recursiveEquals,
                   eqCallsEst$recursiveEquals,
                   eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), 
      type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
   #par(new=T)
   xAxisPercentage()
-  #abline(lm(eqCallsEst$recursiveEquals ~ eqCallsNom$recursiveEquals), col='green')
-  #abline(lm(eqCallsNom$recursiveEquals ~ eqCallsNom$timestamp), col='green')
-  lines(eqCallsNom$recursiveEquals, type='s', col='black')
-  lines(eqCallsNom$recursiveLogicalEquals, type='s', col='blue')
+  #lines(eqCallsNom$recursiveEquals, type='s', col='black')
+  #lines(eqCallsNom$recursiveLogicalEquals, type='s', col='blue')
   lines(eqCallsEst$recursiveEquals, type='s', col='purple', lty=2)
   lines(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals, type='s', col='red')
   title("Equal Calls Evolution") # Forecast (Count)
@@ -283,10 +281,15 @@ print(max(cumsum(eqCallsShaExt$recursiveEquals)))
 print(max(cumsum(eqCallsNom$rootEquals)))
 print(max(cumsum(eqCallsNom$recursiveEquals)))
 
+print(max(cumsum(eqCallsNom$rootLogicalEquals)))
+print(max(cumsum(eqCallsShaExt$rootLogicalEquals)))
+print(max(cumsum(eqCallsNom$recursiveLogicalEquals)))
+print(max(cumsum(eqCallsShaExt$recursiveLogicalEquals)))
+
 
 print("Expected reference equalities vs measured")
 print(max(cumsum(eqCallsEst$recursiveReferenceEqualities)))
-print(max(cumsum(eqCallsShaInt$recursiveReferenceEqualities)))
+print(max(cumsum(eqCallsShaInt$recursiveReferenceEqualities)) + max(cumsum(eqCallsShaExt$recursiveReferenceEqualities)))
 
 print(max(cumsum(eqCallsShaExt$recursiveReferenceEqualities)))
-print(max(cumsum(eqCallsNom$recursiveReferenceEqualities)))
+print(max(cumsum(eqCallsNom$recursiveReferenceEqualities)) + max(cumsum(eqCallsNom$rootEquals)))
