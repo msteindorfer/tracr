@@ -29,8 +29,8 @@ object Tracr extends App {
   //  val path = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/"
 
   //  val path = s"/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/_${if (isSharingEnabled) "b" else "a"}/"
-  //  val path = s"/Users/Michael/Development/rascal-devel/rascal-shell/target/_${if (isSharingEnabled) "b" else "a"}/"
-  val path = s"/Users/Michael/Development/rascal-devel/rascal/target/_${if (isSharingEnabled) "b" else "a"}/"
+  val path = s"/Users/Michael/Development/rascal-devel/rascal-shell/target/_${if (isSharingEnabled) "b" else "a"}/"
+  //  val path = s"/Users/Michael/Development/rascal-devel/rascal/target/_${if (isSharingEnabled) "b" else "a"}/"
 
   val tagMap: GenMap[Long, TagInfo] = time("Deserialize tag map from Google Protocol Buffers") {
     /*
