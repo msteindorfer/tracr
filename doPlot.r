@@ -293,3 +293,17 @@ print(max(cumsum(eqCallsShaInt$recursiveReferenceEqualities)) + max(cumsum(eqCal
 
 print(max(cumsum(eqCallsShaExt$recursiveReferenceEqualities)))
 print(max(cumsum(eqCallsNom$recursiveReferenceEqualities)) + max(cumsum(eqCallsNom$rootEquals)))
+
+
+##
+# Writing data to disk (~appending to CSV file)
+# http://stackoverflow.com/questions/8617347/how-do-i-append-a-vector-as-a-row-in-a-csv-file-with-r
+# http://stackoverflow.com/questions/12381117/add-header-to-file-created-by-write-csv
+###
+csvFileName <- "data-appended.csv"
+
+features <- numeric(0)
+features <- c(features, 1, 2)
+FF <- as.matrix(t(features))
+rownames(FF) <- 'benchmarkName'
+write.table(FF, file = csvFileName, sep = ",", col.names = FALSE, append=TRUE)
