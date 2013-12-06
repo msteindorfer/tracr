@@ -108,7 +108,7 @@ names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEquali
 
 #pdf("_equality-equals-total.pdf")
   plot(cumsum(eqCallsNom$recursiveEquals), 
-       ylim = range(#cumsum(eqCallsNom$recursiveEquals),
+       ylim = range(#cumsum(eqCallsNom$recursiveEquals), cumsum(eqCallsNom$recursiveLogicalEquals),
                     cumsum(eqCallsEst$recursiveEquals),
                     cumsum(eqCallsShaInt$recursiveEquals)), # +eqCallsShaExt$recursiveEquals not needed
        type='n', xaxt = "n", xlab = "Program Progress", ylab = "Total of Equality Checks")
@@ -141,7 +141,7 @@ names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEquali
 
 #pdf("_equality-equals-timely.pdf")
   plot(eqCallsNom$recursiveEquals, 
-     ylim = range(#eqCallsNom$recursiveEquals,
+     ylim = range(#eqCallsNom$recursiveEquals, eqCallsNom$recursiveLogicalEquals,
                   eqCallsEst$recursiveEquals,
                   eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), 
      type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
