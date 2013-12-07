@@ -1,4 +1,5 @@
-setwd("~/Development/rascal-devel/tracr")
+#!/usr/bin/env Rscript
+#setwd("~/Development/rascal-devel/tracr")
 
 ocNom    <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
 ocMin    <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)

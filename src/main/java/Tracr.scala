@@ -1,4 +1,5 @@
 import java.io._
+import java.nio.file.{Paths, Files}
 import java.nio.{ByteOrder, ByteBuffer}
 import java.util.zip.GZIPInputStream
 import org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers
@@ -17,20 +18,12 @@ case class TagInfo(digest: String, classname: String)
 
 object Tracr extends App {
 
-  val isSharingEnabled: Boolean = args.contains("sharingEnabled")
-
   import TracrUtil._
 
-  //  val filename = "/Users/Michael/Dropbox/Research/ObjectLifetime/ActualRun/target/universe"
+  val isSharingEnabled: Boolean = args.contains("sharingEnabled")
+  val path = if (args.head.endsWith("/")) args.head else args.head + "/"
 
-  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe-SingleElementSetJUnitBenchmark"
-  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values/target/universe"
-  //  val filename = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/universe"
-  //  val path = "/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/"
-
-  //  val path = s"/Users/Michael/Development/rascal-devel/pdb.values.benchmarks/target/_${if (isSharingEnabled) "b" else "a"}/"
-  val path = s"/Users/Michael/Development/rascal-devel/rascal-shell/target/_${if (isSharingEnabled) "b" else "a"}/"
-  //  val path = s"/Users/Michael/Development/rascal-devel/rascal/target/_${if (isSharingEnabled) "b" else "a"}/"
+  require (Files.exists(Paths.get(path)))
 
   val tagMap: GenMap[Long, TagInfo] = time("Deserialize tag map from Google Protocol Buffers") {
     /*
