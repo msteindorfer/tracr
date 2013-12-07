@@ -49,7 +49,7 @@ pdf("_heap-evolution.pdf")
   title("Heap Evolution")
 dev.off()
 
-#pdf("_heap-evolution-with-validation.pdf")
+pdf("_heap-evolution-with-validation.pdf")
   heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
   plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", xlab = "Program Progress", yaxt = "n", ylab = "Memory Usage")
   #par(new=T)
@@ -66,9 +66,9 @@ dev.off()
   xAxisPercentage()
   axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
   title("Heap Evolution (incl. Validation)")
-#dev.off()
+dev.off()
 
-#pdf("_memory_savings.pdf")
+pdf("_memory_savings.pdf")
   # plot(diff, type='l')
   max <- range(percEst, percSha)
   range <- range(-max, max)
@@ -84,7 +84,7 @@ dev.off()
   #lmfit <- lm(percEst ~ 1)
   #abline(lmfit)
   title("Memory Savings")
-#dev.off()
+dev.off()
 
 ###
 # Equal Calls
@@ -106,7 +106,7 @@ eqCallsEst <- data.frame(eqCallsTmp$timestamp,
                          eqCallsTmp$recursiveReferenceEqualities + eqCallsNom$rootEquals + eqCallsNom$rootReferenceEqualities)
 names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEqualities')
 
-#pdf("_equality-equals-total.pdf")
+pdf("_equality-equals-total.pdf")
   plot(cumsum(eqCallsNom$recursiveEquals), 
        ylim = range(#cumsum(eqCallsNom$recursiveEquals), cumsum(eqCallsNom$recursiveLogicalEquals),
                     cumsum(eqCallsEst$recursiveEquals),
@@ -124,9 +124,9 @@ names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEquali
   #lines(cumsum(eqCallsTmp$recursiveEquals), type='s', col='purple', lty=2)
   lines(cumsum(eqCallsShaInt$recursiveEquals), type='s', col='red') # +eqCallsShaExt$recursiveEquals not needed
   title("Equal Calls Evolution") # Forecast (Count)
-#dev.off()
+dev.off()
 
-#pdf("_equality-reference-calls-total.pdf")
+pdf("_equality-reference-calls-total.pdf")
   plot(cumsum(eqCallsNom$recursiveEquals), 
      ylim = range(cumsum(eqCallsEst$recursiveReferenceEqualities),
                   cumsum(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities)), 
@@ -137,9 +137,9 @@ names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEquali
   #lines(cumsum(eqCallsTmp$recursiveReferenceEqualities), col='purple', lty=2)
   lines(cumsum(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities), col='red')
   title("Reference Equality Evolution") # Forecast (Count)
-#dev.off()
+dev.off()
 
-#pdf("_equality-equals-timely.pdf")
+pdf("_equality-equals-timely.pdf")
   plot(eqCallsNom$recursiveEquals, 
      ylim = range(#eqCallsNom$recursiveEquals, eqCallsNom$recursiveLogicalEquals,
                   eqCallsEst$recursiveEquals,
@@ -152,9 +152,9 @@ names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEquali
   lines(eqCallsEst$recursiveEquals, type='s', col='purple', lty=2)
   lines(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals, type='s', col='red')
   title("Equal Calls Evolution") # Forecast (Count)
-#dev.off()
+dev.off()
 
-#pdf("_equality-reference-calls-timely.pdf")
+pdf("_equality-reference-calls-timely.pdf")
   plot(eqCallsNom$recursiveEquals, 
        ylim = range(eqCallsEst$recursiveReferenceEqualities,
                     eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities), 
@@ -165,7 +165,7 @@ names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEquali
   #lines(eqCallsTmp$recursiveReferenceEqualities, col='purple', lty=2)
   lines(eqCallsShaExt$recursiveReferenceEqualities + eqCallsShaInt$recursiveReferenceEqualities, col='red')
   title("Reference Equality Evolution") # Forecast (Count)
-#dev.off()
+dev.off()
 
 eqPercEst <- (eqCallsNom$V7-eqCallsEst$V2)*100/eqCallsNom$V7
 eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
