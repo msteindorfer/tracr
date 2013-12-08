@@ -255,7 +255,7 @@ object Tracr extends App {
         while (true) {
           val protoEqualsCall = TrackingProtocolBuffers.EqualsRelation.parseDelimitedFrom(protoInputStream)
 
-          equalsRelationBuilder += EqualsCall(
+          val eq = EqualsCall(
             protoEqualsCall.getTag1,
             protoEqualsCall.getTag2,
             protoEqualsCall.getResult,
@@ -266,6 +266,9 @@ object Tracr extends App {
             protoEqualsCall.getIsHashLookup,
             protoEqualsCall.getIsStructuralEquality
           )
+
+          // Filter out collissions because of the sheer amount
+          if (!eq.isHashLookup || eq.isHashLookup && eq.result) equalsRelationBuilder += eq
         }
       } catch {
         case _: Exception => {}
@@ -307,6 +310,12 @@ object Tracr extends App {
 //
 //    }
 
+  // object EqualsRelationFilter extends Enumeration {
+  //   type EqualsRelationFilter = Value
+  //   val EXT, INT, INT_TRUE = Value // etc.
+  // }
+  // import EqualsRelationFilter._
+
   if (isSharingEnabled) {
     time ("Project equals/isEqual calls [external]") {
       projectEqualsProperty("equalCalls-sha-ext.dat", equalsRelation filter { eq => (!eq.isHashLookup) }, timestampRange, stepSize)
@@ -323,6 +332,9 @@ object Tracr extends App {
   }
 
   def projectEqualsProperty(filename: String, sortedRelation: GenSeq[EqualsCall], timestampRange: NumericRange[Long], stepSize: Long) {
+    // TODO: Operate on indices instead of summarizing first (created to much memory overhead)
+    // TODO: Use EqualsRelationFilter to apply filtering on the go instead of filtering upfront.
+
     /*
      * The following shapes of equals/== are expected:
      * * recursiveEquals == 0 && recursiveReferenceEqualities == 1
