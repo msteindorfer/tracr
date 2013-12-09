@@ -24,8 +24,9 @@ percEst <- (hsNom$V2-hsEst$V2)*100/hsNom$V2
 percSha <- (hsNom$V2-hsSha$V2)*100/hsNom$V2
 
 # y-Axis percentage setup 
+nrow <- nrow(eqCallsEst)
 xAxisPercentage <- function() {
-  axis(1, x <- seq(from=0, to=3000, by=600), labels = paste(x*100/3000, "%", sep = ""))
+  axis(1, x <- seq(from=0, to=nrow, by=nrow/5), labels = paste(x*100/nrow, "%", sep = ""))
 }
 
 
@@ -100,17 +101,17 @@ names(eqCallsNom) <- c('timestamp', 'rootEquals', 'recursiveEquals', 'rootRefere
 
 # data for all cache hits
 eqCallsTmp <- read.csv("equalCalls-est.dat", sep=" ", header=FALSE)
-names(eqCallsTmp) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEqualities')
+names(eqCallsTmp) <- c('timestamp', 'rootEquals', 'recursiveReferenceEqualities')
 # do estimation
 eqCallsEst <- data.frame(eqCallsTmp$timestamp, 
-                         eqCallsTmp$recursiveEquals, 
+                         eqCallsTmp$rootEquals, 
                          eqCallsTmp$recursiveReferenceEqualities + eqCallsNom$rootEquals + eqCallsNom$rootReferenceEqualities)
-names(eqCallsEst) <- c('timestamp', 'recursiveEquals', 'recursiveReferenceEqualities')
+names(eqCallsEst) <- c('timestamp', 'rootEquals', 'recursiveReferenceEqualities')
 
 pdf("_equality-equals-total.pdf")
   plot(cumsum(eqCallsNom$recursiveEquals), 
        ylim = range(#cumsum(eqCallsNom$recursiveEquals), cumsum(eqCallsNom$recursiveLogicalEquals),
-                    cumsum(eqCallsEst$recursiveEquals),
+                    cumsum(eqCallsEst$rootEquals),
                     cumsum(eqCallsShaInt$recursiveEquals)), # +eqCallsShaExt$recursiveEquals not needed
        type='n', xaxt = "n", xlab = "Program Progress", ylab = "Total of Equality Checks")
   #par(new=T)
@@ -121,8 +122,8 @@ pdf("_equality-equals-total.pdf")
 
   #lines(cumsum(eqCallsNom$recursiveEquals), type='s', col='black')
   #lines(cumsum(eqCallsNom$recursiveLogicalEquals), type='s', col='blue')
-  lines(cumsum(eqCallsEst$recursiveEquals), type='s', col='purple', lty=2)
-  #lines(cumsum(eqCallsTmp$recursiveEquals), type='s', col='purple', lty=2)
+  lines(cumsum(eqCallsEst$rootEquals), type='s', col='purple', lty=2)
+  #lines(cumsum(eqCallsTmp$rootEquals), type='s', col='purple', lty=2)
   lines(cumsum(eqCallsShaInt$recursiveEquals), type='s', col='red') # +eqCallsShaExt$recursiveEquals not needed
   title("Equal Calls Evolution") # Forecast (Count)
 dev.off()
@@ -143,14 +144,14 @@ dev.off()
 pdf("_equality-equals-timely.pdf")
   plot(eqCallsNom$recursiveEquals, 
      ylim = range(#eqCallsNom$recursiveEquals, eqCallsNom$recursiveLogicalEquals,
-                  eqCallsEst$recursiveEquals,
+                  eqCallsEst$rootEquals,
                   eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), 
      type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
   #par(new=T)
   xAxisPercentage()
   #lines(eqCallsNom$recursiveEquals, type='s', col='black')
   #lines(eqCallsNom$recursiveLogicalEquals, type='s', col='blue')
-  lines(eqCallsEst$recursiveEquals, type='s', col='purple', lty=2)
+  lines(eqCallsEst$rootEquals, type='s', col='purple', lty=2)
   lines(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals, type='s', col='red')
   title("Equal Calls Evolution") # Forecast (Count)
 dev.off()
@@ -244,22 +245,38 @@ eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
 #     grid(NULL, NA)
 #   #dev.off()
 
+hsEstWith <- function(memBytesPerRecordOverhead) {
+  hsTmp <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*memBytesPerRecordOverhead))
+  names(hsTmp) <- c('V1', 'V2')
+  return(hsTmp)
+}
+
+hsShaWith <- function(memBytesPerRecordOverhead) {
+  hsTmp <- data.frame(hsShaPure$V1, hsShaPure$V2+(ocShaMin$V2*memBytesPerRecordOverhead))
+  names(hsTmp) <- c('V1', 'V2')
+  return(hsTmp)
+}
+
+hsSha <- data.frame(hsShaPure$V1, hsShaPure$V2+(ocShaMin$V2*bytesPerRecordOverhead))
+names(hsSha) <- c('V1', 'V2')
+
+savingsWithBytesPerRecordOverhead <- function(hsTmp) {
+  memSavingsDevelopment <- (cumsum(as.numeric(hsNom$V2)) - cumsum(as.numeric(hsTmp$V2)))*100/cumsum(as.numeric(hsNom$V2))
+  memSavings <- (sum(as.numeric(hsNom$V2)) - sum(as.numeric(hsTmp$V2)))*100/sum(as.numeric(hsNom$V2))  
+  
+  return(memSavings)
+}
+
 print("Summary:")
 
-print("Mean [Estimated Savings]")
-print(mean(percEst))
-
-print("Mean [Real Sharing Savings]")
-print(mean(percSha))
-
 print("Equal Calls [Count] in Program [removed]")
-print(sum(eqCallsNom$V2))
+print(sum(eqCallsNom$rootEquals))
 
-print("Equal Calls [Time] in Program [removed]")
-print(round(sum(eqCallsNom$V4)/1000000, 2)); print("ms") # in milli-seconds
+#print("Equal Calls [Time] in Program [removed]")
+#print(round(sum(eqCallsNom$V4)/1000000, 2)); print("ms") # in milli-seconds
 
 print("Replaced by Reference Comparisions in Program [introduced]") # equals number of deep equals
-print(sum(eqCallsNom$V6))
+print(sum(eqCallsNom$recursiveEquals))
 
 print("Equal Calls [Count] in HashTable [introduced]")
 print(sum(eqCallsShaInt$V2))
@@ -274,37 +291,139 @@ print(max(ocNom$V2))
 
 
 print("Expected cache hits vs measured cache hits")
-print(max(cumsum(eqCallsEst$recursiveEquals)))
-print(max(cumsum(eqCallsShaInt$recursiveEquals)))
+cacheHitsEst <- max(cumsum(eqCallsEst$rootEquals))
+cacheHitsSha <- max(cumsum(eqCallsShaInt$rootEquals))
 
-print(max(cumsum(eqCallsShaExt$rootEquals)))
-print(max(cumsum(eqCallsShaExt$recursiveEquals)))
-print(max(cumsum(eqCallsNom$rootEquals)))
-print(max(cumsum(eqCallsNom$recursiveEquals)))
+# Cache Misses
+# print(max(ocNom$V2) - max(cumsum(eqCallsEst$rootEquals)) - 2) # = object allocations - cache hits - 2 boolean constants
+# print(max(ocSha$V2) - max(cumsum(eqCallsShaInt$rootEquals)) - 2) # = object allocations - cache hits - 2 boolean constants
 
-print(max(cumsum(eqCallsNom$rootLogicalEquals)))
-print(max(cumsum(eqCallsShaExt$rootLogicalEquals)))
-print(max(cumsum(eqCallsNom$recursiveLogicalEquals)))
-print(max(cumsum(eqCallsShaExt$recursiveLogicalEquals)))
+objectsAllocated <- max(ocNom$V2) 
+
+
+# print(max(cumsum(eqCallsShaExt$rootEquals)))
+# print(max(cumsum(eqCallsShaExt$recursiveEquals)))
+# print(max(cumsum(eqCallsNom$rootEquals)))
+# print(max(cumsum(eqCallsNom$recursiveEquals)))
+
+# print(max(cumsum(eqCallsNom$rootLogicalEquals)))
+# print(max(cumsum(eqCallsShaExt$rootLogicalEquals)))
+# print(max(cumsum(eqCallsNom$recursiveLogicalEquals)))
+# print(max(cumsum(eqCallsShaExt$recursiveLogicalEquals)))
 
 
 print("Expected reference equalities vs measured")
-print(max(cumsum(eqCallsEst$recursiveReferenceEqualities)))
-print(max(cumsum(eqCallsShaInt$recursiveReferenceEqualities)) + max(cumsum(eqCallsShaExt$recursiveReferenceEqualities)))
 
-print(max(cumsum(eqCallsShaExt$recursiveReferenceEqualities)))
-print(max(cumsum(eqCallsNom$recursiveReferenceEqualities)) + max(cumsum(eqCallsNom$rootEquals)))
+# eqCallsEst already contains the sum; was added before
+referenceEqualitiesEst <- (
+  sum(eqCallsEst$recursiveReferenceEqualities) # estimate hash-table lookups
+# +sum(eqCallsNom$recursiveReferenceEqualities) # add existing reference equalities
+# +sum(eqCallsNom$rootEquals) # add existing equals that are going to be replaced
+)
+  
+referenceEqualitiesSha <- (
+   sum(eqCallsShaInt$recursiveReferenceEqualities) # measured hash-table lookups
+ + sum(eqCallsShaExt$recursiveReferenceEqualities) # add existing reference equalities
+)
+   
+print(referenceEqualitiesEst)
+print(referenceEqualitiesSha)
 
+
+memSavingsEst0 <- savingsWithBytesPerRecordOverhead(hsEstWith(0))
+memSavingsSha0 <- savingsWithBytesPerRecordOverhead(hsShaWith(0))
+
+memSavingsEst8 <- savingsWithBytesPerRecordOverhead(hsEstWith(8))
+memSavingsSha8 <- savingsWithBytesPerRecordOverhead(hsShaWith(8))
+
+memSavingsEst42 <- savingsWithBytesPerRecordOverhead(hsEstWith(42))
+memSavingsSha42 <- savingsWithBytesPerRecordOverhead(hsShaWith(42))
+
+memSavingsEst79 <- savingsWithBytesPerRecordOverhead(hsEstWith(79))
+memSavingsSha79 <- savingsWithBytesPerRecordOverhead(hsShaWith(79))
+
+
+
+hashAndCacheStatistic <- read.csv("_hashAndCacheStatistic.bin.txt", sep=":", header=FALSE)
+statHashCollisions <- hashAndCacheStatistic$V2[1]
+statCacheHit <- hashAndCacheStatistic$V2[3]
+statCacheMiss <- hashAndCacheStatistic$V2[4] + hashAndCacheStatistic$V2[5]
 
 ##
 # Writing data to disk (~appending to CSV file)
 # http://stackoverflow.com/questions/8617347/how-do-i-append-a-vector-as-a-row-in-a-csv-file-with-r
 # http://stackoverflow.com/questions/12381117/add-header-to-file-created-by-write-csv
 ###
-csvFileName <- "data-appended.csv"
 
-features <- numeric(0)
-features <- c(features, 1, 2)
-FF <- as.matrix(t(features))
-rownames(FF) <- 'benchmarkName'
-write.table(FF, file = csvFileName, sep = ",", col.names = FALSE, append=TRUE)
+resultColumnNames1 <- c('O. Alloc',
+                       'Hits Est.', 'Hits Real.',
+                       'Est. 0', 'Real. 0',
+                       'Est. 42', 'Real. 42',
+                       'Est. 79', 'Real. 79'
+)
+
+features1 <- numeric(0)
+features1 <- c(features1,
+              format(as.numeric(objectsAllocated), digits=2, scientific=TRUE),
+              
+              format(as.numeric(cacheHitsEst), digits=2, scientific=TRUE),
+              format(as.numeric(cacheHitsSha), digits=2, scientific=TRUE),
+
+              format(as.numeric(memSavingsEst0), nsmall=2, digits=2, scientific=FALSE),
+              format(as.numeric(memSavingsSha0), nsmall=2, digits=2, scientific=FALSE),
+
+              format(as.numeric(memSavingsEst42), nsmall=2, digits=2, scientific=FALSE),
+              format(as.numeric(memSavingsSha42), nsmall=2, digits=2, scientific=FALSE),              
+              
+              format(as.numeric(memSavingsEst79), nsmall=2, digits=2, scientific=FALSE),
+              format(as.numeric(memSavingsSha79), nsmall=2, digits=2, scientific=FALSE)              
+)
+
+resultColumnNames2 <- c('Eq', 'EqRec',
+                        '==', '==Rec',
+                        'LogEq', 'LogEqRec',
+                        #
+                        #
+                        #
+                        'Eq', 'EqRec',                       
+                        '==', '==Rec',
+                        'LogEq', 'LogEqRec',
+                        'Coll.'
+)
+
+features2 <- numeric(0)
+features2 <- c(features2,               
+              format(as.numeric(sum(eqCallsNom$rootEquals)), digits=2, scientific=TRUE),
+              format(as.numeric(sum(eqCallsNom$recursiveEquals)), digits=2, scientific=TRUE),
+                            
+              format(as.numeric(sum(eqCallsNom$rootReferenceEqualities)), digits=2, scientific=TRUE),
+              format(as.numeric(sum(eqCallsNom$recursiveReferenceEqualities)), digits=2, scientific=TRUE),
+              
+              format(as.numeric(sum(eqCallsNom$rootLogicalEquals)), digits=2, scientific=TRUE),
+              format(as.numeric(sum(eqCallsNom$recursiveLogicalEquals)), digits=2, scientific=TRUE),
+              
+              # sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals),
+              # sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities),
+              # sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals),
+              
+              format(as.numeric(cacheHitsEst), digits=2, scientific=TRUE),
+              format(as.numeric(cacheHitsSha), digits=2, scientific=TRUE),
+                            
+              format(as.numeric(referenceEqualitiesEst), digits=2, scientific=TRUE),
+              format(as.numeric(referenceEqualitiesSha), digits=2, scientific=TRUE),
+              
+              format(as.numeric(sum(eqCallsShaExt$rootLogicalEquals)), digits=2, scientific=TRUE),
+              format(as.numeric(sum(eqCallsShaExt$recursiveLogicalEquals)), digits=2, scientific=TRUE),
+              
+              format(as.numeric(statHashCollisions), digits=2, scientific=TRUE) #, statCacheHit, statCacheMiss
+)
+
+FF1 <- as.matrix(t(features1))
+rownames(FF1) <- scan("_benchmarkName.bin.txt", what = '')
+colnames(FF1) <- resultColumnNames1
+write.table(FF1, file = "_results1.csv", sep = " & ", col.names = TRUE, append = FALSE, quote = FALSE)
+
+FF2 <- as.matrix(t(features2))
+rownames(FF2) <- scan("_benchmarkName.bin.txt", what = '')
+colnames(FF2) <- resultColumnNames2
+write.table(FF2, file = "_results2.csv", sep = " & ", col.names = TRUE, append = FALSE, quote = FALSE)
