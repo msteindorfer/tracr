@@ -337,20 +337,21 @@ object Tracr extends App {
 
     /*
      * The following shapes of equals/== are expected:
-     * * recursiveEquals == 0 && recursiveReferenceEqualities == 1
-     * * recursiveEquals >  0 && recursiveReferenceEqualities >= 0
+     * * recursive(Logical)Equals == 0 && recursiveReferenceEqualities == 1
+     * * recursive(Logical)Equals >  0 && recursiveReferenceEqualities >= 0
      */
     val summarized = sortedRelation.groupBy(_.timestamp).mapValues {
       case callsByTimestamp => {
         val (structuralEquals, logicalEquals) = callsByTimestamp.partition(_.isStructuralEquality)
 
+        val sumRootEquals                   = structuralEquals.filter(_.deepCount != 0).size
         val sumRecursiveEquals              = structuralEquals.map(_.deepCount).sum
-        val sumRecursiveReferenceEqualities = structuralEquals.map(_.deepReferenceEqualityCount).sum
+
+        val sumRootLogicalEquals            = logicalEquals.filter(_.deepCount != 0).size
         val sumRecursiveLogicalEquals       = logicalEquals.map(_.deepCount).sum
 
-        val sumRootEquals                   = structuralEquals.filter(_.deepCount != 0).size
-        val sumRootReferenceEqualities      = structuralEquals.filter(_.deepCount == 0).size
-        val sumRootLogicalEquals            = logicalEquals.filter(_.deepCount != 0).size
+        val sumRootReferenceEqualities      = structuralEquals.filter(_.deepCount == 0).size + logicalEquals.filter(_.deepCount == 0).size
+        val sumRecursiveReferenceEqualities = structuralEquals.map(_.deepReferenceEqualityCount).sum + logicalEquals.map(_.deepReferenceEqualityCount).sum
 
         (sumRootEquals, sumRecursiveEquals, sumRootReferenceEqualities, sumRecursiveReferenceEqualities, sumRootLogicalEquals, sumRecursiveLogicalEquals)
       }
