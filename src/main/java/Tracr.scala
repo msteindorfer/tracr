@@ -25,6 +25,8 @@ object Tracr extends App {
 
   require (Files.exists(Paths.get(path)))
 
+  val BUF_SIZE = 16777216
+
   val tagMap: GenMap[Long, TagInfo] = time("Deserialize tag map from Google Protocol Buffers") {
     /*
      * Read-in equals relation.
@@ -32,7 +34,7 @@ object Tracr extends App {
     val tagMapBuilder = Map.newBuilder[Long, TagInfo]
 
     {
-      val protoInputStream = new GZIPInputStream(new FileInputStream(path + "_tag_map.bin.gz"))
+      val protoInputStream = new BufferedInputStream(new GZIPInputStream(new FileInputStream(path + "_tag_map.bin.gz")), BUF_SIZE)
       try {
         while (true) {
           val proto = TrackingProtocolBuffers.TagMap.parseDelimitedFrom(protoInputStream)
@@ -85,7 +87,7 @@ object Tracr extends App {
     val universeBuilder = Vector.newBuilder[ObjectLifetime]
 
     {
-      val protoInputStream = new GZIPInputStream(new FileInputStream(path + "_allocation_relation.bin.gz"))
+      val protoInputStream = new BufferedInputStream(new GZIPInputStream(new FileInputStream(path + "_allocation_relation.bin.gz")), BUF_SIZE)
       try {
         while (true) {
           val protoObjectLifetime = TrackingProtocolBuffers.ObjectLifetime.parseDelimitedFrom(protoInputStream)
@@ -250,7 +252,7 @@ object Tracr extends App {
     val equalsRelationBuilder = Vector.newBuilder[EqualsCall]
 
     {
-      val protoInputStream = new GZIPInputStream(new FileInputStream(path + "_equals_relation.bin.gz"))
+      val protoInputStream = new BufferedInputStream(new GZIPInputStream(new FileInputStream(path + "_equals_relation.bin.gz")), BUF_SIZE)
       try {
         while (true) {
           val protoEqualsCall = TrackingProtocolBuffers.EqualsRelation.parseDelimitedFrom(protoInputStream)
