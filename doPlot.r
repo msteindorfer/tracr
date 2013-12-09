@@ -24,7 +24,7 @@ percEst <- (hsNom$V2-hsEst$V2)*100/hsNom$V2
 percSha <- (hsNom$V2-hsSha$V2)*100/hsNom$V2
 
 # y-Axis percentage setup 
-nrow <- nrow(eqCallsEst)
+nrow <- nrow(hsNom)
 xAxisPercentage <- function() {
   axis(1, x <- seq(from=0, to=nrow, by=nrow/5), labels = paste(x*100/nrow, "%", sep = ""))
 }
