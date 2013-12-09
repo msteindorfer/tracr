@@ -315,6 +315,7 @@ object Tracr extends App {
   //   val EXT, INT, INT_TRUE = Value // etc.
   // }
   // import EqualsRelationFilter._
+  // http://stackoverflow.com/questions/11067396/understanding-scala-enumerations
 
   if (isSharingEnabled) {
     time ("Project equals/isEqual calls [external]") {
