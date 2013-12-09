@@ -418,12 +418,15 @@ features2 <- c(features2,
               format(as.numeric(statHashCollisions), digits=2, scientific=TRUE) #, statCacheHit, statCacheMiss
 )
 
+benchmarkName <- scan("_benchmarkName.bin.txt", what = '')
+benchmarkShortName <- scan("_benchmarkShortName.bin.txt", what = '')
+
 FF1 <- as.matrix(t(features1))
-rownames(FF1) <- scan("_benchmarkName.bin.txt", what = '')
+rownames(FF1) <- benchmarkShortName
 colnames(FF1) <- resultColumnNames1
 write.table(FF1, file = "_results1.csv", sep = " & ", col.names = TRUE, append = FALSE, quote = FALSE)
 
 FF2 <- as.matrix(t(features2))
-rownames(FF2) <- scan("_benchmarkName.bin.txt", what = '')
+rownames(FF2) <- benchmarkShortName
 colnames(FF2) <- resultColumnNames2
 write.table(FF2, file = "_results2.csv", sep = " & ", col.names = TRUE, append = FALSE, quote = FALSE)
