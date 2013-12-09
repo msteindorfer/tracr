@@ -355,6 +355,36 @@ statCacheMiss <- hashAndCacheStatistic$V2[4] + hashAndCacheStatistic$V2[5]
 # http://stackoverflow.com/questions/12381117/add-header-to-file-created-by-write-csv
 ###
 
+# install.packages("sitools")
+require(sitools)
+
+# http://stackoverflow.com/questions/11340444/is-there-an-r-function-to-format-number-using-unit-prefix
+f2si2<-function (number,rounding=F) 
+{
+  lut <- c(1e-24, 1e-21, 1e-18, 1e-15, 1e-12, 1e-09, 1e-06, 
+           0.001, 1, 1000, 1e+06, 1e+09, 1e+12, 1e+15, 1e+18, 1e+21, 
+           1e+24)
+  pre <- c("y", "z", "a", "f", "p", "n", "u", "m", "", "k", 
+           "M", "G", "T", "P", "E", "Z", "Y")
+  ix <- findInterval(number, lut)
+  if (lut[ix]!=1) {
+    if (rounding==T) {
+      sistring <- paste(formatC(round(number/lut[ix]), digits = 2, format="f"), pre[ix], sep = "")
+    }
+    else {
+      sistring <- paste(formatC(number/lut[ix], digits = 2, format="f"), pre[ix], sep = "")
+    } 
+  }
+  else {
+    sistring <- as.character(number)
+  }
+  return(sistring)
+}
+
+formatPercent <- function(arg) {
+  return (format(round(as.numeric(arg), 2), nsmall=2, digits=2, scientific=FALSE))
+}
+
 resultColumnNames1 <- c('O. Alloc',
                        'Hits Est.', 'Hits Real.',
                        'Est. 0', 'Real. 0',
@@ -364,19 +394,19 @@ resultColumnNames1 <- c('O. Alloc',
 
 features1 <- numeric(0)
 features1 <- c(features1,
-              format(as.numeric(objectsAllocated), digits=2, scientific=TRUE),
+              f2si2(objectsAllocated),
               
-              format(as.numeric(cacheHitsEst), digits=2, scientific=TRUE),
-              format(as.numeric(cacheHitsSha), digits=2, scientific=TRUE),
+               f2si2(cacheHitsEst),
+               f2si2(cacheHitsSha),
 
-              format(as.numeric(memSavingsEst0), nsmall=2, digits=2, scientific=FALSE),
-              format(as.numeric(memSavingsSha0), nsmall=2, digits=2, scientific=FALSE),
-
-              format(as.numeric(memSavingsEst42), nsmall=2, digits=2, scientific=FALSE),
-              format(as.numeric(memSavingsSha42), nsmall=2, digits=2, scientific=FALSE),              
-              
-              format(as.numeric(memSavingsEst79), nsmall=2, digits=2, scientific=FALSE),
-              format(as.numeric(memSavingsSha79), nsmall=2, digits=2, scientific=FALSE)              
+               formatPercent(memSavingsEst0),
+               formatPercent(memSavingsSha0),
+               
+               formatPercent(memSavingsEst42),
+               formatPercent(memSavingsSha42),
+               
+               formatPercent(memSavingsEst79),
+               formatPercent(memSavingsSha79)
 )
 
 resultColumnNames2 <- c('Eq', 'EqRec',
@@ -393,29 +423,29 @@ resultColumnNames2 <- c('Eq', 'EqRec',
 
 features2 <- numeric(0)
 features2 <- c(features2,               
-              format(as.numeric(sum(eqCallsNom$rootEquals)), digits=2, scientific=TRUE),
-              format(as.numeric(sum(eqCallsNom$recursiveEquals)), digits=2, scientific=TRUE),
+              format(as.numeric(sum(eqCallsNom$rootEquals)), digits=2, scientific=FALSE),
+              format(as.numeric(sum(eqCallsNom$recursiveEquals)), digits=2, scientific=FALSE),
                             
-              format(as.numeric(sum(eqCallsNom$rootReferenceEqualities)), digits=2, scientific=TRUE),
-              format(as.numeric(sum(eqCallsNom$recursiveReferenceEqualities)), digits=2, scientific=TRUE),
+              format(as.numeric(sum(eqCallsNom$rootReferenceEqualities)), digits=2, scientific=FALSE),
+              format(as.numeric(sum(eqCallsNom$recursiveReferenceEqualities)), digits=2, scientific=FALSE),
               
-              format(as.numeric(sum(eqCallsNom$rootLogicalEquals)), digits=2, scientific=TRUE),
-              format(as.numeric(sum(eqCallsNom$recursiveLogicalEquals)), digits=2, scientific=TRUE),
+              format(as.numeric(sum(eqCallsNom$rootLogicalEquals)), digits=2, scientific=FALSE),
+              format(as.numeric(sum(eqCallsNom$recursiveLogicalEquals)), digits=2, scientific=FALSE),
               
               # sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals),
               # sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities),
               # sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals),
               
-              format(as.numeric(cacheHitsEst), digits=2, scientific=TRUE),
-              format(as.numeric(cacheHitsSha), digits=2, scientific=TRUE),
+              format(as.numeric(cacheHitsEst), digits=2, scientific=FALSE),
+              format(as.numeric(cacheHitsSha), digits=2, scientific=FALSE),
                             
-              format(as.numeric(referenceEqualitiesEst), digits=2, scientific=TRUE),
-              format(as.numeric(referenceEqualitiesSha), digits=2, scientific=TRUE),
+              format(as.numeric(referenceEqualitiesEst), digits=2, scientific=FALSE),
+              format(as.numeric(referenceEqualitiesSha), digits=2, scientific=FALSE),
               
-              format(as.numeric(sum(eqCallsShaExt$rootLogicalEquals)), digits=2, scientific=TRUE),
-              format(as.numeric(sum(eqCallsShaExt$recursiveLogicalEquals)), digits=2, scientific=TRUE),
+              format(as.numeric(sum(eqCallsShaExt$rootLogicalEquals)), digits=2, scientific=FALSE),
+              format(as.numeric(sum(eqCallsShaExt$recursiveLogicalEquals)), digits=2, scientific=FALSE),
               
-              format(as.numeric(statHashCollisions), digits=2, scientific=TRUE) #, statCacheHit, statCacheMiss
+              format(as.numeric(statHashCollisions), digits=2, scientific=FALSE) #, statCacheHit, statCacheMiss
 )
 
 benchmarkName <- scan("_benchmarkName.bin.txt", what = '')
@@ -424,9 +454,9 @@ benchmarkShortName <- scan("_benchmarkShortName.bin.txt", what = '')
 FF1 <- as.matrix(t(features1))
 rownames(FF1) <- benchmarkShortName
 colnames(FF1) <- resultColumnNames1
-write.table(FF1, file = "_results1.csv", sep = " & ", col.names = TRUE, append = FALSE, quote = FALSE)
+write.table(FF1, file = "_results1.csv", sep = " & ", col.names = FALSE, append = FALSE, quote = FALSE)
 
 FF2 <- as.matrix(t(features2))
 rownames(FF2) <- benchmarkShortName
 colnames(FF2) <- resultColumnNames2
-write.table(FF2, file = "_results2.csv", sep = " & ", col.names = TRUE, append = FALSE, quote = FALSE)
+write.table(FF2, file = "_results2.csv", sep = " & ", col.names = FALSE, append = FALSE, quote = FALSE)
