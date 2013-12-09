@@ -386,7 +386,7 @@ object Tracr extends App {
         case _ => ()
       }
 
-      if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
+      if (timestampCntr % stepSize == 0) {
         writer.write(s"$timestamp $sumRootEquals $sumRecursiveEquals $sumRootReferenceEqualities $sumRecursiveReferenceEqualities $sumRootLogicalEquals $sumRecursiveLogicalEquals")
         writer.newLine
 
@@ -402,7 +402,7 @@ object Tracr extends App {
       }
     }
 
-    if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
+    if (timestampCntr % stepSize != 0) {
       writer.write(s"$lastTimestamp $sumRootEquals $sumRecursiveEquals $sumRootReferenceEqualities $sumRecursiveReferenceEqualities $sumRootLogicalEquals $sumRecursiveLogicalEquals")
       writer.newLine
     }
@@ -439,7 +439,7 @@ object Tracr extends App {
           ctorIdx += 1
         }
 
-        if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
+        if (timestampCntr % stepSize == 0) {
           writer.write(s"$timestamp ${sumRecursiveEquals} ${sumRecursiveReferenceEqualities}")
           writer.newLine
 
@@ -451,7 +451,7 @@ object Tracr extends App {
         }
       }
 
-      if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
+      if (timestampCntr % stepSize != 0) {
         writer.write(s"$lastTimestamp ${sumRecursiveEquals} ${sumRecursiveReferenceEqualities}")
         writer.newLine
       }
@@ -570,13 +570,13 @@ object TracrUtil {
 
 //        println(s"deltSum: ${ctorSum - dtorSum}")
 
-        if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
+        if (timestampCntr % stepSize == 0) {
           writer.write(s"$timestamp ${ctorSum - dtorSum}"); writer.newLine
           stepCntr += 1
         }
       }
 
-      if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
+      if (timestampCntr % stepSize != 0) {
         writer.write(s"$lastTimestamp ${ctorSum - dtorSum}"); writer.newLine
       }
 
@@ -628,13 +628,13 @@ object TracrUtil {
           idx += 1
         }
 
-        if (timestampCntr % stepSize == 0 && stepCntr < stepCount) {
+        if (timestampCntr % stepSize == 0) {
           writer.write(s"$timestamp ${lastValue}"); writer.newLine
           stepCntr += 1
         }
       }
 
-      if (timestampCntr % stepSize != 0 && stepCntr == stepCount) {
+      if (timestampCntr % stepSize != 0) {
         writer.write(s"$lastTimestamp ${lastValue}"); writer.newLine
       }
 
