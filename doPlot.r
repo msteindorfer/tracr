@@ -423,29 +423,29 @@ resultColumnNames2 <- c('Eq', 'EqRec',
 
 features2 <- numeric(0)
 features2 <- c(features2,               
-              format(as.numeric(sum(eqCallsNom$rootEquals)), digits=2, scientific=FALSE),
-              format(as.numeric(sum(eqCallsNom$recursiveEquals)), digits=2, scientific=FALSE),
+              f2si2(sum(eqCallsNom$rootEquals)),
+              f2si2(sum(eqCallsNom$recursiveEquals)),
                             
-              format(as.numeric(sum(eqCallsNom$rootReferenceEqualities)), digits=2, scientific=FALSE),
-              format(as.numeric(sum(eqCallsNom$recursiveReferenceEqualities)), digits=2, scientific=FALSE),
+              f2si2(sum(eqCallsNom$rootReferenceEqualities)),
+              f2si2(sum(eqCallsNom$recursiveReferenceEqualities)),
               
-              format(as.numeric(sum(eqCallsNom$rootLogicalEquals)), digits=2, scientific=FALSE),
-              format(as.numeric(sum(eqCallsNom$recursiveLogicalEquals)), digits=2, scientific=FALSE),
+              f2si2(sum(eqCallsNom$rootLogicalEquals)),
+              f2si2(sum(eqCallsNom$recursiveLogicalEquals)),
               
               # sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals),
               # sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities),
               # sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals),
               
-              format(as.numeric(cacheHitsEst), digits=2, scientific=FALSE),
-              format(as.numeric(cacheHitsSha), digits=2, scientific=FALSE),
+              f2si2(cacheHitsEst),
+              f2si2(cacheHitsSha),
                             
-              format(as.numeric(referenceEqualitiesEst), digits=2, scientific=FALSE),
-              format(as.numeric(referenceEqualitiesSha), digits=2, scientific=FALSE),
+              f2si2(referenceEqualitiesEst),
+              f2si2(referenceEqualitiesSha),
               
-              format(as.numeric(sum(eqCallsShaExt$rootLogicalEquals)), digits=2, scientific=FALSE),
-              format(as.numeric(sum(eqCallsShaExt$recursiveLogicalEquals)), digits=2, scientific=FALSE),
+              f2si2(sum(eqCallsShaExt$rootLogicalEquals)),
+              f2si2(sum(eqCallsShaExt$recursiveLogicalEquals)),
               
-              format(as.numeric(statHashCollisions), digits=2, scientific=FALSE) #, statCacheHit, statCacheMiss
+              f2si2(statHashCollisions)
 )
 
 benchmarkName <- scan("_benchmarkName.bin.txt", what = '')
