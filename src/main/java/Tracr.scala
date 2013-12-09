@@ -415,7 +415,7 @@ object Tracr extends App {
    * Note: Does not print begin of data, first print is first accumulation.
    */
   def projectExpectedEqualsCall(filename: String, ctorSorted: Vector[ObjectLifetime], timestampRange: NumericRange[Long], stepSize: Long) {
-    var sumRecursiveEquals = BigInt(0)
+    var sumRootEquals = BigInt(0)
     var sumRecursiveReferenceEqualities = BigInt(0)
 
     var lastTimestamp = 0L
@@ -433,26 +433,26 @@ object Tracr extends App {
         timestampCntr += 1
 
         while (ctorIdx < ctorSorted.length && ctorSorted(ctorIdx).ctorTime <= timestamp) {
-          sumRecursiveEquals += 1
+          sumRootEquals += 1
           sumRecursiveReferenceEqualities += ctorSorted(ctorIdx).recursiveReferenceEqualitiesEstimate
 
           ctorIdx += 1
         }
 
         if (timestampCntr % stepSize == 0) {
-          writer.write(s"$timestamp ${sumRecursiveEquals} ${sumRecursiveReferenceEqualities}")
+          writer.write(s"$timestamp ${sumRootEquals} ${sumRecursiveReferenceEqualities}")
           writer.newLine
 
           stepCntr += 1
 
           // reset sums
-          sumRecursiveEquals = BigInt(0)
+          sumRootEquals = BigInt(0)
           sumRecursiveReferenceEqualities = BigInt(0)
         }
       }
 
       if (timestampCntr % stepSize != 0) {
-        writer.write(s"$lastTimestamp ${sumRecursiveEquals} ${sumRecursiveReferenceEqualities}")
+        writer.write(s"$lastTimestamp ${sumRootEquals} ${sumRecursiveReferenceEqualities}")
         writer.newLine
       }
 
