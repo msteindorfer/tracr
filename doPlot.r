@@ -298,7 +298,7 @@ cacheHitsSha <- max(cumsum(eqCallsShaInt$rootEquals))
 # print(max(ocNom$V2) - max(cumsum(eqCallsEst$rootEquals)) - 2) # = object allocations - cache hits - 2 boolean constants
 # print(max(ocSha$V2) - max(cumsum(eqCallsShaInt$rootEquals)) - 2) # = object allocations - cache hits - 2 boolean constants
 
-objectsAllocated <- max(ocNom$V2) 
+objectsAllocated <- max(ocNom$V1)
 
 
 # print(max(cumsum(eqCallsShaExt$rootEquals)))
@@ -400,6 +400,8 @@ formatEq <- function(arg) {
     return (f2si2(as.numeric(arg)))
   }
 }
+
+heapSize <- scan("_heapSize.bin.txt", what = '')
 
 resultColumnNames1 <- c('O. Alloc',
                        'Hits Est.', 'Hits Real.',
