@@ -298,7 +298,7 @@ cacheHitsSha <- max(cumsum(eqCallsShaInt$rootEquals))
 # print(max(ocNom$V2) - max(cumsum(eqCallsEst$rootEquals)) - 2) # = object allocations - cache hits - 2 boolean constants
 # print(max(ocSha$V2) - max(cumsum(eqCallsShaInt$rootEquals)) - 2) # = object allocations - cache hits - 2 boolean constants
 
-objectsAllocated <- max(ocNom$V1)
+objectsAllocated <- (max(ocNom$V1) - 1) # last timestamp only refers to garbage collection events
 
 
 # print(max(cumsum(eqCallsShaExt$rootEquals)))
@@ -403,52 +403,54 @@ formatEq <- function(arg) {
 
 heapSize <- scan("_heapSize.bin.txt", what = '')
 
-resultColumnNames1 <- c('O. Alloc',
-                       'Hits Est.', 'Hits Real.',
-                       'Est. 0', 'Real. 0',
-                       'Est. 42', 'Real. 42',
-                       'Est. 79', 'Real. 79'
+resultColumnNames1 <- c('O. Alloc'
+                       ,'Hits Est.', 'Hits Real.'
+                       ,'Est. 0', 'Real. 0'
+                       ,'Est. 42', 'Real. 42'
+                        ,'Est. 79', 'Real. 79'
 )
 
 features1 <- numeric(0)
-features1 <- c(features1,
-              f2si2(objectsAllocated),
+features1 <- c(features1
+              ,formatEq(objectsAllocated)
               
-               f2si2(cacheHitsEst),
-               f2si2(cacheHitsSha),
+               ,formatEq(cacheHitsEst)
+               ,formatEq(cacheHitsSha)
 
-               formatPercent(memSavingsEst0),
-               formatPercent(memSavingsSha0),
+               ,formatPercent(memSavingsEst0)
+               ,formatPercent(memSavingsSha0)
                
-               formatPercent(memSavingsEst42),
-               formatPercent(memSavingsSha42),
+               ,formatPercent(memSavingsEst42)
+               ,formatPercent(memSavingsSha42)
                
-               formatPercent(memSavingsEst79),
-               formatPercent(memSavingsSha79)
+                ,formatPercent(memSavingsEst79)
+                ,formatPercent(memSavingsSha79)
 )
 
-resultColumnNames2 <- c('Eq', 'EqRec',
-                        '==', '==Rec',
-                        'LogEq', 'LogEqRec',
+resultColumnNames2 <- c(#'Eq', 'EqRec'
+                        #,'==', '==Rec'
+                        #,'LogEq', 'LogEqRec'
                         #
                         #
                         #
-                        'Eq', 'EqRec',                       
-                        '==', '==Rec',
-                        'LogEq', 'LogEqRec',
-                        'Coll.'
+                        
+                        #,
+                        'Eq', 'EqRec'
+                        ,'==', '==Rec'
+                        #,'LogEq', 'LogEqRec'
+                        ,'Coll.'
 )
 
 features2 <- numeric(0)
 features2 <- c(features2,               
-              formatEq(sum(eqCallsNom$rootEquals)),
-              formatEq(sum(eqCallsNom$recursiveEquals)),
+              # formatEq(sum(eqCallsNom$rootEquals)),
+              # formatEq(sum(eqCallsNom$recursiveEquals)),
                             
-              formatEq(sum(eqCallsNom$rootReferenceEqualities)),
-              formatEq(sum(eqCallsNom$recursiveReferenceEqualities)),
+              # formatEq(sum(eqCallsNom$rootReferenceEqualities)),
+              # formatEq(sum(eqCallsNom$recursiveReferenceEqualities)),
               
-              formatEq(sum(eqCallsNom$rootLogicalEquals)),
-              formatEq(sum(eqCallsNom$recursiveLogicalEquals)),
+              # formatEq(sum(eqCallsNom$rootLogicalEquals)),
+              # formatEq(sum(eqCallsNom$recursiveLogicalEquals)),
               
               # sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals),
               # sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities),
@@ -460,8 +462,8 @@ features2 <- c(features2,
               formatEq(referenceEqualitiesEst),
               formatEq(referenceEqualitiesSha),
               
-              formatEq(sum(eqCallsShaExt$rootLogicalEquals)),
-              formatEq(sum(eqCallsShaExt$recursiveLogicalEquals)),
+              # formatEq(sum(eqCallsShaExt$rootLogicalEquals)),
+              # formatEq(sum(eqCallsShaExt$recursiveLogicalEquals)),
               
               formatEq(statHashCollisions)
 )
