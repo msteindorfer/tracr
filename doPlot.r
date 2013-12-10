@@ -343,11 +343,17 @@ memSavingsEst79 <- savingsWithBytesPerRecordOverhead(hsEstWith(79))
 memSavingsSha79 <- savingsWithBytesPerRecordOverhead(hsShaWith(79))
 
 
-
-hashAndCacheStatistic <- read.csv("_hashAndCacheStatistic.bin.txt", sep=":", header=FALSE)
-statHashCollisions <- hashAndCacheStatistic$V2[1]
-statCacheHit <- hashAndCacheStatistic$V2[3]
-statCacheMiss <- hashAndCacheStatistic$V2[4] + hashAndCacheStatistic$V2[5]
+statFile <- "_hashAndCacheStatistic.bin.txt"
+if (file.exists(statFile)) {
+  hashAndCacheStatistic <- read.csv(statFile, sep=":", header=FALSE)
+  statHashCollisions <- hashAndCacheStatistic$V2[1]
+  statCacheHit <- hashAndCacheStatistic$V2[3]
+  statCacheMiss <- hashAndCacheStatistic$V2[4] + hashAndCacheStatistic$V2[5]
+} else {
+  statHashCollisions <- NA
+  statCacheHit <- NA
+  statCacheMiss <- NA
+}
 
 ##
 # Writing data to disk (~appending to CSV file)
@@ -383,6 +389,16 @@ f2si2<-function (number,rounding=F)
 
 formatPercent <- function(arg) {
   return (format(round(as.numeric(arg), 2), nsmall=2, digits=2, scientific=FALSE))
+}
+
+formatEq <- function(arg) {
+  if (missing(arg) || is.na(arg) || arg == "") {
+    return ("--")
+  } else if (as.numeric(arg) == 0) {
+    return (as.character(arg))
+  } else {
+    return (f2si2(as.numeric(arg)))
+  }
 }
 
 resultColumnNames1 <- c('O. Alloc',
@@ -423,29 +439,29 @@ resultColumnNames2 <- c('Eq', 'EqRec',
 
 features2 <- numeric(0)
 features2 <- c(features2,               
-              f2si2(sum(eqCallsNom$rootEquals)),
-              f2si2(sum(eqCallsNom$recursiveEquals)),
+              formatEq(sum(eqCallsNom$rootEquals)),
+              formatEq(sum(eqCallsNom$recursiveEquals)),
                             
-              f2si2(sum(eqCallsNom$rootReferenceEqualities)),
-              f2si2(sum(eqCallsNom$recursiveReferenceEqualities)),
+              formatEq(sum(eqCallsNom$rootReferenceEqualities)),
+              formatEq(sum(eqCallsNom$recursiveReferenceEqualities)),
               
-              f2si2(sum(eqCallsNom$rootLogicalEquals)),
-              f2si2(sum(eqCallsNom$recursiveLogicalEquals)),
+              formatEq(sum(eqCallsNom$rootLogicalEquals)),
+              formatEq(sum(eqCallsNom$recursiveLogicalEquals)),
               
               # sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals),
               # sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities),
               # sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals),
               
-              f2si2(cacheHitsEst),
-              f2si2(cacheHitsSha),
+              formatEq(cacheHitsEst),
+              formatEq(cacheHitsSha),
                             
-              f2si2(referenceEqualitiesEst),
-              f2si2(referenceEqualitiesSha),
+              formatEq(referenceEqualitiesEst),
+              formatEq(referenceEqualitiesSha),
               
-              f2si2(sum(eqCallsShaExt$rootLogicalEquals)),
-              f2si2(sum(eqCallsShaExt$recursiveLogicalEquals)),
+              formatEq(sum(eqCallsShaExt$rootLogicalEquals)),
+              formatEq(sum(eqCallsShaExt$recursiveLogicalEquals)),
               
-              f2si2(statHashCollisions)
+              formatEq(statHashCollisions)
 )
 
 benchmarkName <- scan("_benchmarkName.bin.txt", what = '')
