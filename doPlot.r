@@ -435,37 +435,37 @@ resultColumnNames2 <- c(#'Eq', 'EqRec'
                         #
                         
                         #,
-                        'Eq', 'EqRec'
-                        ,'==', '==Rec'
-                        #,'LogEq', 'LogEqRec'
+                        'EqEst', 'EqSha'
+                        ,'==Est', '==Sha'
+                        #,'DLogEqEst', 'DLogEqSha'
                         ,'Coll.'
 )
 
 features2 <- numeric(0)
-features2 <- c(features2,               
-              # formatEq(sum(eqCallsNom$rootEquals)),
-              # formatEq(sum(eqCallsNom$recursiveEquals)),
+features2 <- c(features2               
+              # ,formatEq(sum(eqCallsNom$rootEquals))
+              # ,formatEq(sum(eqCallsNom$recursiveEquals))
                             
-              # formatEq(sum(eqCallsNom$rootReferenceEqualities)),
-              # formatEq(sum(eqCallsNom$recursiveReferenceEqualities)),
+              # ,formatEq(sum(eqCallsNom$rootReferenceEqualities))
+              # ,formatEq(sum(eqCallsNom$recursiveReferenceEqualities))
               
-              # formatEq(sum(eqCallsNom$rootLogicalEquals)),
-              # formatEq(sum(eqCallsNom$recursiveLogicalEquals)),
+              # ,formatEq(sum(eqCallsNom$rootLogicalEquals))
+              # ,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
               
-              # sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals),
-              # sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities),
-              # sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals),
+              # ,sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals)
+              # ,sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities)
+              # ,sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals)
               
-              formatEq(cacheHitsEst),
-              formatEq(cacheHitsSha),
+              ,formatEq(cacheHitsEst)
+              ,formatEq(cacheHitsSha)
                             
-              formatEq(referenceEqualitiesEst),
-              formatEq(referenceEqualitiesSha),
+              ,formatEq(referenceEqualitiesEst)
+              ,formatEq(referenceEqualitiesSha)
               
-              # formatEq(sum(eqCallsShaExt$rootLogicalEquals)),
-              # formatEq(sum(eqCallsShaExt$recursiveLogicalEquals)),
+              #,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
+              #,formatEq(sum(eqCallsShaExt$recursiveLogicalEquals))
               
-              formatEq(statHashCollisions)
+              ,formatEq(statHashCollisions)
 )
 
 benchmarkName <- scan("_benchmarkName.bin.txt", what = '')
