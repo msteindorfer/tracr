@@ -388,7 +388,13 @@ f2si2<-function (number,rounding=F)
 }
 
 formatPercent <- function(arg) {
-  return (format(round(as.numeric(arg), 2), nsmall=2, digits=2, scientific=FALSE))
+  if (is.nan(arg)) {
+    x <- "0"
+  } else {
+    x <- format(round(as.numeric(arg), 0), nsmall=0, digits=2, scientific=FALSE)
+  }
+  
+  return (paste(x, "\\%", sep = ""))
 }
 
 formatEq <- function(arg) {
@@ -404,10 +410,9 @@ formatEq <- function(arg) {
 heapSize <- scan("_heapSize.bin.txt", what = '')
 
 resultColumnNames1 <- c('O. Alloc'
-                       ,'Hits Est.', 'Hits Real.'
+                       ,'Hits Est.', 'Hits Prec.'
                        ,'Est. 0', 'Real. 0'
                        ,'Est. 42', 'Real. 42'
-                        ,'Est. 79', 'Real. 79'
 )
 
 features1 <- numeric(0)
@@ -415,55 +420,81 @@ features1 <- c(features1
               ,formatEq(objectsAllocated)
               
                ,formatEq(cacheHitsEst)
-               ,formatEq(cacheHitsSha)
+               ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
 
                ,formatPercent(memSavingsEst0)
-               ,formatPercent(memSavingsSha0)
+               ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
                
                ,formatPercent(memSavingsEst42)
-               ,formatPercent(memSavingsSha42)
-               
-                ,formatPercent(memSavingsEst79)
-                ,formatPercent(memSavingsSha79)
+               ,formatPercent((memSavingsSha42 - memSavingsEst42) * 100/memSavingsEst42)
 )
 
-resultColumnNames2 <- c(#'Eq', 'EqRec'
-                        #,'==', '==Rec'
-                        #,'LogEq', 'LogEqRec'
+resultColumnNamesC <- c('O. Alloc'
+                       ,'Hits Est.', 'Hits Prec.'
+                       ,'Est. 0', 'Err. 0'
+                       ,'Est. 42', 'Err. 42'
+                       ,'EqEst' #,'EqEstErr'
+                       ,'EqAliasEst' #,'EqAliasErr'
+                       ,'EqColl.')
+
+featuresC <- numeric(0)
+featuresC <- c(featuresC
+              ,formatEq(objectsAllocated)
+              
+               ,formatEq(cacheHitsEst)
+               ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
+
+               ,formatPercent(memSavingsEst0)
+               ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
+               
+               ,formatPercent(memSavingsEst42)
+               ,formatPercent((memSavingsSha42 - memSavingsEst42) * 100/memSavingsEst42)
+               
+              ,formatEq(cacheHitsEst)
+              #,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
+                            
+              ,formatEq(referenceEqualitiesEst)
+              #,formatPercent((referenceEqualitiesSha - referenceEqualitiesEst) * 100/referenceEqualitiesEst)
+              
+              ,formatEq(statHashCollisions)
+)
+
+resultColumnNames2 <- c('Eq', 'EqRec'
+                        ,'==', '==Rec'
+                        #,'LogEq'
+                        ,'LogEqRec'
                         #
                         #
                         #
-                        
-                        #,
-                        'EqEst', 'EqSha'
+                        ,'EqEst', 'EqSha'
                         ,'==Est', '==Sha'
-                        #,'DLogEqEst', 'DLogEqSha'
+                        ,'DLogEqEst', 'DLogEqSha'
                         ,'Coll.'
 )
 
 features2 <- numeric(0)
 features2 <- c(features2               
-              # ,formatEq(sum(eqCallsNom$rootEquals))
-              # ,formatEq(sum(eqCallsNom$recursiveEquals))
+              ,formatEq(sum(eqCallsNom$rootEquals))
+              ,formatEq(sum(eqCallsNom$recursiveEquals))
                             
-              # ,formatEq(sum(eqCallsNom$rootReferenceEqualities))
-              # ,formatEq(sum(eqCallsNom$recursiveReferenceEqualities))
+              #,formatEq(sum(eqCallsNom$rootReferenceEqualities))
+              ,formatEq(sum(eqCallsNom$recursiveReferenceEqualities))
               
-              # ,formatEq(sum(eqCallsNom$rootLogicalEquals))
-              # ,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
+              ,formatEq(sum(eqCallsNom$rootLogicalEquals))
+              ,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
               
               # ,sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals)
               # ,sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities)
               # ,sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals)
               
               ,formatEq(cacheHitsEst)
-              ,formatEq(cacheHitsSha)
+              ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
                             
               ,formatEq(referenceEqualitiesEst)
-              ,formatEq(referenceEqualitiesSha)
+              ,formatPercent((referenceEqualitiesSha - referenceEqualitiesEst) * 100/referenceEqualitiesEst)
               
-              #,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
-              #,formatEq(sum(eqCallsShaExt$recursiveLogicalEquals))
+              ,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
+              ,formatPercent((sum(eqCallsShaExt$recursiveLogicalEquals) - sum(eqCallsNom$recursiveLogicalEquals)) * 100/sum(eqCallsNom$recursiveLogicalEquals))
               
               ,formatEq(statHashCollisions)
 )
@@ -475,6 +506,11 @@ FF1 <- as.matrix(t(features1))
 rownames(FF1) <- benchmarkShortName
 colnames(FF1) <- resultColumnNames1
 write.table(FF1, file = "_results1.csv", sep = " & ", col.names = FALSE, append = FALSE, quote = FALSE)
+
+FFC <- as.matrix(t(featuresC))
+rownames(FFC) <- benchmarkShortName
+colnames(FFC) <- resultColumnNamesC
+write.table(FFC, file = "_resultsC.csv", sep = " & ", col.names = FALSE, append = FALSE, quote = FALSE)
 
 FF2 <- as.matrix(t(features2))
 rownames(FF2) <- benchmarkShortName
