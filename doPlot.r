@@ -30,7 +30,7 @@ xAxisPercentage <- function() {
 }
 
 
-par(mfrow=c(3,2))
+#par(mfrow=c(3,2))
 
 pdf("_heap-evolution.pdf")
   heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
@@ -56,7 +56,7 @@ pdf("_heap-evolution-with-validation.pdf")
   plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", xlab = "Program Progress", yaxt = "n", ylab = "Memory Usage")
   #par(new=T)
   
-  legend('topleft', c('measured heap size', 'simulated maximaly shared heap size', 'measured maximaly shared heap size'), 
+  legend('topleft', c('measured', 'predicted', 'validated'), 
          lty=1, col=c('black', 'purple', 'red'), bty='n', cex=.75)
   
   lines(hsNom$V2, col='black')
@@ -67,17 +67,17 @@ pdf("_heap-evolution-with-validation.pdf")
   # add a title and subtitle 
   xAxisPercentage()
   axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
-  title("Heap Evolution (incl. Validation)")
+  title("Heap Evolution")
 dev.off()
 
-pdf("_memory_savings.pdf")
+#pdf("_memory_savings.pdf")
   # plot(diff, type='l')
   max <- range(percEst, percSha)
   range <- range(-max, max)
   plot(percEst, type='n', xlab='Program Progress', ylab='Savings (in %)', ylim=range, xaxt = "n")
   xAxisPercentage()
 
-  legend('bottomleft', c('simulated savings', 'validated savings with maximal sharing'), 
+  legend('bottomleft', c('predicted', 'validated'), 
        lty=1, col=c('purple', 'red'), bty='n', cex=.75)
 
   lines(percEst, col='purple', lty=2)
@@ -86,7 +86,7 @@ pdf("_memory_savings.pdf")
   #lmfit <- lm(percEst ~ 1)
   #abline(lmfit)
   title("Memory Savings")
-dev.off()
+#dev.off()
 
 ###
 # Equal Calls
@@ -148,6 +148,10 @@ pdf("_equality-equals-timely.pdf")
                   eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals), 
      type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
   #par(new=T)
+
+legend('bottomright', c('estimated', 'validated'), 
+       lty=1, col=c('purple', 'red'), bty='n', cex=.75)
+
   xAxisPercentage()
   #lines(eqCallsNom$recursiveEquals, type='s', col='black')
   #lines(eqCallsNom$recursiveLogicalEquals, type='s', col='blue')
@@ -155,6 +159,47 @@ pdf("_equality-equals-timely.pdf")
   lines(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals, type='s', col='red')
   title("Equal Calls Evolution") # Forecast (Count)
 dev.off()
+
+# #pdf("_equality-all.pdf")
+#   plot(eqCallsNom$recursiveEquals, 
+#        ylim = range(eqCallsNom$recursiveEquals, eqCallsEst$recursiveReferenceEqualities, eqCallsNom$recursiveLogicalEquals,
+#          eqCallsEst$rootEquals,
+#                     
+#          eqCallsShaExt$recursiveEquals, eqCallsShaInt$recursiveEquals,
+#          eqCallsShaExt$recursiveReferenceEqualities, eqCallsShaInt$recursiveReferenceEqualities
+#                     ), 
+#        type='n', xaxt = "n", xlab = "Program Progress", ylab = "Amount of Equality Checks")
+#   #par(new=T)
+#   xAxisPercentage()
+#   lines(eqCallsNom$recursiveEquals, type='s', col='black')
+#   lines(eqCallsNom$recursiveReference, type='s', col='red')
+#   lines(eqCallsNom$recursiveLogicalEquals, type='s', col='green')
+# 
+#   lines(eqCallsShaInt$recursiveEquals, type='s', col='purple')
+#   lines(eqCallsShaInt$recursiveReference, type='s', col='red')
+#   
+#   lines(eqCallsShaExt$recursiveReference, type='s', col='black')
+#   lines(eqCallsShaExt$recursiveLogicalEquals, type='s', col='green')
+# 
+#   #lines(eqCallsEst$rootEquals, type='s', col='purple', lty=2)
+#   #lines(eqCallsShaExt$recursiveEquals + eqCallsShaInt$recursiveEquals, type='s', col='red')
+#   title("Equal Calls Evolution") # Forecast (Count)
+# #dev.off()
+
+# install.packages("ggplot2")
+# install.packages("reshape2")
+#library(ggplot2)
+#library(reshape2)
+
+#barplot(eqCallsNom)
+
+# library(reshape2) # for melt
+# 
+# melted <- melt(test, "person")
+# 
+# melted$cat <- ''
+# melted[melted$variable == 'value1',]$cat <- "first"
+# melted[melted$variable != 'value1',]$cat <- "second"
 
 pdf("_equality-reference-calls-timely.pdf")
   plot(eqCallsNom$recursiveEquals, 
@@ -199,51 +244,51 @@ eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
 #dev.off()
 
 
-#   ### Create Overlap Statistic Plot
-#   #pdf("_overlap-example.pdf")
-#     plot(0, 0, xlim=range(0, 10), ylim=range(0,7), type = 'n', xaxt='n', xlab='Object Lifetime', ylab='Unique Object ID')
-#     title("Lifetime Overlaps for Objects with Fingerprint 04DA...9A22")  
-#   
-#     legend('bottomright', c('measured objects', 'replacement objects'), 
-#          lty=1, col=c('black', 'purple'), bty='n', cex=.75)
-#   
-#     axis(1, at = seq(0, 10, by = 1))
-#   
-#     xCoord1 = c(0, 3)
-#     yCoord1 = c(1, 1)
-#     lines(xCoord1, yCoord1, lwd=5)
-#     xCoord2 = c(2, 6)
-#     yCoord2 = c(2, 2)
-#     lines(xCoord2, yCoord2, lwd=5)
-#     xCoord3 = c(4, 5)
-#     yCoord3 = c(3, 3)
-#     lines(xCoord3, yCoord3, lwd=5)
-#     xCoord4 = c(7, 9)
-#     yCoord4 = c(4, 4)
-#     lines(xCoord4, yCoord4, lwd=5)
-#     xCoord5 = c(8, 10)
-#     yCoord5 = c(5, 5)
-#     lines(xCoord5, yCoord5, lwd=5)
-#   
-#     xCoord6 = c(0, 6)
-#     yCoord6 = c(6, 6)
-#     lines(xCoord6, yCoord6, lwd=5, col='purple', lty=1)
-#   
-#     xCoord7 = c(7, 10)
-#     yCoord7 = c(7, 7)
-#     lines(xCoord7, yCoord7, lwd=5, col='purple', lty=1)
-#   
-#     overlapFingerprintLabel <- '04DA...9A22'
-#     text((xCoord1[2] - xCoord1[1]) / 2 + xCoord1[1], yCoord1[2], overlapFingerprintLabel, pos = 1)
-#     text((xCoord2[2] - xCoord2[1]) / 2 + xCoord2[1], yCoord2[2], overlapFingerprintLabel, pos = 1)
-#     text((xCoord3[2] - xCoord3[1]) / 2 + xCoord3[1], yCoord3[2], overlapFingerprintLabel, pos = 1)
-#     text((xCoord4[2] - xCoord4[1]) / 2 + xCoord4[1], yCoord4[2], overlapFingerprintLabel, pos = 1)
-#     text((xCoord5[2] - xCoord5[1]) / 2 + xCoord5[1], yCoord5[2], overlapFingerprintLabel, pos = 1)
-#     text((xCoord6[2] - xCoord6[1]) / 2 + xCoord6[1], yCoord6[2], overlapFingerprintLabel, pos = 1, col = 'purple')
-#     text((xCoord7[2] - xCoord7[1]) / 2 + xCoord7[1], yCoord7[2], overlapFingerprintLabel, pos = 1, col = 'purple')
-#   
-#     grid(NULL, NA)
-#   #dev.off()
+### Create Overlap Statistic Plot
+pdf("_overlap-example.pdf", width=7, height=4)
+  plot(0, 0, xlim=range(0, 10), ylim=range(0,7), type = 'n', xaxt='n', xlab='Object Lifetime', ylab='Unique Object ID')
+  #title("Lifetime Overlaps for Objects with Fingerprint 04DA...9A22")  
+
+  legend('bottomright', c('measured objects', 'replacement objects'), 
+       lty=1, col=c('black', 'purple'), bty='n', cex=.75)
+
+  axis(1, at = seq(0, 10, by = 1))
+
+  xCoord1 = c(0, 3)
+  yCoord1 = c(1, 1)
+  lines(xCoord1, yCoord1, lwd=5)
+  xCoord2 = c(2, 6)
+  yCoord2 = c(2, 2)
+  lines(xCoord2, yCoord2, lwd=5)
+  xCoord3 = c(4, 5)
+  yCoord3 = c(3, 3)
+  lines(xCoord3, yCoord3, lwd=5)
+  xCoord4 = c(7, 9)
+  yCoord4 = c(4, 4)
+  lines(xCoord4, yCoord4, lwd=5)
+  xCoord5 = c(8, 10)
+  yCoord5 = c(5, 5)
+  lines(xCoord5, yCoord5, lwd=5)
+
+  xCoord6 = c(0, 6)
+  yCoord6 = c(6, 6)
+  lines(xCoord6, yCoord6, lwd=5, col='purple', lty=1)
+
+  xCoord7 = c(7, 10)
+  yCoord7 = c(7, 7)
+  lines(xCoord7, yCoord7, lwd=5, col='purple', lty=1)
+
+  overlapFingerprintLabel <- '04DA...9A22'
+  text((xCoord1[2] - xCoord1[1]) / 2 + xCoord1[1], yCoord1[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord2[2] - xCoord2[1]) / 2 + xCoord2[1], yCoord2[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord3[2] - xCoord3[1]) / 2 + xCoord3[1], yCoord3[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord4[2] - xCoord4[1]) / 2 + xCoord4[1], yCoord4[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord5[2] - xCoord5[1]) / 2 + xCoord5[1], yCoord5[2], overlapFingerprintLabel, pos = 1)
+  text((xCoord6[2] - xCoord6[1]) / 2 + xCoord6[1], yCoord6[2], overlapFingerprintLabel, pos = 1, col = 'purple')
+  text((xCoord7[2] - xCoord7[1]) / 2 + xCoord7[1], yCoord7[2], overlapFingerprintLabel, pos = 1, col = 'purple')
+
+  grid(NULL, NA)
+dev.off()
 
 hsEstWith <- function(memBytesPerRecordOverhead) {
   hsTmp <- data.frame(hsMin$V1, hsMin$V2+(ocMin$V2*memBytesPerRecordOverhead))
@@ -516,3 +561,32 @@ FF2 <- as.matrix(t(features2))
 rownames(FF2) <- benchmarkShortName
 colnames(FF2) <- resultColumnNames2
 write.table(FF2, file = "_results2.csv", sep = " & ", col.names = FALSE, append = FALSE, quote = FALSE)
+
+
+### The new stuff :)
+x_abc <- data.frame(hsNom$V2, hsMin$V2, hsShaPure$V2)
+names(x_abc) <- c('hsNom', 'hsMin', 'hsSha')
+
+x_bc <- data.frame(hsMin$V2, hsShaPure$V2)
+names(x_bc) <- c('hsMin', 'hsSha')
+
+#install.packages("beanplot")
+library(beanplot)
+
+pdf("__plot_boxplot.pdf")
+	boxplot(x_bc)
+dev.off()
+
+pdf("__plot_boxplot_all.pdf")
+	boxplot(x_abc)
+dev.off()
+
+pdf("__plot_beanplot.pdf")
+	beanplot(x_bc)
+dev.off()
+
+pdf("__plot_beanplot_all.pdf")
+	beanplot(x_abc)
+dev.off()
+
+lm_min_sha <- lm(x_bc$hsMin ~ x_bc$hsSha)
