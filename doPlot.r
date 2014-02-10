@@ -375,7 +375,7 @@ f2si2<-function (number,rounding=F)
   ix <- findInterval(number, lut)
   if (lut[ix]!=1) {
     if (rounding==T) {
-      sistring <- paste(formatC(round(number/lut[ix]), digits = 2, format="f"), pre[ix], sep = "")
+      sistring <- paste(formatC(round(number/lut[ix]), digits = 0, format="f"), pre[ix], sep = "")
     }
     else {
       sistring <- paste(formatC(number/lut[ix], digits = 2, format="f"), pre[ix], sep = "")
@@ -403,7 +403,7 @@ formatEq <- function(arg) {
   } else if (as.numeric(arg) == 0) {
     return (as.character(arg))
   } else {
-    return (f2si2(as.numeric(arg)))
+    return (f2si2(as.numeric(arg), T))
   }
 }
 
