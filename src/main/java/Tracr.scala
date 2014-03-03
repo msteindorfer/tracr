@@ -1,10 +1,11 @@
 import java.io._
-import java.nio.file.{Paths, Files}
+import java.nio.file.{StandardOpenOption, Paths, Files}
 import java.nio.{ByteOrder, ByteBuffer}
 import java.util.zip.GZIPInputStream
 import org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers
 import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
 import scala.collection.immutable.NumericRange
+import scala._
 import scala.Some
 
 case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean) {
@@ -17,6 +18,8 @@ case class EqualsCall(tag1: Long, tag2: Long, result: Boolean, deepCount: Int, d
 case class TagInfo(digest: String, classname: String)
 
 object Tracr extends App {
+
+  val startTime = System.nanoTime();
 
   import TracrUtil._
 
@@ -165,11 +168,11 @@ object Tracr extends App {
 
         val ctorMinSorted = ctorSorted.filter(!_.isRedundant)
         val dtorMinSorted = dtorSorted.filter(!_.isRedundant)
-        
+
         projectProperty("heapSizes-sha-min.dat", ctorMinSorted, dtorMinSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
       } else {
         val filename = "heapSizes-nom.dat"
-        
+
         projectProperty(filename, ctorSorted, dtorSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
       }
     }
@@ -475,6 +478,16 @@ object Tracr extends App {
     }
   }
 
+  val endTime = System.nanoTime();
+  val outputString = s"${endTime - startTime}"
+
+  try {
+    java.nio.file.Files.write(Paths.get("target/_timeTracr.txt"),
+      outputString.getBytes("UTF-8"), StandardOpenOption.CREATE,
+      StandardOpenOption.TRUNCATE_EXISTING);
+  } catch {
+    case e1: IOException => throw new RuntimeException(e1)
+  }
 }
 
 object TracrUtil {
