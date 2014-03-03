@@ -591,15 +591,15 @@ pdf("__plot_boxplot__all.pdf")
 dev.off()
 
 pdf("__plot_beanplot_ac.pdf")
-	beanplot(x_ac)
+	beanplot(x_ac, col = c("grey", "red", "grey"), border = ("grey"))
 dev.off()
 
 pdf("__plot_beanplot_bd.pdf")
-	beanplot(x_bd)
+	beanplot(x_bd, col = c("grey", "red", "grey"), border = ("grey"))
 dev.off()
 
 pdf("__plot_beanplot__all.pdf")
-	beanplot(x_abcd)
+	beanplot(x_abcd, col = c("grey", "red", "grey"), border = ("grey"))
 dev.off()
 
 
