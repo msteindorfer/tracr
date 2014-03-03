@@ -6,9 +6,11 @@ ocMin    <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
 ocSha    <- read.csv("objectCount-sha.dat", sep=" ", header=FALSE)
 ocShaMin <- read.csv("objectCount-sha-min.dat", sep=" ", header=FALSE)
 
-hsNom     <- read.csv("heapSizes-nom.dat", sep=" ", header=FALSE)
-hsMin     <- read.csv("heapSizes-min.dat", sep=" ", header=FALSE)
-hsShaPure <- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
+hsNom     		<- read.csv("heapSizes-nom.dat", sep=" ", header=FALSE)
+hsMin     		<- read.csv("heapSizes-min.dat", sep=" ", header=FALSE)
+hsShaPure		<- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
+hsShaPureMin 	<- read.csv("heapSizes-sha-min.dat", sep=" ", header=FALSE)
+
 # maximal sharing prognosis: min + bytesPerRecordOverhead
 bytesPerRecordOverhead <- 42 # TODO: solve(bytesPerRecordOverhead) to know max overhead per record to benefit
 #
@@ -564,29 +566,42 @@ write.table(FF2, file = "_results2.csv", sep = " & ", col.names = FALSE, append 
 
 
 ### The new stuff :)
-x_abc <- data.frame(hsNom$V2, hsMin$V2, hsShaPure$V2)
-names(x_abc) <- c('hsNom', 'hsMin', 'hsSha')
+x_abcd <- data.frame(hsNom$V2, hsMin$V2, hsShaPure$V2, hsShaPureMin$V2)
+names(x_abcd) <- c('hsNom', 'hsNomMin', 'hsSha', 'hsShaMin')
 
-x_bc <- data.frame(hsMin$V2, hsShaPure$V2)
-names(x_bc) <- c('hsMin', 'hsSha')
+x_ac <- data.frame(hsNom$V2, hsShaPure$V2)
+names(x_ac) <- c('hsNom', 'hsSha')
+
+x_bd <- data.frame(hsMin$V2, hsShaPureMin$V2)
+names(x_bd) <- c('hsNomMin', 'hsShaMin')
 
 #install.packages("beanplot")
 library(beanplot)
 
-pdf("__plot_boxplot.pdf")
-	boxplot(x_bc)
+pdf("__plot_boxplot_ac.pdf")
+	boxplot(x_ac)
 dev.off()
 
-pdf("__plot_boxplot_all.pdf")
-	boxplot(x_abc)
+pdf("__plot_boxplot_bd.pdf")
+	boxplot(x_bd)
 dev.off()
 
-pdf("__plot_beanplot.pdf")
-	beanplot(x_bc)
+pdf("__plot_boxplot__all.pdf")
+	boxplot(x_abcd)
 dev.off()
 
-pdf("__plot_beanplot_all.pdf")
-	beanplot(x_abc)
+pdf("__plot_beanplot_ac.pdf")
+	beanplot(x_ac)
 dev.off()
 
-lm_min_sha <- lm(x_bc$hsMin ~ x_bc$hsSha)
+pdf("__plot_beanplot_bd.pdf")
+	beanplot(x_bd)
+dev.off()
+
+pdf("__plot_beanplot__all.pdf")
+	beanplot(x_abcd)
+dev.off()
+
+
+lm_nom <- lm(x_ac$hsNom ~ x_bd$hsSha)
+lm_min <- lm(x_bd$hsNomMin ~ x_bd$hsShaMin)

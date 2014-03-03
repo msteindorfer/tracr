@@ -159,8 +159,19 @@ object Tracr extends App {
     val dtorSorted: Vector[ObjectLifetime] = time("dtorSorted") { universeList   filter (_.dtorTime.isDefined) sortWith (_.dtorTime.get < _.dtorTime.get) }
 
     time ("Project Heap Size") {
-      val filename = if (isSharingEnabled) "heapSizes-sha.dat" else "heapSizes-nom.dat"
-      projectProperty(filename, ctorSorted, dtorSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
+      if (isSharingEnabled) {
+
+        projectProperty("heapSizes-sha.dat", ctorSorted, dtorSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
+
+        val ctorMinSorted = ctorSorted.filter(!_.isRedundant)
+        val dtorMinSorted = dtorSorted.filter(!_.isRedundant)
+        
+        projectProperty("heapSizes-sha-min.dat", ctorMinSorted, dtorMinSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
+      } else {
+        val filename = "heapSizes-nom.dat"
+        
+        projectProperty(filename, ctorSorted, dtorSorted, timestampRange, stepSize)(_.measuredSizeInBytes)
+      }
     }
 
     time ("Project Object Size") {
