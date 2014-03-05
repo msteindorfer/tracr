@@ -1,5 +1,7 @@
 #!/usr/bin/env Rscript
 #setwd("~/Development/rascal-devel/tracr")
+#setwd("~/Research/orpheus-results/_doTypeCheckParserGenerator-Xmx4096m-Xmx4096m")
+#setwd("~/Research/orpheus-results_2014-03-04/_org.eclipse.imp.pdb.values.benchmarks.RelationResourceBenchmark#closureStarJWAM16FullAndreas-Xmx4096m-Xmx4096m")
 
 ocNom    <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
 ocMin    <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
@@ -8,7 +10,7 @@ ocShaMin <- read.csv("objectCount-sha-min.dat", sep=" ", header=FALSE)
 
 hsNom     		<- read.csv("heapSizes-nom.dat", sep=" ", header=FALSE)
 hsMin     		<- read.csv("heapSizes-min.dat", sep=" ", header=FALSE)
-hsShaPure		<- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
+hsShaPure		  <- read.csv("heapSizes-sha.dat", sep=" ", header=FALSE)
 hsShaPureMin 	<- read.csv("heapSizes-sha-min.dat", sep=" ", header=FALSE)
 
 # maximal sharing prognosis: min + bytesPerRecordOverhead
@@ -304,6 +306,12 @@ hsShaWith <- function(memBytesPerRecordOverhead) {
   return(hsTmp)
 }
 
+hsShaMinWith <- function(memBytesPerRecordOverhead) {
+  hsTmp <- data.frame(hsShaPureMin$V1, hsShaPureMin$V2+(ocShaMin$V2*memBytesPerRecordOverhead))
+  names(hsTmp) <- c('V1', 'V2')
+  return(hsTmp)
+}
+
 hsSha <- data.frame(hsShaPure$V1, hsShaPure$V2+(ocShaMin$V2*bytesPerRecordOverhead))
 names(hsSha) <- c('V1', 'V2')
 
@@ -378,16 +386,16 @@ print(referenceEqualitiesSha)
 
 
 memSavingsEst0 <- savingsWithBytesPerRecordOverhead(hsEstWith(0))
-memSavingsSha0 <- savingsWithBytesPerRecordOverhead(hsShaWith(0))
+memSavingsSha0 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(0))
 
 memSavingsEst8 <- savingsWithBytesPerRecordOverhead(hsEstWith(8))
-memSavingsSha8 <- savingsWithBytesPerRecordOverhead(hsShaWith(8))
+memSavingsSha8 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(8))
 
 memSavingsEst42 <- savingsWithBytesPerRecordOverhead(hsEstWith(42))
-memSavingsSha42 <- savingsWithBytesPerRecordOverhead(hsShaWith(42))
+memSavingsSha42 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(42))
 
 memSavingsEst79 <- savingsWithBytesPerRecordOverhead(hsEstWith(79))
-memSavingsSha79 <- savingsWithBytesPerRecordOverhead(hsShaWith(79))
+memSavingsSha79 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(79))
 
 
 statFile <- "_hashAndCacheStatistic.bin.txt"
@@ -457,29 +465,34 @@ formatEq <- function(arg) {
 heapSize <- scan("_heapSize.bin.txt", what = '')
 
 resultColumnNames1 <- c('O. Alloc'
-                       ,'Hits Est.', 'Hits Prec.'
-                       ,'Est. 0', 'Real. 0'
-                       ,'Est. 42', 'Real. 42'
-)
+                        ,'Hits Est.', 'Hits Prec.'
+                        ,'Est.', 'Real.'
+#                         ,'Est. 0', 'Real. 0'
+#                         ,'Est. 42', 'Real. 42'                        
+                        )
 
 features1 <- numeric(0)
 features1 <- c(features1
-              ,formatEq(objectsAllocated)
-              
+               ,formatEq(objectsAllocated)
+               
                ,formatEq(cacheHitsEst)
                ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
-
-               ,formatPercent(memSavingsEst0)
-               ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
-               
+                              
                ,formatPercent(memSavingsEst42)
-               ,formatPercent((memSavingsSha42 - memSavingsEst42) * 100/memSavingsEst42)
+               ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)                             
+              
+#                ,formatPercent(memSavingsEst0)
+#                ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
+#                
+#                ,formatPercent(memSavingsEst42)
+#                ,formatPercent((memSavingsSha42 - memSavingsEst42) * 100/memSavingsEst42)
 )
 
 resultColumnNamesC <- c('O. Alloc'
                        ,'Hits Est.', 'Hits Prec.'
-                       ,'Est. 0', 'Err. 0'
-                       ,'Est. 42', 'Err. 42'
+                       ,'Est.', 'Err.'
+                       # ,'Est. 0', 'Err. 0'
+                       # ,'Est. 42', 'Err. 42'
                        ,'EqEst' #,'EqEstErr'
                        ,'EqAliasEst' #,'EqAliasErr'
                        ,'EqColl.')
@@ -488,15 +501,18 @@ featuresC <- numeric(0)
 featuresC <- c(featuresC
               ,formatEq(objectsAllocated)
               
-               ,formatEq(cacheHitsEst)
-               ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
+              ,formatEq(cacheHitsEst)
+              ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
 
-               ,formatPercent(memSavingsEst0)
-               ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
-               
-               ,formatPercent(memSavingsEst42)
-               ,formatPercent((memSavingsSha42 - memSavingsEst42) * 100/memSavingsEst42)
-               
+              ,formatPercent(memSavingsEst42)
+              ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
+              
+              # ,formatPercent(memSavingsEst0)
+              # ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
+              
+              # ,formatPercent(memSavingsEst42)
+              # ,formatPercent((memSavingsSha42 - memSavingsEst42) * 100/memSavingsEst42)
+                            
               ,formatEq(cacheHitsEst)
               #,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
                             
@@ -570,10 +586,10 @@ x_abcd <- data.frame(hsNom$V2, hsMin$V2, hsShaPure$V2, hsShaPureMin$V2)
 names(x_abcd) <- c('hsNom', 'hsNomMin', 'hsSha', 'hsShaMin')
 
 x_ac <- data.frame(hsNom$V2, hsShaPure$V2)
-names(x_ac) <- c('hsNom', 'hsSha')
+names(x_ac) <- c('hsA', 'hsB')
 
 x_bd <- data.frame(hsMin$V2, hsShaPureMin$V2)
-names(x_bd) <- c('hsNomMin', 'hsShaMin')
+names(x_bd) <- c('hsA', 'hsB')
 
 #install.packages("beanplot")
 library(beanplot)
@@ -603,5 +619,63 @@ pdf("__plot_beanplot__all.pdf")
 dev.off()
 
 
-lm_nom <- lm(x_ac$hsNom ~ x_bd$hsSha)
-lm_min <- lm(x_bd$hsNomMin ~ x_bd$hsShaMin)
+#####
+#
+ocNomWithoutReordering <- read.csv("objectCount-nom-without-reordering.dat", sep=" ", header=FALSE)
+ocMinWithoutReordering <- read.csv("objectCount-min-without-reordering.dat", sep=" ", header=FALSE)
+hsNomWithoutReordering <- read.csv("heapSizes-nom-without-reordering.dat", sep=" ", header=FALSE)
+hsMinWithoutReordering <- read.csv("heapSizes-min-without-reordering.dat", sep=" ", header=FALSE)
+hsEstWithoutReordering <- data.frame(hsMinWithoutReordering$V1, hsMinWithoutReordering$V2+(ocMinWithoutReordering$V2*bytesPerRecordOverhead))
+names(hsEstWithoutReordering) <- c('V1', 'V2')
+
+x_ord_vs_unord <- data.frame(hsNom$V2, hsMin$V2, hsNomWithoutReordering$V2, hsMinWithoutReordering$V2)
+names(x_ord_vs_unord) <- c('hsNom', 'hsNomMin', 'hsNomWithoutReordering', 'hsNomMinWithoutReordering')
+
+ocNomWithXORHashing <- read.csv("objectCount-nom-with-xor-hashing.dat", sep=" ", header=FALSE)
+ocMinWithXORHashing <- read.csv("objectCount-min-with-xor-hashing.dat", sep=" ", header=FALSE)
+hsNomWithXORHashing <- read.csv("heapSizes-nom-with-xor-hashing.dat", sep=" ", header=FALSE)
+hsMinWithXORHashing <- read.csv("heapSizes-min-with-xor-hashing.dat", sep=" ", header=FALSE)
+hsEstWithXORHashing <- data.frame(hsMinWithXORHashing$V1, hsMinWithXORHashing$V2+(ocMinWithXORHashing$V2*bytesPerRecordOverhead))
+names(hsEstWithXORHashing) <- c('V1', 'V2')
+
+pdf("__plot_boxplot__ord_vs_unord.pdf")
+  boxplot(x_ord_vs_unord)
+dev.off()
+
+pdf("__plot_beanplot__ord_vs_unord.pdf")
+  beanplot(x_ord_vs_unord, col = c("grey", "red", "grey"), border = ("grey"))
+dev.off()
+
+plot(x_ord_vs_unord$hsNom, type='n')
+lines(x_ord_vs_unord$hsNom, col='black')
+lines(x_ord_vs_unord$hsNomWithoutReordering, col='purple')
+
+plot(hsNom$V2, type='n')
+lines(hsNom$V2, col='black')
+lines(hsNomWithoutReordering$V2, col='purple')
+lines(hsNomWithXORHashing$V2, col='red')
+
+plot(hsMin$V2, type='n')
+lines(hsMin$V2, col='black')
+lines(hsMinWithoutReordering$V2, col='purple')
+lines(hsMinWithXORHashing$V2, col='red')
+# lines(hsMinWithoutReordering$V2, col='red')
+# lines(hsEst$V2, col='purple')
+# lines(hsEstWithoutReordering$V2, col='purple')
+
+plot(ocNom$V2, type='n')
+lines(ocNom$V2, col='black')
+lines(ocNomWithoutReordering$V2, col='purple')
+lines(ocNomWithXORHashing$V2, col='red')
+
+plot(ocMin$V2, type='n')
+lines(ocMin$V2, col='black')
+lines(ocMinWithoutReordering$V2, col='purple')
+lines(ocMinWithXORHashing$V2, col='red')
+#
+####
+
+
+
+lm_nom <- lm(x_ac)
+lm_min <- lm(x_bd)
