@@ -249,7 +249,7 @@ eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
 
 
 ### Create Overlap Statistic Plot
-pdf("_overlap-example.pdf", width=7, height=4)
+pdf("_overlap-example.pdf", width=7, height=7)
   plot(0, 0, xlim=range(0, 10), ylim=range(0,7), type = 'n', xaxt='n', xlab='Object Lifetime', ylab='Unique Object ID')
   #title("Lifetime Overlaps for Objects with Fingerprint 04DA...9A22")  
 
