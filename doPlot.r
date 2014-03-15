@@ -529,8 +529,13 @@ featuresC <- c(featuresC
               #,formatEq(statHashCollisions)
 )
 
-resultColumnNames2 <- c(
-                        'equalsSum'
+resultColumnNames2 <- c("Allocations"
+                        ,'Cache Hits'
+                        ,'Mem. Model'
+                        ,'Mem. Error A'
+                        ,'Mem. Error B'                        
+                        #
+                        ,'equalsSum'
                         ,'==Sum'
                         #
                         ,'equalsEst'
@@ -543,7 +548,14 @@ resultColumnNames2 <- c(
 )
 
 features2 <- numeric(0)
-features2 <- c(features2               
+features2 <- c(features2
+              ,formatEq(objectsAllocated)  
+              ,formatEq(cacheHitsEst)
+
+              ,formatPercent(memSavingsEst42)  
+              ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
+              ,formatPercent((memSavingsShaMin0 - memSavingsEst0) * 100/memSavingsEst0)
+
               #,formatEq(sum(eqCallsNom$rootEquals))
               ,formatEq(sum(eqCallsNom$recursiveEquals))
                             
