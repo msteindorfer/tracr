@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 #setwd("~/Development/rascal-devel/tracr")
 #setwd("~/Research/orpheus-results/_doTypeCheckParserGenerator-Xmx4096m-Xmx4096m")
-#setwd("~/Research/orpheus-results_2014-03-04/_org.eclipse.imp.pdb.values.benchmarks.RelationResourceBenchmark#closureStarJWAM16FullAndreas-Xmx4096m-Xmx4096m")
+#setwd("~/Research/orpheus-results_2014-03-06/_org.eclipse.imp.pdb.values.benchmarks.MaximalSharingBenchmark#testSingleTreeWithShareableElements_20-Xms4096m_-Xmx4096m-Xms4096m_-Xmx4096m")
 
 ocNom    <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
 ocMin    <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
@@ -254,7 +254,7 @@ pdf("_overlap-example.pdf", width=7, height=7)
   #title("Lifetime Overlaps for Objects with Fingerprint 04DA...9A22")  
 
   legend('bottomright', c('measured objects', 'replacement objects'), 
-       lty=1, col=c('black', 'purple'), bty='n', cex=.75)
+       lty=c(1,6), col=c('black', 'black'), bty='n', cex=.75)
 
   axis(1, at = seq(0, 10, by = 1))
 
@@ -276,11 +276,11 @@ pdf("_overlap-example.pdf", width=7, height=7)
 
   xCoord6 = c(0, 6)
   yCoord6 = c(6, 6)
-  lines(xCoord6, yCoord6, lwd=5, col='purple', lty=1)
+  lines(xCoord6, yCoord6, lwd=5, col='black', lty=6)
 
   xCoord7 = c(7, 10)
   yCoord7 = c(7, 7)
-  lines(xCoord7, yCoord7, lwd=5, col='purple', lty=1)
+  lines(xCoord7, yCoord7, lwd=5, col='black', lty=6)
 
   overlapFingerprintLabel <- '04DA...9A22'
   text((xCoord1[2] - xCoord1[1]) / 2 + xCoord1[1], yCoord1[2], overlapFingerprintLabel, pos = 1)
@@ -288,8 +288,8 @@ pdf("_overlap-example.pdf", width=7, height=7)
   text((xCoord3[2] - xCoord3[1]) / 2 + xCoord3[1], yCoord3[2], overlapFingerprintLabel, pos = 1)
   text((xCoord4[2] - xCoord4[1]) / 2 + xCoord4[1], yCoord4[2], overlapFingerprintLabel, pos = 1)
   text((xCoord5[2] - xCoord5[1]) / 2 + xCoord5[1], yCoord5[2], overlapFingerprintLabel, pos = 1)
-  text((xCoord6[2] - xCoord6[1]) / 2 + xCoord6[1], yCoord6[2], overlapFingerprintLabel, pos = 1, col = 'purple')
-  text((xCoord7[2] - xCoord7[1]) / 2 + xCoord7[1], yCoord7[2], overlapFingerprintLabel, pos = 1, col = 'purple')
+  text((xCoord6[2] - xCoord6[1]) / 2 + xCoord6[1], yCoord6[2], overlapFingerprintLabel, pos = 1, col = 'black')
+  text((xCoord7[2] - xCoord7[1]) / 2 + xCoord7[1], yCoord7[2], overlapFingerprintLabel, pos = 1, col = 'black')
 
   grid(NULL, NA)
 dev.off()
@@ -386,13 +386,15 @@ print(referenceEqualitiesSha)
 
 
 memSavingsEst0 <- savingsWithBytesPerRecordOverhead(hsEstWith(0))
-memSavingsSha0 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(0))
+memSavingsSha0 <- savingsWithBytesPerRecordOverhead(hsShaWith(0))
+memSavingsShaMin0 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(0))
 
 memSavingsEst8 <- savingsWithBytesPerRecordOverhead(hsEstWith(8))
 memSavingsSha8 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(8))
 
 memSavingsEst42 <- savingsWithBytesPerRecordOverhead(hsEstWith(42))
-memSavingsSha42 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(42))
+memSavingsSha42 <- savingsWithBytesPerRecordOverhead(hsShaWith(42))
+memSavingsShaMin42 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(42))
 
 memSavingsEst79 <- savingsWithBytesPerRecordOverhead(hsEstWith(79))
 memSavingsSha79 <- savingsWithBytesPerRecordOverhead(hsShaMinWith(79))
@@ -465,8 +467,9 @@ formatEq <- function(arg) {
 heapSize <- scan("_heapSize.bin.txt", what = '')
 
 resultColumnNames1 <- c('O. Alloc'
-                        ,'Hits Est.', 'Hits Prec.'
-                        ,'Est.', 'Real.'
+                        ,'Hits Est.'
+                        #,'Hits Prec.'
+                        ,'Est.', 'Err.', 'Err. of min.'
 #                         ,'Est. 0', 'Real. 0'
 #                         ,'Est. 42', 'Real. 42'                        
                         )
@@ -476,11 +479,12 @@ features1 <- c(features1
                ,formatEq(objectsAllocated)
                
                ,formatEq(cacheHitsEst)
-               ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
-                              
-               ,formatPercent(memSavingsEst42)
-               ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)                             
-              
+               #,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
+                
+               ,formatPercent(memSavingsEst42)  
+               ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
+               ,formatPercent((memSavingsShaMin0 - memSavingsEst0) * 100/memSavingsEst0)               
+               
 #                ,formatPercent(memSavingsEst0)
 #                ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
 #                
@@ -489,23 +493,26 @@ features1 <- c(features1
 )
 
 resultColumnNamesC <- c('O. Alloc'
-                       ,'Hits Est.', 'Hits Prec.'
-                       ,'Est.', 'Err.'
+                       ,'Hits Est.'
+                       #,'Hits Prec.'
+                       ,'Est.', 'Err.', 'Err. of min.'
                        # ,'Est. 0', 'Err. 0'
                        # ,'Est. 42', 'Err. 42'
                        ,'EqEst' #,'EqEstErr'
                        ,'EqAliasEst' #,'EqAliasErr'
-                       ,'EqColl.')
+                       # ,'EqColl.'
+                       )
 
 featuresC <- numeric(0)
 featuresC <- c(featuresC
               ,formatEq(objectsAllocated)
               
               ,formatEq(cacheHitsEst)
-              ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
+              #,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
 
-              ,formatPercent(memSavingsEst42)
+              ,formatPercent(memSavingsEst42)  
               ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
+              ,formatPercent((memSavingsShaMin0 - memSavingsEst0) * 100/memSavingsEst0)
               
               # ,formatPercent(memSavingsEst0)
               # ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
@@ -519,7 +526,7 @@ featuresC <- c(featuresC
               ,formatEq(referenceEqualitiesEst)
               #,formatPercent((referenceEqualitiesSha - referenceEqualitiesEst) * 100/referenceEqualitiesEst)
               
-              ,formatEq(statHashCollisions)
+              #,formatEq(statHashCollisions)
 )
 
 resultColumnNames2 <- c('Eq', 'EqRec'
@@ -602,7 +609,7 @@ pdf("__plot_boxplot_bd.pdf")
 	boxplot(x_bd)
 dev.off()
 
-pdf("__plot_boxplot__all.pdf")
+pdf("__plot_boxplot__all.pdf", width=7, height=5)
 	boxplot(x_abcd)
 dev.off()
 
