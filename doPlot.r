@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 #setwd("~/Development/rascal-devel/tracr")
 #setwd("~/Research/orpheus-results/_doTypeCheckParserGenerator-Xmx4096m-Xmx4096m")
-#setwd("~/Research/orpheus-results_2014-03-06/_org.eclipse.imp.pdb.values.benchmarks.MaximalSharingBenchmark#testSingleTreeWithShareableElements_20-Xms4096m_-Xmx4096m-Xms4096m_-Xmx4096m")
+setwd("~/Research/orpheus-results_2014-03-06/_org.eclipse.imp.pdb.values.benchmarks.MaximalSharingBenchmark#testSingleTreeWithShareableElements_20-Xms4096m_-Xmx4096m-Xms4096m_-Xmx4096m")
 
 ocNom    <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
 ocMin    <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
@@ -529,29 +529,29 @@ featuresC <- c(featuresC
               #,formatEq(statHashCollisions)
 )
 
-resultColumnNames2 <- c('Eq', 'EqRec'
-                        ,'==', '==Rec'
-                        #,'LogEq'
-                        ,'LogEqRec'
+resultColumnNames2 <- c(
+                        'equalsSum'
+                        ,'==Sum'
                         #
-                        #
-                        #
-                        ,'EqEst', 'EqSha'
-                        ,'==Est', '==Sha'
-                        ,'DLogEqEst', 'DLogEqSha'
+                        ,'equalsEst'
+                        ,'equalsSha'
+                        ,'==Est'
+                        ,'==Sha'
+                        ,'equivEst'
+                        ,'equivSha'
                         ,'Coll.'
 )
 
 features2 <- numeric(0)
 features2 <- c(features2               
-              ,formatEq(sum(eqCallsNom$rootEquals))
+              #,formatEq(sum(eqCallsNom$rootEquals))
               ,formatEq(sum(eqCallsNom$recursiveEquals))
                             
               #,formatEq(sum(eqCallsNom$rootReferenceEqualities))
               ,formatEq(sum(eqCallsNom$recursiveReferenceEqualities))
               
-              ,formatEq(sum(eqCallsNom$rootLogicalEquals))
-              ,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
+              #,formatEq(sum(eqCallsNom$rootLogicalEquals))
+              #,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
               
               # ,sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals)
               # ,sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities)
