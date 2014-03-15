@@ -493,7 +493,7 @@ features1 <- c(features1
 )
 
 resultColumnNamesC <- c('O. Alloc'
-                       ,'Hits Est.'
+                       #,'Hits Est.'
                        #,'Hits Prec.'
                        ,'Est.', 'Err.', 'Err. of min.'
                        # ,'Est. 0', 'Err. 0'
@@ -507,7 +507,7 @@ featuresC <- numeric(0)
 featuresC <- c(featuresC
               ,formatEq(objectsAllocated)
               
-              ,formatEq(cacheHitsEst)
+              #,formatEq(cacheHitsEst)
               #,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
 
               ,formatPercent(memSavingsEst42)  
