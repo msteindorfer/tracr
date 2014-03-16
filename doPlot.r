@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 #setwd("~/Development/rascal-devel/tracr")
 #setwd("~/Research/orpheus-results/_doTypeCheckParserGenerator-Xmx4096m-Xmx4096m")
-#setwd("~/Research/orpheus-results_2014-03-06/_org.eclipse.imp.pdb.values.benchmarks.MaximalSharingBenchmark#testSingleTreeWithShareableElements_20-Xms4096m_-Xmx4096m-Xms4096m_-Xmx4096m")
+#setwd("~/Research/orpheus-results_2014-03-06/_doExpLang-Xms4096m_-Xmx4096m-Xms4096m_-Xmx4096m")
 
 ocNom    <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
 ocMin    <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
@@ -574,9 +574,13 @@ features2 <- c(features2
               # ,sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals)
 
               # NEW              
-              ,formatEq(equalsEst)
-              ,formatPercent((equalsSha - equalsEst) * 100/equalsEst)
-                            
+              #,formatEq(equalsEst)
+              #,formatPercent((equalsSha - equalsEst) * 100/equalsEst)
+              #
+              # OLD
+              ,formatEq(cacheHitsEst)
+              ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)              
+              
               ,formatEq(referenceEqualitiesEst)
               ,formatPercent((referenceEqualitiesSha - referenceEqualitiesEst) * 100/referenceEqualitiesEst)
               
