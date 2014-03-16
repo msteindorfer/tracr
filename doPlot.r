@@ -444,11 +444,15 @@ f2si2<-function (number,rounding=F)
   return(sistring)
 }
 
-formatPercent <- function(arg) {
+formatPercent <- function(arg,rounding=T) {
   if (is.nan(arg)) {
     x <- "0"
   } else {
-    x <- format(round(as.numeric(arg), 0), nsmall=0, digits=2, scientific=FALSE)
+    if (rounding==T) {
+      x <- format(round(as.numeric(arg), 0), nsmall=0, digits=2, scientific=FALSE)            
+    } else {
+      x <- format(round(as.numeric(arg), 2), nsmall=2, digits=2, scientific=FALSE)      
+    }      
   }
   
   return (paste(x, "\\%", sep = ""))
@@ -531,7 +535,7 @@ featuresC <- c(featuresC
 
 print("Expected cache hits vs measured cache hits")
 equalsEst <- cacheHitsEst + sum(eqCallsNom$recursiveLogicalEquals)
-equalsSha <- max(cumsum(eqCallsShaInt$rootEquals)) + max(cumsum(eqCallsShaExt$recursiveEquals))
+equalsSha <- sum(eqCallsShaInt$rootEquals) + sum(eqCallsShaExt$recursiveLogicalEquals)
 
 resultColumnNames2 <- c("Allocations"
                         ,'Cache Hits'
@@ -561,7 +565,7 @@ features2 <- c(features2
               ,formatPercent((memSavingsShaMin0 - memSavingsEst0) * 100/memSavingsEst0)
 
               #,formatEq(sum(eqCallsNom$rootEquals))
-              ,formatEq(sum(eqCallsNom$recursiveEquals))
+              ,formatEq(sum(eqCallsNom$recursiveEquals) + sum(eqCallsNom$recursiveLogicalEquals))
                             
               #,formatEq(sum(eqCallsNom$rootReferenceEqualities))
               ,formatEq(sum(eqCallsNom$recursiveReferenceEqualities))
@@ -574,12 +578,12 @@ features2 <- c(features2
               # ,sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals)
 
               # NEW              
-              #,formatEq(equalsEst)
-              #,formatPercent((equalsSha - equalsEst) * 100/equalsEst)
+              ,formatEq(equalsEst)
+              ,formatPercent((equalsSha - equalsEst) * 100/equalsEst)
               #
               # OLD
-              ,formatEq(cacheHitsEst)
-              ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)              
+              #,formatEq(cacheHitsEst)
+              #,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)              
               
               ,formatEq(referenceEqualitiesEst)
               ,formatPercent((referenceEqualitiesSha - referenceEqualitiesEst) * 100/referenceEqualitiesEst)
@@ -659,12 +663,12 @@ names(hsEstWithoutReordering) <- c('V1', 'V2')
 x_ord_vs_unord <- data.frame(hsNom$V2, hsMin$V2, hsNomWithoutReordering$V2, hsMinWithoutReordering$V2)
 names(x_ord_vs_unord) <- c('hsNom', 'hsNomMin', 'hsNomWithoutReordering', 'hsNomMinWithoutReordering')
 
-ocNomWithXORHashing <- read.csv("objectCount-nom-with-xor-hashing.dat", sep=" ", header=FALSE)
-ocMinWithXORHashing <- read.csv("objectCount-min-with-xor-hashing.dat", sep=" ", header=FALSE)
-hsNomWithXORHashing <- read.csv("heapSizes-nom-with-xor-hashing.dat", sep=" ", header=FALSE)
-hsMinWithXORHashing <- read.csv("heapSizes-min-with-xor-hashing.dat", sep=" ", header=FALSE)
-hsEstWithXORHashing <- data.frame(hsMinWithXORHashing$V1, hsMinWithXORHashing$V2+(ocMinWithXORHashing$V2*bytesPerRecordOverhead))
-names(hsEstWithXORHashing) <- c('V1', 'V2')
+ocNomWithoutXORHashing <- read.csv("objectCount-nom-without-xor-hashing.dat", sep=" ", header=FALSE)
+ocMinWithoutXORHashing <- read.csv("objectCount-min-without-xor-hashing.dat", sep=" ", header=FALSE)
+hsNomWithoutXORHashing <- read.csv("heapSizes-nom-without-xor-hashing.dat", sep=" ", header=FALSE)
+hsMinWithoutXORHashing <- read.csv("heapSizes-min-without-xor-hashing.dat", sep=" ", header=FALSE)
+hsEstWithoutXORHashing <- data.frame(hsMinWithoutXORHashing$V1, hsMinWithoutXORHashing$V2+(ocMinWithoutXORHashing$V2*bytesPerRecordOverhead))
+names(hsEstWithoutXORHashing) <- c('V1', 'V2')
 
 pdf("__plot_boxplot__ord_vs_unord.pdf")
   boxplot(x_ord_vs_unord)
@@ -681,12 +685,12 @@ lines(x_ord_vs_unord$hsNomWithoutReordering, col='purple')
 plot(hsNom$V2, type='n')
 lines(hsNom$V2, col='black')
 lines(hsNomWithoutReordering$V2, col='purple')
-lines(hsNomWithXORHashing$V2, col='red')
+lines(hsNomWithoutXORHashing$V2, col='red')
 
 plot(hsMin$V2, type='n')
 lines(hsMin$V2, col='black')
 lines(hsMinWithoutReordering$V2, col='purple')
-lines(hsMinWithXORHashing$V2, col='red')
+lines(hsMinWithoutXORHashing$V2, col='red')
 # lines(hsMinWithoutReordering$V2, col='red')
 # lines(hsEst$V2, col='purple')
 # lines(hsEstWithoutReordering$V2, col='purple')
@@ -694,12 +698,12 @@ lines(hsMinWithXORHashing$V2, col='red')
 plot(ocNom$V2, type='n')
 lines(ocNom$V2, col='black')
 lines(ocNomWithoutReordering$V2, col='purple')
-lines(ocNomWithXORHashing$V2, col='red')
+lines(ocNomWithoutXORHashing$V2, col='red')
 
 plot(ocMin$V2, type='n')
 lines(ocMin$V2, col='black')
 lines(ocMinWithoutReordering$V2, col='purple')
-lines(ocMinWithXORHashing$V2, col='red')
+lines(ocMinWithoutXORHashing$V2, col='red')
 #
 ####
 
