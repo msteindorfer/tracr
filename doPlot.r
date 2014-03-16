@@ -529,6 +529,10 @@ featuresC <- c(featuresC
               #,formatEq(statHashCollisions)
 )
 
+print("Expected cache hits vs measured cache hits")
+equalsEst <- cacheHitsEst + sum(eqCallsNom$recursiveLogicalEquals)
+equalsSha <- max(cumsum(eqCallsShaInt$rootEquals)) + max(cumsum(eqCallsShaExt$recursiveEquals))
+
 resultColumnNames2 <- c("Allocations"
                         ,'Cache Hits'
                         ,'Mem. Model'
@@ -568,9 +572,10 @@ features2 <- c(features2
               # ,sum(eqCallsNom$rootEquals), sum(eqCallsNom$recursiveEquals)
               # ,sum(eqCallsNom$rootReferenceEqualities), sum(eqCallsNom$recursiveReferenceEqualities)
               # ,sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals)
-              
-              ,formatEq(cacheHitsEst)
-              ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)
+
+              # NEW              
+              ,formatEq(equalsEst)
+              ,formatPercent((equalsSha - equalsEst) * 100/equalsEst)
                             
               ,formatEq(referenceEqualitiesEst)
               ,formatPercent((referenceEqualitiesSha - referenceEqualitiesEst) * 100/referenceEqualitiesEst)
