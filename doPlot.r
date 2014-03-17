@@ -55,12 +55,12 @@ pdf("_heap-evolution.pdf")
   title("Heap Evolution")
 dev.off()
 
-pdf("_heap-evolution-with-validation.pdf")
+pdf("_heap-evolution-with-validation.pdf", width=7, height=5)
   heapEvo_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
   plot(hsMin$V2, type='n', ylim=heapEvo_yRange, xaxt = "n", xlab = "Program Progress", yaxt = "n", ylab = "Memory Usage")
   #par(new=T)
   
-  legend('topleft', c('measured', 'predicted', 'validated'), 
+  legend('topleft', c('Original', 'Estimate', 'Measurement A'), 
          lty=1, col=c('black', 'purple', 'red'), bty='n', cex=.75)
   
   lines(hsNom$V2, col='black')
@@ -71,7 +71,7 @@ pdf("_heap-evolution-with-validation.pdf")
   # add a title and subtitle 
   xAxisPercentage()
   axis(2, y <- seq(from=0, to=max(heapEvo_yRange), by=(max(heapEvo_yRange) - min(heapEvo_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
-  title("Heap Evolution")
+  #title("Heap Evolution")
 dev.off()
 
 #pdf("_memory_savings.pdf")
@@ -249,7 +249,7 @@ eqPercSha <- (eqCallsNom$V7-eqCallsShaInt$V7-eqCallsShaExt$V7)#*100/hsNom$V2
 
 
 ### Create Overlap Statistic Plot
-pdf("_overlap-example.pdf", width=7, height=7)
+pdf("_overlap-example.pdf", width=7, height=5)
   plot(0, 0, xlim=range(0, 10), ylim=range(0,7), type = 'n', xaxt='n', xlab='Object Lifetime', ylab='Unique Object ID')
   #title("Lifetime Overlaps for Objects with Fingerprint 04DA...9A22")  
 
@@ -458,13 +458,13 @@ formatPercent <- function(arg,rounding=T) {
   return (paste(x, "\\%", sep = ""))
 }
 
-formatEq <- function(arg) {
+formatEq <- function(arg,rounding=T) {
   if (missing(arg) || is.na(arg) || arg == "") {
     return ("--")
   } else if (as.numeric(arg) == 0) {
     return (as.character(arg))
   } else {
-    return (f2si2(as.numeric(arg), T))
+    return (f2si2(as.numeric(arg), rounding))
   }
 }
 
@@ -538,7 +538,11 @@ equalsEst <- cacheHitsEst + sum(eqCallsNom$recursiveLogicalEquals)
 equalsSha <- sum(eqCallsShaInt$rootEquals) + sum(eqCallsShaExt$recursiveLogicalEquals)
 
 resultColumnNames2 <- c("Allocations"
+                        #
                         ,'Cache Hits'
+                        ,'Cache Hits Error'
+                        ,'Coll.'
+                        #
                         ,'Mem. Model'
                         ,'Mem. Error A'
                         ,'Mem. Error B'                        
@@ -550,25 +554,27 @@ resultColumnNames2 <- c("Allocations"
                         ,'equalsSha'
                         ,'==Est'
                         ,'==Sha'
-                        ,'equivEst'
-                        ,'equivSha'
-                        ,'Coll.'
+                        #,'equivEst'
+                        #,'equivSha'
 )
 
 features2 <- numeric(0)
 features2 <- c(features2
               ,formatEq(objectsAllocated)  
+              
               ,formatEq(cacheHitsEst)
-
+              ,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst, F)
+              ,formatEq(statHashCollisions)
+              
               ,formatPercent(memSavingsEst42)  
               ,formatPercent((memSavingsSha0 - memSavingsEst0) * 100/memSavingsEst0)
               ,formatPercent((memSavingsShaMin0 - memSavingsEst0) * 100/memSavingsEst0)
 
               #,formatEq(sum(eqCallsNom$rootEquals))
-              ,formatEq(sum(eqCallsNom$recursiveEquals) + sum(eqCallsNom$recursiveLogicalEquals))
+              #,formatEq(sum(eqCallsNom$recursiveEquals) + sum(eqCallsNom$recursiveLogicalEquals))
                             
               #,formatEq(sum(eqCallsNom$rootReferenceEqualities))
-              ,formatEq(sum(eqCallsNom$recursiveReferenceEqualities))
+              #,formatEq(sum(eqCallsNom$recursiveReferenceEqualities))
               
               #,formatEq(sum(eqCallsNom$rootLogicalEquals))
               #,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
@@ -578,6 +584,7 @@ features2 <- c(features2
               # ,sum(eqCallsNom$rootLogicalEquals), sum(eqCallsNom$recursiveLogicalEquals)
 
               # NEW              
+              ,formatEq(sum(eqCallsNom$recursiveEquals) + sum(eqCallsNom$recursiveLogicalEquals))
               ,formatEq(equalsEst)
               ,formatPercent((equalsSha - equalsEst) * 100/equalsEst)
               #
@@ -585,13 +592,12 @@ features2 <- c(features2
               #,formatEq(cacheHitsEst)
               #,formatPercent((cacheHitsSha - cacheHitsEst) * 100/cacheHitsEst)              
               
+              ,formatEq(sum(eqCallsNom$recursiveReferenceEqualities))
               ,formatEq(referenceEqualitiesEst)
               ,formatPercent((referenceEqualitiesSha - referenceEqualitiesEst) * 100/referenceEqualitiesEst)
               
-              ,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
-              ,formatPercent((sum(eqCallsShaExt$recursiveLogicalEquals) - sum(eqCallsNom$recursiveLogicalEquals)) * 100/sum(eqCallsNom$recursiveLogicalEquals))
-              
-              ,formatEq(statHashCollisions)
+              #,formatEq(sum(eqCallsNom$recursiveLogicalEquals))
+              #,formatPercent((sum(eqCallsShaExt$recursiveLogicalEquals) - sum(eqCallsNom$recursiveLogicalEquals)) * 100/sum(eqCallsNom$recursiveLogicalEquals))
 )
 
 benchmarkName <- scan("_benchmarkName.bin.txt", what = '')
