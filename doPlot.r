@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 #setwd("~/Development/rascal-devel/tracr")
 #setwd("~/Research/orpheus-results/_doTypeCheckParserGenerator-Xmx4096m-Xmx4096m")
-#setwd("~/Research/orpheus-results_2014-03-06/_doExpLang-Xms4096m_-Xmx4096m-Xms4096m_-Xmx4096m")
+#setwd("~/Research/orpheus-results_2014-03-16/_org.eclipse.imp.pdb.values.benchmarks.MaximalSharingBenchmark#testSingleTreeWithShareableElements_20-Xms4096m_-Xmx4096m-Xms128m_-Xmx128m")
 
 ocNom    <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
 ocMin    <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
@@ -621,7 +621,7 @@ write.table(FF2, file = "_results2.csv", sep = " & ", col.names = FALSE, append 
 
 ### The new stuff :)
 x_abcd <- data.frame(hsNom$V2, hsMin$V2, hsShaPure$V2, hsShaPureMin$V2)
-names(x_abcd) <- c('hsNom', 'hsNomMin', 'hsSha', 'hsShaMin')
+names(x_abcd) <- c('Original', 'Estimate', 'Data point A', 'Data point B')
 
 x_ac <- data.frame(hsNom$V2, hsShaPure$V2)
 names(x_ac) <- c('hsA', 'hsB')
@@ -641,7 +641,11 @@ pdf("__plot_boxplot_bd.pdf")
 dev.off()
 
 pdf("__plot_boxplot__all.pdf", width=7, height=5)
-	boxplot(x_abcd)
+  boxplot(x_abcd, ylab = "Memory Usage", yaxt="n") # xlab = "Memory Profile"
+  
+  # y-values range
+  abcd_yRange <- range(hsNom$V2, hsMin$V2, hsSha$V2, hsEst$V2)
+  axis(2, y <- seq(from=0, to=max(abcd_yRange), by=(max(abcd_yRange) - min(abcd_yRange)) / 4), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
 dev.off()
 
 pdf("__plot_beanplot_ac.pdf")
