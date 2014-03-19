@@ -21,7 +21,9 @@ names(hsEst) <- c('V1', 'V2')
 #
 hsSha <- data.frame(hsShaPure$V1, hsShaPure$V2+(ocShaMin$V2*bytesPerRecordOverhead))
 names(hsSha) <- c('V1', 'V2')
-
+#
+hsShaMin <- data.frame(hsShaPureMin$V1, hsShaPureMin$V2+(ocShaMin$V2*bytesPerRecordOverhead))
+names(hsShaMin) <- c('V1', 'V2')
 
 #diff <- (hsNom$V2-hsEst$V2)
 percEst <- (hsNom$V2-hsEst$V2)*100/hsNom$V2
@@ -618,6 +620,30 @@ rownames(FF2) <- benchmarkShortName
 colnames(FF2) <- resultColumnNames2
 write.table(FF2, file = "_results2.csv", sep = " & ", col.names = FALSE, append = FALSE, quote = FALSE)
 
+
+# hugeTableColumnNames <- c('O. Alloc'
+#                         #,'Hits Est.'
+#                         #,'Hits Prec.'
+#                         ,'Est.', 'Err.', 'Err. of min.'
+#                         # ,'Est. 0', 'Err. 0'
+#                         # ,'Est. 42', 'Err. 42'
+#                         ,'EqEst' #,'EqEstErr'
+#                         ,'EqAliasEst' #,'EqAliasErr'
+#                         # ,'EqColl.'
+# )
+
+hugeTable <- numeric(0)
+hugeTable <- c(hugeTable
+  , mean(hsNom$V2)
+  , mean(hsEst$V2)  
+  , mean(hsSha$V2)  
+  , mean(hsShaMin$V2)    
+)
+
+FFHUGE <- as.matrix(t(hugeTable))
+rownames(FFHUGE) <- benchmarkShortName
+# colnames(FFHUGE) <- resultColumnNamesC
+write.table(FFHUGE, file = "_resultsHUGE.csv", sep = " , ", col.names = FALSE, append = FALSE, quote = FALSE)
 
 ### The new stuff :)
 x_abcd <- data.frame(hsNom$V2, hsMin$V2, hsShaPure$V2, hsShaPureMin$V2)
