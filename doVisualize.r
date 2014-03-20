@@ -37,8 +37,8 @@ tableColumnNames <- c(
 memoryProfilesS <- read.csv("calibration-redundant-data.csv", header=FALSE, col.names = tableColumnNames)
 memoryProfilesSStressed <- read.csv("calibration-redundant-data-stressed.csv", header=FALSE, col.names = tableColumnNames)
 
-common_xlab = 'object count (log) [by tree depth]'
-common_ylab = 'memory usage (log)'
+common_xlab = 'object count (log2) [d=tree depth]'
+common_ylab = 'memory usage (log10)'
 
 xAt = c(0, 1, 2, 5, 10, 15, 20)
 xTicksLog2 = log(2^(xAt+1)-1+3, base = 2)
@@ -58,7 +58,7 @@ pdf("calibrationRedundant.pdf", width=7, height=5)
   
   plot(memoryProfilesS$ObjAllocations, type = "n", xlab=common_xlab, xaxt = "n", xlim = xRange, ylab=common_ylab, ylim = yRange, yaxt = "n")
   
-  legend('topleft', c('original', 'estimate', 'measurement (with default heap size)', 'measurement (with minimal heap size)'), 
+  legend('topleft', c('original', 'estimate', 'measurement (with default heap size)', 'measurement (with tight heap size)'), 
        lty = c(1, 3, 1, 1), bty='n', cex=.75, pch = c(19, 17, 1, 13))
 
   #xLabels = parse(text=paste("2^(", xAt, ")-1", sep=""))
