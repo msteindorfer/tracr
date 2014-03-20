@@ -621,19 +621,17 @@ colnames(FF2) <- resultColumnNames2
 write.table(FF2, file = "_results2.csv", sep = " & ", col.names = FALSE, append = FALSE, quote = FALSE)
 
 
-# hugeTableColumnNames <- c('O. Alloc'
-#                         #,'Hits Est.'
-#                         #,'Hits Prec.'
-#                         ,'Est.', 'Err.', 'Err. of min.'
-#                         # ,'Est. 0', 'Err. 0'
-#                         # ,'Est. 42', 'Err. 42'
-#                         ,'EqEst' #,'EqEstErr'
-#                         ,'EqAliasEst' #,'EqAliasErr'
-#                         # ,'EqColl.'
-# )
+hugeTableColumnNames <- c(
+    "ObjAllocations"
+  , "MemOriginal"
+  , "MemEstimated"
+  , "MemMeasurementA"                 
+  , "MemMeasurementB"                 
+)
 
 hugeTable <- numeric(0)
 hugeTable <- c(hugeTable
+  , objectsAllocated
   , mean(hsNom$V2)
   , mean(hsEst$V2)  
   , mean(hsSha$V2)  
@@ -642,7 +640,7 @@ hugeTable <- c(hugeTable
 
 FFHUGE <- as.matrix(t(hugeTable))
 rownames(FFHUGE) <- benchmarkShortName
-# colnames(FFHUGE) <- resultColumnNamesC
+colnames(FFHUGE) <- hugeTableColumnNames
 write.table(FFHUGE, file = "_resultsHUGE.csv", sep = " , ", col.names = FALSE, append = FALSE, quote = FALSE)
 
 ### The new stuff :)
