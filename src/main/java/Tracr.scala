@@ -8,7 +8,7 @@ import scala.collection.immutable.NumericRange
 import scala._
 import scala.Some
 
-case class ObjectLifetime(tag: Option[Long], digest: String, ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean) {
+case class ObjectLifetime(tag: Option[Long], digest: Option[String], ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean) {
   require(ctorTime >= 0)
   require(!dtorTime.isDefined || dtorTime.get >= 0)
   require(measuredSizeInBytes >= 0)
@@ -30,27 +30,35 @@ object Tracr extends App {
 
   val BUF_SIZE = 16777216
 
-  val tagMap: GenMap[Long, TagInfo] = time("Deserialize tag map from Google Protocol Buffers") {
-    /*
-     * Read-in equals relation.
-     */
-    val tagMapBuilder = Map.newBuilder[Long, TagInfo]
-
-    {
-      val protoInputStream = new BufferedInputStream(new GZIPInputStream(new FileInputStream(path + "_tag_map.bin.gz")), BUF_SIZE)
-      try {
-        while (true) {
-          val proto = TrackingProtocolBuffers.TagMap.parseDelimitedFrom(protoInputStream)
-
-          tagMapBuilder += proto.getTag -> TagInfo(proto.getDigest.intern(), proto.getClassname.intern())
-        }
-      } catch {
-        case _: Exception => {}
-      }
-    }
-
-    tagMapBuilder.result
-  }
+//  val tagMap: GenMap[Long, TagInfo] = time("Deserialize tag map from Google Protocol Buffers") {
+//    if (isSharingEnabled) {
+//      Map.empty[Long, TagInfo]
+//    } else {
+//      /*
+//       * Read-in equals relation.
+//       */
+//      val tagMapBuilder = Map.newBuilder[Long, TagInfo]
+//
+//      // currently tags are only used by overlap statistics
+//      val protoInputStream = new BufferedInputStream(new GZIPInputStream(new FileInputStream(path + "_tag_map.bin.gz")), BUF_SIZE)
+//      try {
+//        var continue = true
+//        while (continue) {
+//          val proto = TrackingProtocolBuffers.TagMap.parseDelimitedFrom(protoInputStream)
+//
+//          if (proto != null && proto.isInitialized) {
+//            tagMapBuilder += proto.getTag -> TagInfo(proto.getDigest.intern(), proto.getClassname.intern())
+//          } else {
+//            continue = false
+//          }
+//        }
+//      } catch {
+//        case e1: Exception => { throw new RuntimeException(e1) }
+//      }
+//
+//      tagMapBuilder.result
+//    }
+//  }
 
   /*
    * Deserialize universe from Google Protocol Buffers
@@ -92,45 +100,36 @@ object Tracr extends App {
     {
       val protoInputStream = new BufferedInputStream(new GZIPInputStream(new FileInputStream(path + "_allocation_relation.bin.gz")), BUF_SIZE)
       try {
-        while (true) {
+        var continue = true
+        while (continue) {
           val protoObjectLifetime = TrackingProtocolBuffers.ObjectLifetime.parseDelimitedFrom(protoInputStream)
 
-          val tag = protoObjectLifetime.getTag
-          val digest = tagMap.get(tag).get.digest
-          val ctorTime = protoObjectLifetime.getCtorTime
-          val dtorTime = objectFreeMap.get(tag)
-          val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
-          val recursiveReferenceEqualitiesEstimate = protoObjectLifetime.getRecursiveReferenceEqualitiesEstimate
-          val hashTableOverhead = protoObjectLifetime.getHashTableOverhead
-          val isRedundant = protoObjectLifetime.getIsRedundant
+          if (protoObjectLifetime != null && protoObjectLifetime.isInitialized) {
+            val tag = protoObjectLifetime.getTag
+            val digest = if (protoObjectLifetime.hasDigest) Some(protoObjectLifetime.getDigest) else None
+//            val digest = tagMap.get(tag) match {
+//              case None => None
+//              case Some(tagInfo) => Some(tagInfo.digest)
+//            }
+            val ctorTime = protoObjectLifetime.getCtorTime
+            val dtorTime = objectFreeMap.get(tag)
+            val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
+            val recursiveReferenceEqualitiesEstimate = protoObjectLifetime.getRecursiveReferenceEqualitiesEstimate
+            val hashTableOverhead = protoObjectLifetime.getHashTableOverhead
+            val isRedundant = protoObjectLifetime.getIsRedundant
 
-          universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, recursiveReferenceEqualitiesEstimate, hashTableOverhead, isRedundant)
+            universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, recursiveReferenceEqualitiesEstimate, hashTableOverhead, isRedundant)
+          } else {
+            continue = false
+          }
         }
       } catch {
-        case _: Exception => {}
+        case e1: Exception => { throw new RuntimeException(e1) }
       }
     }
 
     universeBuilder.result
   }
-
-  val overlapStatistics: GenMap[String, GenSeq[GenSeq[ObjectLifetime]]] = time("Calculate overlap statistics") {
-    valueOverlapStatistics(sortedUniverse)
-  }
-
-//  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
-//    println(s"${runs.length} runs for $digest")
-//
-//    for (run <- runs) {
-//      println("A RUN")
-//      run.foreach(println)
-//
-////      val sizes = run.map(_.measuredSizeInBytes).toSet
-////      if (sizes.size > 1) {
-////        println(s"${run.head.digest}, $sizes")
-////      }
-//    }
-//  }
 
   /*
    * Replay heap size history.
@@ -204,6 +203,24 @@ object Tracr extends App {
   }
 
   if (!isSharingEnabled) {
+    val overlapStatistics: GenMap[String, GenSeq[GenSeq[ObjectLifetime]]] = time("Calculate overlap statistics") {
+      valueOverlapStatistics(sortedUniverse)
+    }
+
+    //  for ((digest, runs) <- overlapStatistics filter (!_._2.isEmpty)) {
+    //    println(s"${runs.length} runs for $digest")
+    //
+    //    for (run <- runs) {
+    //      println("A RUN")
+    //      run.foreach(println)
+    //
+    ////      val sizes = run.map(_.measuredSizeInBytes).toSet
+    ////      if (sizes.size > 1) {
+    ////        println(s"${run.head.digest}, $sizes")
+    ////      }
+    //    }
+    //  }
+
     /*
      * Suggest optimistic heap history.
      */
@@ -268,26 +285,31 @@ object Tracr extends App {
     {
       val protoInputStream = new BufferedInputStream(new GZIPInputStream(new FileInputStream(path + "_equals_relation.bin.gz")), BUF_SIZE)
       try {
-        while (true) {
+        var continue = true
+        while (continue) {
           val protoEqualsCall = TrackingProtocolBuffers.EqualsRelation.parseDelimitedFrom(protoInputStream)
 
-          val eq = EqualsCall(
-            protoEqualsCall.getTag1,
-            protoEqualsCall.getTag2,
-            protoEqualsCall.getResult,
-            protoEqualsCall.getDeepCount,
-            protoEqualsCall.getDeepTime,
-            protoEqualsCall.getDeepReferenceEqualityCount,
-            protoEqualsCall.getTimestamp,
-            protoEqualsCall.getIsHashLookup,
-            protoEqualsCall.getIsStructuralEquality
-          )
+          if (protoEqualsCall != null && protoEqualsCall.isInitialized) {
+            val eq = EqualsCall(
+              protoEqualsCall.getTag1,
+              protoEqualsCall.getTag2,
+              protoEqualsCall.getResult,
+              protoEqualsCall.getDeepCount,
+              protoEqualsCall.getDeepTime,
+              protoEqualsCall.getDeepReferenceEqualityCount,
+              protoEqualsCall.getTimestamp,
+              protoEqualsCall.getIsHashLookup,
+              protoEqualsCall.getIsStructuralEquality
+            )
 
-          // Filter out collissions because of the sheer amount
-          if (!eq.isHashLookup || eq.isHashLookup && eq.result) equalsRelationBuilder += eq
+            // Filter out collissions because of the sheer amount
+            if (!eq.isHashLookup || eq.isHashLookup && eq.result) equalsRelationBuilder += eq
+          } else {
+            continue = false
+          }
         }
       } catch {
-        case _: Exception => {}
+        case e1: Exception => { throw new RuntimeException(e1) }
       }
     }
 
@@ -507,7 +529,7 @@ object TracrUtil {
   }
 
   def valueOverlapStatistics(sortedUniverse: GenSeq[ObjectLifetime]): GenMap[String, GenSeq[GenSeq[ObjectLifetime]]] = {
-    val identitiesByValue: GenMap[String, GenSeq[ObjectLifetime]] = sortedUniverse groupBy (_.digest)
+    val identitiesByValue: GenMap[String, GenSeq[ObjectLifetime]] = sortedUniverse groupBy (_.digest.get)
     val runsByValue: GenMap[String, GenSeq[GenSeq[ObjectLifetime]]] = identitiesByValue mapValues calculateRuns
     runsByValue
   }
