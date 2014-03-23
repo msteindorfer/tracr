@@ -623,19 +623,73 @@ write.table(FF2, file = "_results2.csv", sep = " & ", col.names = FALSE, append 
 
 hugeTableColumnNames <- c(
     "ObjAllocations"
+  , "CacheHitsEstimated"
+  , "CacheFalseEquals"
+
   , "MemOriginal"
   , "MemEstimated"
   , "MemMeasurementA"                 
-  , "MemMeasurementB"                 
+  , "MemMeasurementB" 
+
+  , "OriginalEqualsRoot"
+  , "OriginalEqualsRecursive"
+  , "OriginalReferenceRoot"
+  , "OriginalReferenceRecursive"
+  , "OriginalEquivRoot"
+  , "OriginalEquivRecursive"
+  , "OriginalEqualsAndEquivRoot"
+  , "OriginalEqualsAndEquivRecursive"
+
+  , "MeasuredProgramEqualsRoot"
+  , "MeasuredProgramEqualsRecursive"
+  , "MeasuredProgramReferenceRoot"
+  , "MeasuredProgramReferenceRecursive"
+  , "MeasuredProgramEquivRoot"
+  , "MeasuredProgramEquivRecursive"
+  , "MeasuredProgramEqualsAndEquivRoot"
+  , "MeasuredProgramEqualsAndEquivRecursive"
+
+  , "MeasuredCacheEqualsRoot"
+  , "MeasuredCacheReferenceRecursive"
+
+  , "EstimatedCacheEqualsRoot"
+  , "EstimatedCacheReferenceRecursive"
 )
 
 hugeTable <- numeric(0)
 hugeTable <- c(hugeTable
   , objectsAllocated
+  , cacheHitsEst
+  , statHashCollisions
+
   , mean(hsNom$V2)
   , mean(hsEst$V2)  
   , mean(hsSha$V2)  
-  , mean(hsShaMin$V2)    
+  , mean(hsShaMin$V2)
+
+  , sum(eqCallsNom$rootEquals)
+  , sum(eqCallsNom$recursiveEquals)                
+  , sum(eqCallsNom$rootReferenceEqualities)
+  , sum(eqCallsNom$recursiveReferenceEqualities)
+  , sum(eqCallsNom$rootLogicalEquals)
+  , sum(eqCallsNom$recursiveLogicalEquals)
+  , sum(eqCallsNom$rootEquals) + sum(eqCallsNom$rootLogicalEquals)
+  , sum(eqCallsNom$recursiveEquals) + sum(eqCallsNom$recursiveLogicalEquals)
+
+  , sum(eqCallsShaExt$rootEquals)
+  , sum(eqCallsShaExt$recursiveEquals)                
+  , sum(eqCallsShaExt$rootReferenceEqualities)
+  , sum(eqCallsShaExt$recursiveReferenceEqualities)
+  , sum(eqCallsShaExt$rootLogicalEquals)
+  , sum(eqCallsShaExt$recursiveLogicalEquals)
+  , sum(eqCallsShaExt$rootEquals) + sum(eqCallsShaExt$rootLogicalEquals)
+  , sum(eqCallsShaExt$recursiveEquals) + sum(eqCallsShaExt$recursiveLogicalEquals)
+
+  , sum(eqCallsShaInt$rootEquals)
+  , sum(eqCallsShaInt$recursiveReferenceEqualities)
+
+  , sum(eqCallsTmp$rootEquals)
+  , sum(eqCallsTmp$recursiveReferenceEqualities)
 )
 
 FFHUGE <- as.matrix(t(hugeTable))

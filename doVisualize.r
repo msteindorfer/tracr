@@ -28,10 +28,10 @@ csUnits <- function (number,rounding=T)
 tableColumnNames <- c(
     "BenchmarkShortName"
   , "ObjAllocations"
-  , "MemOriginal"
-  , "MemEstimated"
-  , "MemMeasurementA"                 
-  , "MemMeasurementB"                 
+  , "MeanMemOriginal"
+  , "MeanMemEstimated"
+  , "MeanMemMeasurementA"                 
+  , "MeanMemMeasurementB"                 
 )
 
 memoryProfilesS <- read.csv("calibration-redundant-data.csv", header=FALSE, col.names = tableColumnNames)
@@ -54,7 +54,7 @@ yAxis <- function() {
 
 pdf("calibrationRedundant.pdf", width=7, height=5)  
   xRange <- range(log(memoryProfilesS$ObjAllocations, base = 2))
-  yRange <- range(log10(memoryProfilesS$MemOriginal), log10(memoryProfilesS$MemEstimated))
+  yRange <- range(log10(memoryProfilesS$MeanMemOriginal), log10(memoryProfilesS$MeanMemEstimated))
   
   plot(memoryProfilesS$ObjAllocations, type = "n", xlab=common_xlab, xaxt = "n", xlim = xRange, ylab=common_ylab, ylim = yRange, yaxt = "n")
   
@@ -65,18 +65,18 @@ pdf("calibrationRedundant.pdf", width=7, height=5)
   xAxis()
   yAxis()  
 
-  points(x = xTicksLog2, y = log10(memoryProfilesS$MemOriginal), type="b", pch=19)
-  points(x = xTicksLog2, y = log10(memoryProfilesS$MemEstimated), type="b", pch=17, lty=3)
-  points(x = xTicksLog2, y = log10(memoryProfilesS$MemMeasurementA), type="b", pch=1)
-  #points(log10(memoryProfilesS$MemMeasurementB), type="b", pch=2)  
-  points(x = xTicksLog2, y = log10(memoryProfilesSStressed$MemMeasurementA), type="b", pch=13)
+  points(x = xTicksLog2, y = log10(memoryProfilesS$MeanMemOriginal), type="b", pch=19)
+  points(x = xTicksLog2, y = log10(memoryProfilesS$MeanMemEstimated), type="b", pch=17, lty=3)
+  points(x = xTicksLog2, y = log10(memoryProfilesS$MeanMemMeasurementA), type="b", pch=1)
+  #points(log10(memoryProfilesS$MeanMemMeasurementB), type="b", pch=2)  
+  points(x = xTicksLog2, y = log10(memoryProfilesSStressed$MeanMemMeasurementA), type="b", pch=13)
 dev.off()
 
 
 memoryProfilesU <- read.csv("calibration-redundancy-free-data.csv", header=FALSE, col.names = tableColumnNames)
 
 pdf("calibrationRedundancyFree.pdf", width=7, height=5)
-  yRange <- range(log10(memoryProfilesU$MemOriginal), log10(memoryProfilesU$MemEstimated))
+  yRange <- range(log10(memoryProfilesU$MeanMemOriginal), log10(memoryProfilesU$MeanMemEstimated))
 
   plot(memoryProfilesS$ObjAllocations, type = "n", xlab=common_xlab, xaxt = "n", xlim = xRange, ylab=common_ylab, ylim = yRange, yaxt = "n")
 
@@ -89,8 +89,235 @@ pdf("calibrationRedundancyFree.pdf", width=7, height=5)
   xAxis()
   yAxis()
 
-  points(x = xTicksLog2, y = log10(memoryProfilesU$MemOriginal), type="b", pch=19)
-  points(x = xTicksLog2, y = log10(memoryProfilesU$MemEstimated), type="b", pch=17, lty=3)
-  points(x = xTicksLog2, y = log10(memoryProfilesU$MemMeasurementA), type="b", pch=1)
-  #points(log10(memoryProfilesU$MemMeasurementB), type="b", pch=2)  
+  points(x = xTicksLog2, y = log10(memoryProfilesU$MeanMemOriginal), type="b", pch=19)
+  points(x = xTicksLog2, y = log10(memoryProfilesU$MeanMemEstimated), type="b", pch=17, lty=3)
+  points(x = xTicksLog2, y = log10(memoryProfilesU$MeanMemMeasurementA), type="b", pch=1)
+  #points(log10(memoryProfilesU$MeanMemMeasurementB), type="b", pch=2)  
 dev.off()
+
+tableColumnNamesTotal <- c(
+  "BenchmarkShortName"
+  , "InputSize"
+  , "ObjAllocations"
+  , "MeanMemOriginal"
+  , "MeanMemEstimated"
+  , "MeanMemMeasurementA"                 
+  , "MeanMemMeasurementB"                 
+)
+
+memoryMod17 <- read.csv("mod17-data.csv", header=FALSE, col.names = tableColumnNamesTotal)
+memoryMod17ME <- read.csv("mod17-me-data.csv", header=FALSE, col.names = tableColumnNames)
+memoryMod17MS <- read.csv("mod17-ms-data.csv", header=FALSE, col.names = tableColumnNames)
+memoryMod17MT <- read.csv("mod17-mt-data.csv", header=FALSE, col.names = tableColumnNames)
+
+xAt = c(5, 10, 15, 20)
+xTicksLog2 = log(2^(xAt+1)-1+3, base = 2)
+
+xAxis <- function() {
+  axis(1, at = xTicksLog2, labels = paste(lapply(memoryMod17ME$ObjAllocations, csUnits), " [d=", xAt , "]", sep = ""), cex.axis=0.85)
+} 
+
+pdf("mod17.pdf", width=7, height=5)
+  xRange <- range(seq(from=5, by=5, to=20)) # range(log(memoryMod17ME$ObjAllocations, base = 2))
+  yRange <- range(log10(memoryMod17ME$MeanMemOriginal), log10(memoryMod17ME$MeanMemEstimated))
+  
+  plot(memoryMod17ME$ObjAllocations, type = "n", xlab=common_xlab, xaxt = "n", xlim = xRange, ylab=common_ylab, ylim = yRange, yaxt = "n")
+  
+  legend('topleft', c('original', 'estimate', 'measurement (with default heap size)'), 
+         lty = c(1, 3, 1), bty='n', cex=.75, pch = c(19, 17, 1))
+  
+  #axis(1, x <- seq(from=1, to=length(memoryMod17ME$ObjAllocations)), labels = lapply(memoryMod17ME$ObjAllocations, csUnits))
+  #axis(2, y <- seq(from=0, to=max(yRange), by=(max(yRange) - min(yRange)) / 4), labels = lapply(exp(y), csUnits))
+  
+  xAxis()
+  yAxis()
+  
+  points(x = xAt, y = log10(memoryMod17ME$MeanMemOriginal), type="b", pch=19)
+  points(x = xAt, y = log10(memoryMod17ME$MeanMemEstimated), type="b", pch=17, lty=3)
+  #points(x = xAt, y = log10(memoryMod17ME$MeanMemMeasurementA), type="b", pch=1)
+#   points(x = xAt, y = log10(memoryMod17ME$MeanMemMeasurementB), type="b", pch=2) 
+
+  points(x = xAt, y = log10(memoryMod17MS$MeanMemOriginal), type="b", pch=19)
+  points(x = xAt, y = log10(memoryMod17MS$MeanMemEstimated), type="b", pch=17, lty=3)
+  #points(x = xAt, y = log10(memoryMod17MS$MeanMemMeasurementA), type="b", pch=1)
+#   points(x = xAt, y = log10(memoryMod17MS$MeanMemMeasurementB), type="b", pch=2)  
+
+#   points(x = xAt, y = log10(memoryMod17MT$MeanMemOriginal), type="b", pch=19)
+#   points(x = xAt, y = log10(memoryMod17MT$MeanMemEstimated), type="b", pch=17, lty=3)
+#   #points(x = xAt, y = log10(memoryMod17MT$MeanMemMeasurementA), type="b", pch=1)
+#   points(x = xAt, y = log10(memoryMod17MS(memoryMod17MT$MeanMemMeasurementB), type="b", pch=2)  
+
+dev.off()
+
+#install.packages("ggplot2")
+#install.packages("reshape2")
+library(ggplot2)
+library(reshape2)
+
+#memoryMod17 <- data.frame(memoryMod17[1:2], log(memoryMod17[3:7]))
+
+d <- ggplot(data=melt(memoryMod17[-6], id.vars=c('BenchmarkShortName','InputSize')), aes(BenchmarkShortName, y = value, fill=variable))
+d <- d + geom_bar(position="dodge", stat="identity")
+d
+
+boxplot(memoryMod17$MeanMemMeasurementA, memoryMod17$MeanMemMeasurementB)
+t.test(memoryMod17$MeanMemEstimated, memoryMod17$MeanMemMeasurementB)
+t.test(memoryMod17$MeanMemEstimated, memoryMod17$MeanMemMeasurementA)
+
+
+allDataColumnNames <- c(
+    "BenchmarkShortName"
+  , "ObjAllocations"
+  , "CacheHitsEstimated"
+  , "CacheFalseEquals"
+
+  , "MemOriginal"
+  , "MemEstimated"
+  , "MemMeasurementA"                 
+  , "MemMeasurementB" 
+
+  , "OriginalEqualsRoot"
+  , "OriginalEqualsRecursive"
+  , "OriginalReferenceRoot"
+  , "OriginalReferenceRecursive"
+  , "OriginalEquivRoot"
+  , "OriginalEquivRecursive"
+  , "OriginalEqualsAndEquivRoot"
+  , "OriginalEqualsAndEquivRecursive"
+
+  , "MeasuredProgramEqualsRoot"
+  , "MeasuredProgramEqualsRecursive"
+  , "MeasuredProgramReferenceRoot"
+  , "MeasuredProgramReferenceRecursive"
+  , "MeasuredProgramEquivRoot"
+  , "MeasuredProgramEquivRecursive"
+  , "MeasuredProgramEqualsAndEquivRoot"
+  , "MeasuredProgramEqualsAndEquivRecursive"
+
+  , "MeasuredCacheEqualsRoot"
+  , "MeasuredCacheReferenceRecursive"
+
+  , "EstimatedCacheEqualsRoot"
+  , "EstimatedCacheReferenceRecursive"
+)
+
+allData <- read.csv("all-data.csv", header=FALSE, col.names = allDataColumnNames)
+
+# Plot Memory: Original vs Estimated
+allDataMemSubset <- allData[,c("BenchmarkShortName", "MemOriginal", "MemEstimated")]
+allDataMemSubsetLog <- data.frame(allDataMemSubset[1], log(allDataMemSubset[-1]))
+
+mem <- ggplot(data=melt(allDataMemSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(value), fill=variable))
+mem <- mem + geom_bar(position="dodge", stat="identity")
+mem
+
+
+# Plot Memory: Allocations vs Cache Hits vs Collisions 
+allDataCacheHitSubset <- allData[,c("BenchmarkShortName", "ObjAllocations", "CacheHitsEstimated", "CacheFalseEquals")]
+allDataCacheHitSubsetLog <- data.frame(allDataCacheHitSubset[1], log(allDataCacheHitSubset[-1]))
+
+ch <- ggplot(data=melt(allDataCacheHitSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(value), fill=variable))
+ch <- ch + geom_bar(position="dodge", stat="identity")
+ch
+
+
+# Plot Memory: Redundancy vs Mean Memory Savings
+objectRedundancyFactor <- (allData$CacheHitsEstimated / allData$ObjAllocations)
+memoryReductionFactor <- 1 - (allData$MemMeasurementB / allData$MemOriginal)
+
+allDataRVSSubset <- data.frame(allData$BenchmarkShortName, objectRedundancyFactor, memoryReductionFactor)
+names(allDataRVSSubset) <- c("BenchmarkShortName", "objectRedundancyFactor", "memoryReductionFactor")
+
+rvs <- ggplot(data=melt(allDataRVSSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+rvs <- rvs + geom_bar(position="dodge", stat="identity")
+rvs
+
+
+# Plot Equality: Equality Profile (Root)
+allDataOrigEqRootSubset <- allData[,c("BenchmarkShortName", "OriginalEqualsRoot", "OriginalReferenceRoot", "OriginalEquivRoot")]
+allDataOrigEqRootSubsetLog <- data.frame(allDataOrigEqRootSubset[1], log(allDataOrigEqRootSubset[-1]))
+
+origEqRoot <- ggplot(data=melt(allDataOrigEqRootSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
+origEqRoot <- origEqRoot + geom_bar(position="stack", stat="identity")
+origEqRoot 
+
+
+# Plot Equality: Equality Profile (Recursive)
+allDataOrigEqRecursiveSubset <- allData[,c("BenchmarkShortName", "OriginalEqualsRecursive", "OriginalReferenceRecursive", "OriginalEquivRecursive")]
+allDataOrigEqRecursiveSubsetLog <- data.frame(allDataOrigEqRecursiveSubset[1], log(allDataOrigEqRecursiveSubset[-1]))
+
+origEqRecursive <- ggplot(data=melt(allDataOrigEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
+origEqRecursive <- origEqRecursive + geom_bar(position="stack", stat="identity")
+origEqRecursive 
+
+
+# Plot Equality: Equality Profile (Nested)
+allDataOrigEqNestedSubset <- data.frame(allData$BenchmarkShortName, allData$OriginalEqualsRecursive - allData$OriginalEqualsRoot, allData$OriginalReferenceRecursive - allData$OriginalReferenceRoot, allData$OriginalEquivRecursive - allData$OriginalEquivRoot)
+names(allDataOrigEqNestedSubset) <- c("BenchmarkShortName", "OriginalEqualsNested", "OriginalReferenceNested", "OriginalEquivNested")
+allDataOrigEqNestedSubsetLog <- data.frame(allDataOrigEqNestedSubset[1], log(allDataOrigEqNestedSubset[-1]))
+
+origEqNested <- ggplot(data=melt(allDataOrigEqNestedSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
+origEqNested <- origEqNested + geom_bar(position="dodge", stat="identity")
+origEqNested 
+
+
+# Plot Equality: Root vs Recursive
+equalsRootToRecFactor <- (allData$OriginalEqualsRecursive / allData$OriginalEqualsRoot)
+equivRootToRecFactor <- (allData$OriginalEquivRecursive / allData$OriginalEquivRoot)
+
+equalitiesRootToRecFactor <- ((allData$OriginalEqualsRecursive + allData$OriginalEquivRecursive) / (allData$OriginalEqualsRoot + allData$OriginalEquivRoot))
+referencesRootToRecFactor <- ((allData$OriginalReferenceRecursive - allData$OriginalReferenceRoot) / (allData$OriginalEqualsRoot + allData$OriginalEquivRoot))
+
+equalitiesRootToRecFactor[is.nan(equalitiesRootToRecFactor)] <- NA
+referencesRootToRecFactor[is.infinite(referencesRootToRecFactor)] <- NA
+
+allDataRootToRecSubset <- data.frame(allData$BenchmarkShortName, equalitiesRootToRecFactor, referencesRootToRecFactor)
+names(allDataRootToRecSubset) <- c("BenchmarkShortName", "equalitiesRootToRecFactor", "referencesRootToRecFactor")
+
+rtr <- ggplot(data=melt(allDataRootToRecSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+rtr <- rtr + geom_bar(position="dodge", stat="identity")
+rtr 
+
+
+# Plot Equality Measured: Equality Profile (Recursive)
+allDataMeasuredEqRecursiveSubset <- allData[,c("BenchmarkShortName", "MeasuredProgramEqualsRecursive", "MeasuredProgramReferenceRecursive", "MeasuredProgramEquivRecursive")]
+allDataMeasuredEqRecursiveSubsetLog <- data.frame(allDataMeasuredEqRecursiveSubset[1], log(allDataMeasuredEqRecursiveSubset[-1]))
+
+measuredEqRecursive <- ggplot(data=melt(allDataMeasuredEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
+measuredEqRecursive <- measuredEqRecursive + geom_bar(position="stack", stat="identity")
+measuredEqRecursive 
+
+
+# Plot Equality Cache: Equality Profile (Cache)
+allDataEstimatedCacheEqualsSubset <- allData[,c("BenchmarkShortName", "EstimatedCacheEqualsRoot", "EstimatedCacheReferenceRecursive", "MeasuredCacheEqualsRoot", "MeasuredCacheReferenceRecursive")]
+allDataEstimatedCacheEqualsSubsetLog <- data.frame(allDataEstimatedCacheEqualsSubset[1], log(allDataEstimatedCacheEqualsSubset[-1]))
+
+ece <- ggplot(data=melt(allDataEstimatedCacheEqualsSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+ece <- ece + geom_bar(position="dodge", stat="identity")
+ece 
+
+
+# Plot Equality (Cache): Root vs Recursive
+cacheReferencesRootToRecFactor <- (allData$EstimatedCacheReferenceRecursive / allData$EstimatedCacheEqualsRoot)
+cacheReferencesRootToRecFactor[is.infinite(cacheReferencesRootToRecFactor)] <- NA
+
+cacheReferencesRootToRecFactorReal <- (allData$EstimatedCacheReferenceRecursive / allData$MeasuredCacheEqualsRoot)
+cacheReferencesRootToRecFactorReal[is.infinite(cacheReferencesRootToRecFactorReal)] <- NA
+
+allDataCacheRootToRecSubset <- data.frame(allData$BenchmarkShortName, cacheReferencesRootToRecFactor, cacheReferencesRootToRecFactorReal)
+names(allDataCacheRootToRecSubset) <- c("BenchmarkShortName", "cacheReferencesRootToRecFactorEstimated", "cacheReferencesRootToRecFactorReal")
+
+crtr <- ggplot(data=melt(allDataCacheRootToRecSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+crtr <- crtr + geom_bar(position="dodge", stat="identity")
+crtr 
+
+# > mean(cacheReferencesRootToRecFactorReal)
+# [1] 1.390391
+
+# > mean(cacheReferencesRootToRecFactorEstimated)
+# [1] 1.391842
+
+# > mean(equalitiesRootToRecFactor[!is.na(equalitiesRootToRecFactor)])
+# [1] 2.67706
+# > mean(referencesRootToRecFactor[!is.na(referencesRootToRecFactor)])
+# [1] 0.004540694
