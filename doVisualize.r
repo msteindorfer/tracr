@@ -217,14 +217,33 @@ mem
 dev.off()
 
 
+# Plot Memory: Cache Hits vs Collisions (Factor)
+collisionFactor <- (allData$CacheFalseEquals / allData$CacheHitsEstimated)
+collisionFactor[is.infinite(collisionFactor)] <- NA
+
+allDataCollisionFactorSubset <- data.frame(allData$BenchmarkShortName, collisionFactor)
+names(allDataCollisionFactorSubset) <- c("BenchmarkShortName", "collisionFactor")
+# allDataCollisionFactorSubsetLog <- data.frame(allDataCollisionFactorSubset[1], log(allDataCollisionFactorSubset[-1]))
+
+pdf("viz_cachehits-vs-collisions.pdf", width=7, height=5)  
+chf <- ggplot(data=melt(allDataCollisionFactorSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+# chf <- chf + geom_boxplot() 
+chf <- chf + geom_bar(position="dodge", stat="identity")
+chf <- chf + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+chf
+dev.off()
+
+
 # Plot Memory: Allocations vs Cache Hits vs Collisions 
 allDataCacheHitSubset <- allData[,c("BenchmarkShortName", "ObjAllocations", "CacheHitsEstimated", "CacheFalseEquals")]
 allDataCacheHitSubsetLog <- data.frame(allDataCacheHitSubset[1], log(allDataCacheHitSubset[-1]))
 
+pdf("viz_allocations-vs-cachehits-vs-collisions.pdf", width=7, height=5)  
 ch <- ggplot(data=melt(allDataCacheHitSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(value), fill=variable))
 ch <- ch + geom_bar(position="dodge", stat="identity")
 ch <- ch + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ch
+dev.off()
 
 
 # Plot Memory: Redundancy vs Mean Memory Savings
@@ -234,10 +253,20 @@ memoryReductionFactor <- 1 - (allData$MemMeasurementB / allData$MemOriginal)
 allDataRVSSubset <- data.frame(allData$BenchmarkShortName, objectRedundancyFactor, memoryReductionFactor)
 names(allDataRVSSubset) <- c("BenchmarkShortName", "objectRedundancyFactor", "memoryReductionFactor")
 
+pdf("viz_object-redundancy-vs-estimated-mean-memory-savings.pdf", width=7, height=5)
 rvs <- ggplot(data=melt(allDataRVSSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 rvs <- rvs + geom_bar(position="dodge", stat="identity")
 rvs <- rvs + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 rvs
+dev.off()
+# Total Range/Mean
+mean(objectRedundancyFactor)
+min(objectRedundancyFactor)
+max(objectRedundancyFactor)
+# D--H Range/Mean
+mean(allDataRVSSubset[4:8,]$objectRedundancyFactor)
+min(allDataRVSSubset[4:8,]$objectRedundancyFactor)
+max(allDataRVSSubset[4:8,]$objectRedundancyFactor)
 
 
 # Plot Equality: Equality Profile (Root)
@@ -254,10 +283,12 @@ origEqRoot
 allDataOrigEqRecursiveSubset <- allData[,c("BenchmarkShortName", "OriginalEqualsRecursive", "OriginalReferenceRecursive", "OriginalEquivRecursive")]
 allDataOrigEqRecursiveSubsetLog <- data.frame(allDataOrigEqRecursiveSubset[1], log(allDataOrigEqRecursiveSubset[-1]))
 
+pdf("viz_equality-profile-recursive-profiled.pdf", width=7, height=5)  
 origEqRecursive <- ggplot(data=melt(allDataOrigEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
 origEqRecursive <- origEqRecursive + geom_bar(position="stack", stat="identity")
 origEqRecursive <- origEqRecursive + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 origEqRecursive 
+dev.off()
 
 
 # Plot Equality: Equality Profile (Nested)
@@ -294,10 +325,12 @@ rtr
 allDataMeasuredEqRecursiveSubset <- allData[,c("BenchmarkShortName", "MeasuredProgramEqualsRecursive", "MeasuredProgramReferenceRecursive", "MeasuredProgramEquivRecursive")]
 allDataMeasuredEqRecursiveSubsetLog <- data.frame(allDataMeasuredEqRecursiveSubset[1], log(allDataMeasuredEqRecursiveSubset[-1]))
 
+pdf("viz_equality-profile-recursive-measured.pdf", width=7, height=5)  
 measuredEqRecursive <- ggplot(data=melt(allDataMeasuredEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
 measuredEqRecursive <- measuredEqRecursive + geom_bar(position="stack", stat="identity")
 measuredEqRecursive <- measuredEqRecursive + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 measuredEqRecursive 
+dev.off()
 
 
 # Plot Equality Cache: Equality Profile (Cache)
@@ -351,8 +384,8 @@ allDataEqualsAccuracySubset <- data.frame(allData$BenchmarkShortName, cacheEqual
 names(allDataEqualsAccuracySubset) <- c("BenchmarkShortName", "cacheEqualsAccuracyFactor", "cacheReferenceAccuracyFactor", "memoryMeanAccuracyFactor")
 
 eqac <- ggplot(data=melt(allDataEqualsAccuracySubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
-eqac <- eqac + geom_boxplot() 
-# eqac <- eqac + geom_bar(position="dodge", stat="identity")
+#eqac <- eqac + geom_boxplot() 
+eqac <- eqac + geom_bar(position="dodge", stat="identity")
 eqac <- eqac + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 eqac 
 
