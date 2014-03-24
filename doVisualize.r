@@ -38,7 +38,7 @@ memoryProfilesS <- read.csv("calibration-redundant-data.csv", header=FALSE, col.
 memoryProfilesSStressed <- read.csv("calibration-redundant-data-stressed.csv", header=FALSE, col.names = tableColumnNames)
 
 common_xlab = 'object count (log2) [d=tree depth]'
-common_ylab = 'memory usage (log10)'
+common_ylab = 'memory usage in bytes (log10)'
 
 xAt = c(0, 1, 2, 5, 10, 15, 20)
 xTicksLog2 = log(2^(xAt+1)-1+3, base = 2)
