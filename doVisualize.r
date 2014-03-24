@@ -199,6 +199,8 @@ allDataColumnNames <- c(
 
   , "EstimatedCacheEqualsRoot"
   , "EstimatedCacheReferenceRecursive"
+
+
 )
 
 allData <- read.csv("all-data.csv", header=FALSE, col.names = allDataColumnNames)
@@ -207,9 +209,12 @@ allData <- read.csv("all-data.csv", header=FALSE, col.names = allDataColumnNames
 allDataMemSubset <- allData[,c("BenchmarkShortName", "MemOriginal", "MemEstimated")]
 allDataMemSubsetLog <- data.frame(allDataMemSubset[1], log(allDataMemSubset[-1]))
 
+pdf("viz_absolute-memory-original-vs-estimated.pdf", width=7, height=5)  
 mem <- ggplot(data=melt(allDataMemSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(value), fill=variable))
 mem <- mem + geom_bar(position="dodge", stat="identity")
+mem <- mem + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 mem
+dev.off()
 
 
 # Plot Memory: Allocations vs Cache Hits vs Collisions 
@@ -218,6 +223,7 @@ allDataCacheHitSubsetLog <- data.frame(allDataCacheHitSubset[1], log(allDataCach
 
 ch <- ggplot(data=melt(allDataCacheHitSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(value), fill=variable))
 ch <- ch + geom_bar(position="dodge", stat="identity")
+ch <- ch + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ch
 
 
@@ -230,6 +236,7 @@ names(allDataRVSSubset) <- c("BenchmarkShortName", "objectRedundancyFactor", "me
 
 rvs <- ggplot(data=melt(allDataRVSSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 rvs <- rvs + geom_bar(position="dodge", stat="identity")
+rvs <- rvs + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 rvs
 
 
@@ -239,6 +246,7 @@ allDataOrigEqRootSubsetLog <- data.frame(allDataOrigEqRootSubset[1], log(allData
 
 origEqRoot <- ggplot(data=melt(allDataOrigEqRootSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
 origEqRoot <- origEqRoot + geom_bar(position="stack", stat="identity")
+origEqRoot <- origEqRoot + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 origEqRoot 
 
 
@@ -248,6 +256,7 @@ allDataOrigEqRecursiveSubsetLog <- data.frame(allDataOrigEqRecursiveSubset[1], l
 
 origEqRecursive <- ggplot(data=melt(allDataOrigEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
 origEqRecursive <- origEqRecursive + geom_bar(position="stack", stat="identity")
+origEqRecursive <- origEqRecursive + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 origEqRecursive 
 
 
@@ -258,6 +267,7 @@ allDataOrigEqNestedSubsetLog <- data.frame(allDataOrigEqNestedSubset[1], log(all
 
 origEqNested <- ggplot(data=melt(allDataOrigEqNestedSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
 origEqNested <- origEqNested + geom_bar(position="dodge", stat="identity")
+origEqNested <- origEqNested + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 origEqNested 
 
 
@@ -276,6 +286,7 @@ names(allDataRootToRecSubset) <- c("BenchmarkShortName", "equalitiesRootToRecFac
 
 rtr <- ggplot(data=melt(allDataRootToRecSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 rtr <- rtr + geom_bar(position="dodge", stat="identity")
+rtr <- rtr + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 rtr 
 
 
@@ -285,6 +296,7 @@ allDataMeasuredEqRecursiveSubsetLog <- data.frame(allDataMeasuredEqRecursiveSubs
 
 measuredEqRecursive <- ggplot(data=melt(allDataMeasuredEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
 measuredEqRecursive <- measuredEqRecursive + geom_bar(position="stack", stat="identity")
+measuredEqRecursive <- measuredEqRecursive + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 measuredEqRecursive 
 
 
@@ -294,6 +306,7 @@ allDataEstimatedCacheEqualsSubsetLog <- data.frame(allDataEstimatedCacheEqualsSu
 
 ece <- ggplot(data=melt(allDataEstimatedCacheEqualsSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 ece <- ece + geom_bar(position="dodge", stat="identity")
+ece <- ece + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ece 
 
 
@@ -309,6 +322,7 @@ names(allDataCacheRootToRecSubset) <- c("BenchmarkShortName", "cacheReferencesRo
 
 crtr <- ggplot(data=melt(allDataCacheRootToRecSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 crtr <- crtr + geom_bar(position="dodge", stat="identity")
+crtr <- crtr + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 crtr 
 
 # > mean(cacheReferencesRootToRecFactorReal)
@@ -321,3 +335,37 @@ crtr
 # [1] 2.67706
 # > mean(referencesRootToRecFactor[!is.na(referencesRootToRecFactor)])
 # [1] 0.004540694
+
+
+# Plot Equality (Cache): Precision
+cacheEqualsAccuracyFactor <- (allData$EstimatedCacheEqualsRoot / allData$MeasuredCacheEqualsRoot)
+cacheEqualsAccuracyFactor[is.infinite(cacheEqualsAccuracyFactor)] <- NA
+
+cacheReferenceAccuracyFactor <- (allData$EstimatedCacheReferenceRecursive / allData$MeasuredCacheReferenceRecursive)
+cacheReferenceAccuracyFactor[is.infinite(cacheReferenceAccuracyFactor)] <- NA
+
+memoryMeanAccuracyFactor <- ((allData$MemEstimated) / allData$MemMeasurementB)
+memoryMeanAccuracyFactor[is.infinite(memoryMeanAccuracyFactor)] <- NA
+
+allDataEqualsAccuracySubset <- data.frame(allData$BenchmarkShortName, cacheEqualsAccuracyFactor, cacheReferenceAccuracyFactor, memoryMeanAccuracyFactor)
+names(allDataEqualsAccuracySubset) <- c("BenchmarkShortName", "cacheEqualsAccuracyFactor", "cacheReferenceAccuracyFactor", "memoryMeanAccuracyFactor")
+
+eqac <- ggplot(data=melt(allDataEqualsAccuracySubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+eqac <- eqac + geom_boxplot() 
+# eqac <- eqac + geom_bar(position="dodge", stat="identity")
+eqac <- eqac + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+eqac 
+
+
+allDataEqualsAccuracySubset <- data.frame(allData$BenchmarkShortName, cacheEqualsAccuracyFactor)
+names(allDataEqualsAccuracySubset) <- c("BenchmarkShortName", "cacheEqualsAccuracyFactor")
+
+new <- ggplot(data=allDataEqualsAccuracySubset, aes("Overall", y = cacheEqualsAccuracyFactor))
+new <- new + geom_boxplot() 
+# eqac <- eqac + geom_bar(position="dodge", stat="identity")
+new <- new + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+new 
+
+boxplot(cacheEqualsAccuracyFactor)
+boxplot(cacheReferenceAccuracyFactor)
+boxplot(memoryMeanAccuracyFactor)
