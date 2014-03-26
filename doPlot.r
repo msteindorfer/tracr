@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 #setwd("~/Development/rascal-devel/tracr")
 #setwd("~/Research/orpheus-results/_doTypeCheckParserGenerator-Xmx4096m-Xmx4096m")
-#setwd("~/Research/orpheus-results_2014-03-16/_org.eclipse.imp.pdb.values.benchmarks.MaximalSharingBenchmark#testSingleTreeWithShareableElements_20-Xms4096m_-Xmx4096m-Xms128m_-Xmx128m")
+#setwd("~/Research/orpheus-results_2014-03-16/_doExpLang-Xms4096m_-Xmx4096m-Xms4096m_-Xmx4096m")
 
 ocNom    <- read.csv("objectCount-nom.dat", sep=" ", header=FALSE)
 ocMin    <- read.csv("objectCount-min.dat", sep=" ", header=FALSE)
@@ -621,6 +621,54 @@ colnames(FF2) <- resultColumnNames2
 write.table(FF2, file = "_results2.csv", sep = " & ", col.names = FALSE, append = FALSE, quote = FALSE)
 
 
+recordFile <- "_timeBenchmarkA.txt"
+if (file.exists(recordFile)) {
+  record <- read.csv(recordFile, sep=":", header=FALSE)
+  runtimeBenchmarkA <- record$V1
+} else {
+  runtimeBenchmarkA <- NA
+}
+
+recordFile <- "_timeBenchmarkB.txt"
+if (file.exists(recordFile)) {
+  record <- read.csv(recordFile, sep=":", header=FALSE)
+  runtimeBenchmarkB <- record$V1
+} else {
+  runtimeBenchmarkB <- NA
+}
+
+recordFile <- "_timeBenchmarkAA.txt"
+if (file.exists(recordFile)) {
+  record <- read.csv(recordFile, sep=":", header=FALSE)
+  runtimeBenchmarkAA <- record$V1
+} else {
+  runtimeBenchmarkAA <- NA
+}
+
+recordFile <- "_timeBenchmarkBB.txt"
+if (file.exists(recordFile)) {
+  record <- read.csv(recordFile, sep=":", header=FALSE)
+  runtimeBenchmarkBB <- record$V1
+} else {
+  runtimeBenchmarkBB <- NA
+}
+
+recordFile <- "_timeTracrA.txt"
+if (file.exists(recordFile)) {
+  record <- read.csv(recordFile, sep=":", header=FALSE)
+  runtimeTracrA <- record$V1
+} else {
+  runtimeTracrA <- NA
+}
+
+recordFile <- "_timeTracrB.txt"
+if (file.exists(recordFile)) {
+  record <- read.csv(recordFile, sep=":", header=FALSE)
+  runtimeTracrB <- record$V1
+} else {
+  runtimeTracrB <- NA
+}
+
 hugeTableColumnNames <- c(
     "ObjAllocations"
   , "CacheHitsEstimated"
@@ -654,6 +702,14 @@ hugeTableColumnNames <- c(
 
   , "EstimatedCacheEqualsRoot"
   , "EstimatedCacheReferenceRecursive"
+
+  , "runtimeBenchmarkA"
+  , "runtimeBenchmarkB"
+  , "runtimeBenchmarkAA"
+  , "runtimeBenchmarkBB"
+
+  , "runtimeTracrA"
+  , "runtimeTracrB"
 )
 
 hugeTable <- numeric(0)
@@ -690,6 +746,14 @@ hugeTable <- c(hugeTable
 
   , sum(eqCallsTmp$rootEquals)
   , sum(eqCallsTmp$recursiveReferenceEqualities)
+
+  , runtimeBenchmarkA
+  , runtimeBenchmarkB
+  , runtimeBenchmarkAA
+  , runtimeBenchmarkBB
+
+  , runtimeTracrA
+  , runtimeTracrB
 )
 
 FFHUGE <- as.matrix(t(hugeTable))

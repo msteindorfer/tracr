@@ -1,4 +1,5 @@
 #!/usr/bin/env Rscript
+setwd("~/Development/rascal-devel/tracr")
 
 require(sitools)
 
@@ -199,8 +200,14 @@ allDataColumnNames <- c(
 
   , "EstimatedCacheEqualsRoot"
   , "EstimatedCacheReferenceRecursive"
-
-
+  
+  , "runtimeBenchmarkA"
+  , "runtimeBenchmarkB"
+  , "runtimeBenchmarkAA"
+  , "runtimeBenchmarkBB"
+  
+  , "runtimeTracrA"
+  , "runtimeTracrB"
 )
 
 allData <- read.csv("all-data.csv", header=FALSE, col.names = allDataColumnNames)
