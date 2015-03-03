@@ -161,11 +161,6 @@ d <- ggplot(data=melt(memoryMod17[-6], id.vars=c('BenchmarkShortName','InputSize
 d <- d + geom_bar(position="dodge", stat="identity")
 d
 
-boxplot(memoryMod17$MeanMemMeasurementA, memoryMod17$MeanMemMeasurementB)
-t.test(memoryMod17$MeanMemEstimated, memoryMod17$MeanMemMeasurementB)
-t.test(memoryMod17$MeanMemEstimated, memoryMod17$MeanMemMeasurementA)
-
-
 allDataColumnNames <- c(
     "BenchmarkShortName"
   , "ObjAllocations"
@@ -443,3 +438,79 @@ new
 boxplot(cacheEqualsAccuracyFactor)
 boxplot(cacheReferenceAccuracyFactor)
 boxplot(memoryMeanAccuracyFactor)
+
+#With Martin
+boxplot(allData$MemMeasurementA, allData$MemMeasurementB)
+t.test(allData$MemEstimated, allData$MemMeasurementB)
+t.test(allData$MemEstimated, allData$MemMeasurementA)
+
+memoryMeanAccuracyFactorA <- ((allData$MemEstimated) / allData$MemMeasurementA)
+memoryMeanAccuracyFactorA[is.infinite(memoryMeanAccuracyFactorA)] <- NA
+memoryMeanAccuracyFactorB <- ((allData$MemEstimated) / allData$MemMeasurementB)
+memoryMeanAccuracyFactorB[is.infinite(memoryMeanAccuracyFactorB)] <- NA
+
+# pdf("mem-hypothesis-1-vs-2_in_control.pdf", width=7, height=5)
+#   boxplot((allData$MemMeasurementA), (allData$MemMeasurementB), names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Mean Memory Usage")
+# 
+#   #yRange <- range(allData$MemMeasurementA, allData$MemMeasurementB)
+#   #axis(2, y <- seq(from=0, to=max(yRange), by=(max(yRange) - min(yRange)) / 6), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
+#   title("Differences in Validating Mean Memory Usage (in Control Experiment)")
+# dev.off()
+# t.test(allData$MemEstimated, allData$MemMeasurementB)
+# t.test(allData$MemEstimated, allData$MemMeasurementA)
+# 
+# pdf("mem-estimate-vs-hypothesis-2_in_control.pdf", width=7, height=5)
+#   boxplot(log(allData$MemEstimated), log(allData$MemMeasurementB), names=c("Orpheus Estimate", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Mean Memory Usage")
+# 
+#   yRange <- range(allData$MemEstimated, allData$MemMeasurementB)
+#   axis(2, y <- seq(from=0, to=max(yRange), by=(max(yRange) - min(yRange)) / 5), labels = paste(round(y/(1024*1024), digits=0), "MB", sep = ""))
+#   title("Accuracy of Orpheus' Memory Estimates (in Control Experiment)")
+# dev.off()
+
+pdf("mem-hypothesis-1-vs-2_in_control.pdf", width=7, height=4)
+  boxplot(memoryMeanAccuracyFactorA, memoryMeanAccuracyFactorB, names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Accuracy Relative to Estimate", ylim = range(c(0, 0.2, 0.4, 0.6, 0.8, 1.0)))
+  yRange <- range(memoryMeanAccuracyFactorA, memoryMeanAccuracyFactorB)
+  axis(2, y <- c(0.0, 0.25, 0.5, 0.75, 1.0), labels = paste(round(y*100, digits=0), "%", sep = ""), cex.axis=0.95)
+  title("Differences in Validating Mean Memory Usage (in Control Experiment)")
+dev.off()
+#c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+
+pdf("mem-hypothesis-1-vs-2_in_real.pdf", width=7, height=4)
+  boxplot(memoryMeanAccuracyFactorA, memoryMeanAccuracyFactorB, names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Accuracy Relative to Estimate", ylim = range(c(0, 0.2, 0.4, 0.6, 0.8, 1.0)))
+  yRange <- range(memoryMeanAccuracyFactorA, memoryMeanAccuracyFactorB)
+  axis(2, y <- c(0.0, 0.25, 0.5, 0.75, 1.0), labels = paste(round(y*100, digits=0), "%", sep = ""), cex.axis=0.95)
+  title("Differences in Validating Mean Memory Usage (in Realistic Experiment)")
+dev.off()
+#c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
+
+t.test(allData$MemEstimated, allData$MemMeasurementB)
+t.test(allData$MemEstimated, allData$MemMeasurementA)
+
+validation <- data.frame(allData$BenchmarkShortName, cacheEqualsAccuracyFactor)
+names(validation) <- c("BenchmarkShortName", "cacheEqualsAccuracyFactor")
+
+new <- ggplot(data=validation, aes("Overall", y = cacheEqualsAccuracyFactor))
+new <- new + geom_boxplot() 
+# eqac <- eqac + geom_bar(position="dodge", stat="identity")
+new <- new + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+new 
+
+# pdf("calibrationRedundant.pdf", width=7, height=5)  
+# xRange <- range(log(memoryProfilesS$ObjAllocations, base = 2))
+# yRange <- range(log10(memoryProfilesS$MeanMemOriginal), log10(memoryProfilesS$MeanMemEstimated))
+# 
+# plot(memoryProfilesS$ObjAllocations, type = "n", xlab=common_xlab, xaxt = "n", xlim = xRange, ylab=common_ylab, ylim = yRange, yaxt = "n")
+# 
+# legend('topleft', c('original', 'estimate', 'measurement (with default heap size)', 'measurement (with tight heap size)'), 
+#        lty = c(1, 3, 1, 1), bty='n', cex=.75, pch = c(19, 17, 1, 13))
+# 
+# #xLabels = parse(text=paste("2^(", xAt, ")-1", sep=""))
+# xAxis()
+# yAxis()  
+# 
+# points(x = xTicksLog2, y = log10(memoryProfilesS$MeanMemOriginal), type="b", pch=19)
+# points(x = xTicksLog2, y = log10(memoryProfilesS$MeanMemEstimated), type="b", pch=17, lty=3)
+# points(x = xTicksLog2, y = log10(memoryProfilesS$MeanMemMeasurementA), type="b", pch=1)
+# #points(log10(memoryProfilesS$MeanMemMeasurementB), type="b", pch=2)  
+# points(x = xTicksLog2, y = log10(memoryProfilesSStressed$MeanMemMeasurementA), type="b", pch=13)
+# dev.off()
