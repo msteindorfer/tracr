@@ -444,10 +444,18 @@ boxplot(allData$MemMeasurementA, allData$MemMeasurementB)
 t.test(allData$MemEstimated, allData$MemMeasurementB)
 t.test(allData$MemEstimated, allData$MemMeasurementA)
 
-memoryMeanAccuracyFactorA <- ((allData$MemEstimated) / allData$MemMeasurementA)
-memoryMeanAccuracyFactorA[is.infinite(memoryMeanAccuracyFactorA)] <- NA
-memoryMeanAccuracyFactorB <- ((allData$MemEstimated) / allData$MemMeasurementB)
-memoryMeanAccuracyFactorB[is.infinite(memoryMeanAccuracyFactorB)] <- NA
+ctrlData <- allData[grep("^(S|U).. ", allData$BenchmarkShortName, ignore.case=T),] # excluding additional 'Min' measurements
+realData <- allData[grep("^(S|U)", allData$BenchmarkShortName, ignore.case=T, invert=T),]
+
+ctrlData_memoryMeanAccuracyFactorA <- ((ctrlData$MemEstimated) / ctrlData$MemMeasurementA)
+ctrlData_memoryMeanAccuracyFactorA[is.infinite(ctrlData_memoryMeanAccuracyFactorA)] <- NA
+ctrlData_memoryMeanAccuracyFactorB <- ((ctrlData$MemEstimated) / ctrlData$MemMeasurementB)
+ctrlData_memoryMeanAccuracyFactorB[is.infinite(ctrlData_memoryMeanAccuracyFactorB)] <- NA
+
+realData_memoryMeanAccuracyFactorA <- ((realData$MemEstimated) / realData$MemMeasurementA)
+realData_memoryMeanAccuracyFactorA[is.infinite(realData_memoryMeanAccuracyFactorA)] <- NA
+realData_memoryMeanAccuracyFactorB <- ((realData$MemEstimated) / realData$MemMeasurementB)
+realData_memoryMeanAccuracyFactorB[is.infinite(realData_memoryMeanAccuracyFactorB)] <- NA
 
 # pdf("mem-hypothesis-1-vs-2_in_control.pdf", width=7, height=5)
 #   boxplot((allData$MemMeasurementA), (allData$MemMeasurementB), names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Mean Memory Usage")
@@ -468,23 +476,23 @@ memoryMeanAccuracyFactorB[is.infinite(memoryMeanAccuracyFactorB)] <- NA
 # dev.off()
 
 pdf("mem-hypothesis-1-vs-2_in_control.pdf", width=7, height=4)
-  boxplot(memoryMeanAccuracyFactorA, memoryMeanAccuracyFactorB, names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Accuracy Relative to Estimate", ylim = range(c(0, 0.2, 0.4, 0.6, 0.8, 1.0)))
-  yRange <- range(memoryMeanAccuracyFactorA, memoryMeanAccuracyFactorB)
+  boxplot(ctrlData_memoryMeanAccuracyFactorA, ctrlData_memoryMeanAccuracyFactorB, names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Accuracy Relative to Estimate", ylim = range(c(0, 0.2, 0.4, 0.6, 0.8, 1.0)))
+  yRange <- range(ctrlData_memoryMeanAccuracyFactorA, ctrlData_memoryMeanAccuracyFactorB)
   axis(2, y <- c(0.0, 0.25, 0.5, 0.75, 1.0), labels = paste(round(y*100, digits=0), "%", sep = ""), cex.axis=0.95)
   title("Differences in Validating Mean Memory Usage (in Control Experiment)")
 dev.off()
 #c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
 
 pdf("mem-hypothesis-1-vs-2_in_real.pdf", width=7, height=4)
-  boxplot(memoryMeanAccuracyFactorA, memoryMeanAccuracyFactorB, names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Accuracy Relative to Estimate", ylim = range(c(0, 0.2, 0.4, 0.6, 0.8, 1.0)))
-  yRange <- range(memoryMeanAccuracyFactorA, memoryMeanAccuracyFactorB)
+  boxplot(realData_memoryMeanAccuracyFactorA, realData_memoryMeanAccuracyFactorB, names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Accuracy Relative to Estimate", ylim = range(c(0, 0.2, 0.4, 0.6, 0.8, 1.0)))
+  yRange <- range(realData_memoryMeanAccuracyFactorA, realData_memoryMeanAccuracyFactorB)
   axis(2, y <- c(0.0, 0.25, 0.5, 0.75, 1.0), labels = paste(round(y*100, digits=0), "%", sep = ""), cex.axis=0.95)
   title("Differences in Validating Mean Memory Usage (in Realistic Experiment)")
 dev.off()
 #c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
 
-t.test(allData$MemEstimated, allData$MemMeasurementB)
-t.test(allData$MemEstimated, allData$MemMeasurementA)
+t.test(ctrlData$MemEstimated, ctrlData$MemMeasurementB)
+t.test(ctrlData$MemEstimated, ctrlData$MemMeasurementA)
 
 validation <- data.frame(allData$BenchmarkShortName, cacheEqualsAccuracyFactor)
 names(validation) <- c("BenchmarkShortName", "cacheEqualsAccuracyFactor")
