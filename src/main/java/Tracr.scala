@@ -4,11 +4,11 @@ import java.nio.{ByteOrder, ByteBuffer}
 import java.util.zip.GZIPInputStream
 import org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers
 import scala.collection.{GenIterable, GenSeq, GenMap, GenSet}
-import scala.collection.immutable.NumericRange
+import scala.collection.immutable.{SortedMap, NumericRange}
 import scala._
 import scala.Some
 
-case class ObjectLifetime(tag: Option[Long], digest: Option[String], ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean) {
+case class ObjectLifetime(tag: Option[Long], digest: Option[String], ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean, oepDigest: Option[String], oepObjectGraph: Option[String]) {
   require(ctorTime >= 0)
   require(!dtorTime.isDefined || dtorTime.get >= 0)
   require(measuredSizeInBytes >= 0)
@@ -118,7 +118,10 @@ object Tracr extends App {
             val hashTableOverhead = protoObjectLifetime.getHashTableOverhead
             val isRedundant = protoObjectLifetime.getIsRedundant
 
-            universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, recursiveReferenceEqualitiesEstimate, hashTableOverhead, isRedundant)
+            val oepDigest = if (protoObjectLifetime.hasOepDigest) Some(protoObjectLifetime.getOepDigest) else None
+            val oepObjectGraph = if (protoObjectLifetime.hasOepObjectGraph) Some(protoObjectLifetime.getOepObjectGraph) else None
+
+            universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, recursiveReferenceEqualitiesEstimate, hashTableOverhead, isRedundant, oepDigest, oepObjectGraph)
           } else {
             continue = false
           }
@@ -221,6 +224,40 @@ object Tracr extends App {
     //    }
     //  }
 
+
+    time("Calculate Object Redundancy Profiling (ORP) over Object Equality Profiling (OEP)") {
+      val recordsGroupedByDigest: GenMap[String, GenSeq[ObjectLifetime]] = sortedUniverse groupBy (_.digest.get)
+      val distinctOepDigestsByDigest: GenMap[String, Int] = recordsGroupedByDigest mapValues { _.map(_.oepDigest).toSet.size }
+
+      val frequencyByDistinctOepDigests: GenMap[Int, Int] = distinctOepDigestsByDigest.groupBy(_._2).mapValues(_.size)
+
+      val numberOfDataPoints = frequencyByDistinctOepDigests.values.sum
+      val formatFrequency = (freq: Int, numberOfDataPoints: Int) => { "%.4f" format (100 * freq.toDouble / numberOfDataPoints) }
+
+      val relativeFrequencyByDistinctOepDigests = frequencyByDistinctOepDigests mapValues { freq => formatFrequency(freq, numberOfDataPoints) }
+
+      // printing histogram
+      println(relativeFrequencyByDistinctOepDigests .toList.sortBy(_._1))
+      println()
+
+      // serialize histogram
+      val outputFile = new File("orpVsOep.dat")
+      val writer = new BufferedWriter(new FileWriter(outputFile))
+
+      for ((distinctOepDigests, frequency) <- frequencyByDistinctOepDigests.toList.sortBy(_._1)) {
+        val relativeFrequencyFormatted = formatFrequency(frequency, numberOfDataPoints)
+
+        writer write s"$distinctOepDigests,$frequency,$relativeFrequencyFormatted"
+        writer.newLine
+      }
+
+      writer.flush
+      writer.close
+
+      println()
+    }
+
+
     /*
      * Suggest optimistic heap history.
      */
@@ -233,7 +270,7 @@ object Tracr extends App {
         dtorTime = overlap.map(_.dtorTime).max
         size = overlap.head.measuredSizeInBytes
         recursiveReferenceEqualitiesEstimate = overlap.head.recursiveReferenceEqualitiesEstimate
-      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, recursiveReferenceEqualitiesEstimate, 0, false)
+      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, recursiveReferenceEqualitiesEstimate, 0, false, None, None)
     };
 
     /*

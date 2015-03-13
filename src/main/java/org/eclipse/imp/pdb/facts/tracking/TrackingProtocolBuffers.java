@@ -8,10 +8,10 @@ public final class TrackingProtocolBuffers {
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistry registry) {
   }
-  public interface ObjectLifetimeOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface ObjectLifetimeOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:ObjectLifetime)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 tag = 1;
     /**
      * <code>required int64 tag = 1;</code>
      */
@@ -21,7 +21,6 @@ public final class TrackingProtocolBuffers {
      */
     long getTag();
 
-    // optional string digest = 2;
     /**
      * <code>optional string digest = 2;</code>
      */
@@ -36,7 +35,6 @@ public final class TrackingProtocolBuffers {
     com.google.protobuf.ByteString
         getDigestBytes();
 
-    // required int64 ctorTime = 3;
     /**
      * <code>required int64 ctorTime = 3;</code>
      */
@@ -46,7 +44,6 @@ public final class TrackingProtocolBuffers {
      */
     long getCtorTime();
 
-    // optional int64 dtorTime = 4;
     /**
      * <code>optional int64 dtorTime = 4;</code>
      */
@@ -56,7 +53,6 @@ public final class TrackingProtocolBuffers {
      */
     long getDtorTime();
 
-    // optional int64 measuredSizeInBytes = 5;
     /**
      * <code>optional int64 measuredSizeInBytes = 5;</code>
      */
@@ -66,7 +62,6 @@ public final class TrackingProtocolBuffers {
      */
     long getMeasuredSizeInBytes();
 
-    // optional int32 recursiveReferenceEqualitiesEstimate = 6;
     /**
      * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
      */
@@ -76,7 +71,6 @@ public final class TrackingProtocolBuffers {
      */
     int getRecursiveReferenceEqualitiesEstimate();
 
-    // optional int64 hashTableOverhead = 7;
     /**
      * <code>optional int64 hashTableOverhead = 7;</code>
      */
@@ -86,7 +80,6 @@ public final class TrackingProtocolBuffers {
      */
     long getHashTableOverhead();
 
-    // optional bool isRedundant = 8;
     /**
      * <code>optional bool isRedundant = 8;</code>
      */
@@ -96,7 +89,6 @@ public final class TrackingProtocolBuffers {
      */
     boolean getIsRedundant();
 
-    // optional int32 deepReferenceEqualityEstimate = 9;
     /**
      * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
      */
@@ -105,13 +97,42 @@ public final class TrackingProtocolBuffers {
      * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
      */
     int getDeepReferenceEqualityEstimate();
+
+    /**
+     * <code>optional string oepDigest = 10;</code>
+     */
+    boolean hasOepDigest();
+    /**
+     * <code>optional string oepDigest = 10;</code>
+     */
+    java.lang.String getOepDigest();
+    /**
+     * <code>optional string oepDigest = 10;</code>
+     */
+    com.google.protobuf.ByteString
+        getOepDigestBytes();
+
+    /**
+     * <code>optional string oepObjectGraph = 11;</code>
+     */
+    boolean hasOepObjectGraph();
+    /**
+     * <code>optional string oepObjectGraph = 11;</code>
+     */
+    java.lang.String getOepObjectGraph();
+    /**
+     * <code>optional string oepObjectGraph = 11;</code>
+     */
+    com.google.protobuf.ByteString
+        getOepObjectGraphBytes();
   }
   /**
    * Protobuf type {@code ObjectLifetime}
    */
   public static final class ObjectLifetime extends
-      com.google.protobuf.GeneratedMessage
-      implements ObjectLifetimeOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:ObjectLifetime)
+      ObjectLifetimeOrBuilder {
     // Use ObjectLifetime.newBuilder() to construct.
     private ObjectLifetime(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -163,8 +184,9 @@ public final class TrackingProtocolBuffers {
               break;
             }
             case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              digest_ = input.readBytes();
+              digest_ = bs;
               break;
             }
             case 24: {
@@ -200,6 +222,18 @@ public final class TrackingProtocolBuffers {
             case 72: {
               bitField0_ |= 0x00000100;
               deepReferenceEqualityEstimate_ = input.readInt32();
+              break;
+            }
+            case 82: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000200;
+              oepDigest_ = bs;
+              break;
+            }
+            case 90: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00000400;
+              oepObjectGraph_ = bs;
               break;
             }
           }
@@ -242,7 +276,6 @@ public final class TrackingProtocolBuffers {
     }
 
     private int bitField0_;
-    // required int64 tag = 1;
     public static final int TAG_FIELD_NUMBER = 1;
     private long tag_;
     /**
@@ -258,7 +291,6 @@ public final class TrackingProtocolBuffers {
       return tag_;
     }
 
-    // optional string digest = 2;
     public static final int DIGEST_FIELD_NUMBER = 2;
     private java.lang.Object digest_;
     /**
@@ -301,7 +333,6 @@ public final class TrackingProtocolBuffers {
       }
     }
 
-    // required int64 ctorTime = 3;
     public static final int CTORTIME_FIELD_NUMBER = 3;
     private long ctorTime_;
     /**
@@ -317,7 +348,6 @@ public final class TrackingProtocolBuffers {
       return ctorTime_;
     }
 
-    // optional int64 dtorTime = 4;
     public static final int DTORTIME_FIELD_NUMBER = 4;
     private long dtorTime_;
     /**
@@ -333,7 +363,6 @@ public final class TrackingProtocolBuffers {
       return dtorTime_;
     }
 
-    // optional int64 measuredSizeInBytes = 5;
     public static final int MEASUREDSIZEINBYTES_FIELD_NUMBER = 5;
     private long measuredSizeInBytes_;
     /**
@@ -349,7 +378,6 @@ public final class TrackingProtocolBuffers {
       return measuredSizeInBytes_;
     }
 
-    // optional int32 recursiveReferenceEqualitiesEstimate = 6;
     public static final int RECURSIVEREFERENCEEQUALITIESESTIMATE_FIELD_NUMBER = 6;
     private int recursiveReferenceEqualitiesEstimate_;
     /**
@@ -365,7 +393,6 @@ public final class TrackingProtocolBuffers {
       return recursiveReferenceEqualitiesEstimate_;
     }
 
-    // optional int64 hashTableOverhead = 7;
     public static final int HASHTABLEOVERHEAD_FIELD_NUMBER = 7;
     private long hashTableOverhead_;
     /**
@@ -381,7 +408,6 @@ public final class TrackingProtocolBuffers {
       return hashTableOverhead_;
     }
 
-    // optional bool isRedundant = 8;
     public static final int ISREDUNDANT_FIELD_NUMBER = 8;
     private boolean isRedundant_;
     /**
@@ -397,7 +423,6 @@ public final class TrackingProtocolBuffers {
       return isRedundant_;
     }
 
-    // optional int32 deepReferenceEqualityEstimate = 9;
     public static final int DEEPREFERENCEEQUALITYESTIMATE_FIELD_NUMBER = 9;
     private int deepReferenceEqualityEstimate_;
     /**
@@ -413,6 +438,90 @@ public final class TrackingProtocolBuffers {
       return deepReferenceEqualityEstimate_;
     }
 
+    public static final int OEPDIGEST_FIELD_NUMBER = 10;
+    private java.lang.Object oepDigest_;
+    /**
+     * <code>optional string oepDigest = 10;</code>
+     */
+    public boolean hasOepDigest() {
+      return ((bitField0_ & 0x00000200) == 0x00000200);
+    }
+    /**
+     * <code>optional string oepDigest = 10;</code>
+     */
+    public java.lang.String getOepDigest() {
+      java.lang.Object ref = oepDigest_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          oepDigest_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string oepDigest = 10;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOepDigestBytes() {
+      java.lang.Object ref = oepDigest_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        oepDigest_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int OEPOBJECTGRAPH_FIELD_NUMBER = 11;
+    private java.lang.Object oepObjectGraph_;
+    /**
+     * <code>optional string oepObjectGraph = 11;</code>
+     */
+    public boolean hasOepObjectGraph() {
+      return ((bitField0_ & 0x00000400) == 0x00000400);
+    }
+    /**
+     * <code>optional string oepObjectGraph = 11;</code>
+     */
+    public java.lang.String getOepObjectGraph() {
+      java.lang.Object ref = oepObjectGraph_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          oepObjectGraph_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string oepObjectGraph = 11;</code>
+     */
+    public com.google.protobuf.ByteString
+        getOepObjectGraphBytes() {
+      java.lang.Object ref = oepObjectGraph_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        oepObjectGraph_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       tag_ = 0L;
       digest_ = "";
@@ -423,11 +532,14 @@ public final class TrackingProtocolBuffers {
       hashTableOverhead_ = 0L;
       isRedundant_ = false;
       deepReferenceEqualityEstimate_ = 0;
+      oepDigest_ = "";
+      oepObjectGraph_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTag()) {
         memoizedIsInitialized = 0;
@@ -470,6 +582,12 @@ public final class TrackingProtocolBuffers {
       }
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         output.writeInt32(9, deepReferenceEqualityEstimate_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        output.writeBytes(10, getOepDigestBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        output.writeBytes(11, getOepObjectGraphBytes());
       }
       getUnknownFields().writeTo(output);
     }
@@ -515,6 +633,14 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000100) == 0x00000100)) {
         size += com.google.protobuf.CodedOutputStream
           .computeInt32Size(9, deepReferenceEqualityEstimate_);
+      }
+      if (((bitField0_ & 0x00000200) == 0x00000200)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(10, getOepDigestBytes());
+      }
+      if (((bitField0_ & 0x00000400) == 0x00000400)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(11, getOepObjectGraphBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -598,8 +724,9 @@ public final class TrackingProtocolBuffers {
      * Protobuf type {@code ObjectLifetime}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.ObjectLifetimeOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:ObjectLifetime)
+        org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.ObjectLifetimeOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_ObjectLifetime_descriptor;
@@ -650,6 +777,10 @@ public final class TrackingProtocolBuffers {
         bitField0_ = (bitField0_ & ~0x00000080);
         deepReferenceEqualityEstimate_ = 0;
         bitField0_ = (bitField0_ & ~0x00000100);
+        oepDigest_ = "";
+        bitField0_ = (bitField0_ & ~0x00000200);
+        oepObjectGraph_ = "";
+        bitField0_ = (bitField0_ & ~0x00000400);
         return this;
       }
 
@@ -714,6 +845,14 @@ public final class TrackingProtocolBuffers {
           to_bitField0_ |= 0x00000100;
         }
         result.deepReferenceEqualityEstimate_ = deepReferenceEqualityEstimate_;
+        if (((from_bitField0_ & 0x00000200) == 0x00000200)) {
+          to_bitField0_ |= 0x00000200;
+        }
+        result.oepDigest_ = oepDigest_;
+        if (((from_bitField0_ & 0x00000400) == 0x00000400)) {
+          to_bitField0_ |= 0x00000400;
+        }
+        result.oepObjectGraph_ = oepObjectGraph_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -759,6 +898,16 @@ public final class TrackingProtocolBuffers {
         if (other.hasDeepReferenceEqualityEstimate()) {
           setDeepReferenceEqualityEstimate(other.getDeepReferenceEqualityEstimate());
         }
+        if (other.hasOepDigest()) {
+          bitField0_ |= 0x00000200;
+          oepDigest_ = other.oepDigest_;
+          onChanged();
+        }
+        if (other.hasOepObjectGraph()) {
+          bitField0_ |= 0x00000400;
+          oepObjectGraph_ = other.oepObjectGraph_;
+          onChanged();
+        }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
       }
@@ -794,7 +943,6 @@ public final class TrackingProtocolBuffers {
       }
       private int bitField0_;
 
-      // required int64 tag = 1;
       private long tag_ ;
       /**
        * <code>required int64 tag = 1;</code>
@@ -827,7 +975,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional string digest = 2;
       private java.lang.Object digest_ = "";
       /**
        * <code>optional string digest = 2;</code>
@@ -841,9 +988,12 @@ public final class TrackingProtocolBuffers {
       public java.lang.String getDigest() {
         java.lang.Object ref = digest_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          digest_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            digest_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -901,7 +1051,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // required int64 ctorTime = 3;
       private long ctorTime_ ;
       /**
        * <code>required int64 ctorTime = 3;</code>
@@ -934,7 +1083,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int64 dtorTime = 4;
       private long dtorTime_ ;
       /**
        * <code>optional int64 dtorTime = 4;</code>
@@ -967,7 +1115,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int64 measuredSizeInBytes = 5;
       private long measuredSizeInBytes_ ;
       /**
        * <code>optional int64 measuredSizeInBytes = 5;</code>
@@ -1000,7 +1147,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int32 recursiveReferenceEqualitiesEstimate = 6;
       private int recursiveReferenceEqualitiesEstimate_ ;
       /**
        * <code>optional int32 recursiveReferenceEqualitiesEstimate = 6;</code>
@@ -1033,7 +1179,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int64 hashTableOverhead = 7;
       private long hashTableOverhead_ ;
       /**
        * <code>optional int64 hashTableOverhead = 7;</code>
@@ -1066,7 +1211,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional bool isRedundant = 8;
       private boolean isRedundant_ ;
       /**
        * <code>optional bool isRedundant = 8;</code>
@@ -1099,7 +1243,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int32 deepReferenceEqualityEstimate = 9;
       private int deepReferenceEqualityEstimate_ ;
       /**
        * <code>optional int32 deepReferenceEqualityEstimate = 9;</code>
@@ -1132,6 +1275,158 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
+      private java.lang.Object oepDigest_ = "";
+      /**
+       * <code>optional string oepDigest = 10;</code>
+       */
+      public boolean hasOepDigest() {
+        return ((bitField0_ & 0x00000200) == 0x00000200);
+      }
+      /**
+       * <code>optional string oepDigest = 10;</code>
+       */
+      public java.lang.String getOepDigest() {
+        java.lang.Object ref = oepDigest_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            oepDigest_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string oepDigest = 10;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOepDigestBytes() {
+        java.lang.Object ref = oepDigest_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          oepDigest_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string oepDigest = 10;</code>
+       */
+      public Builder setOepDigest(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        oepDigest_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string oepDigest = 10;</code>
+       */
+      public Builder clearOepDigest() {
+        bitField0_ = (bitField0_ & ~0x00000200);
+        oepDigest_ = getDefaultInstance().getOepDigest();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string oepDigest = 10;</code>
+       */
+      public Builder setOepDigestBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000200;
+        oepDigest_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object oepObjectGraph_ = "";
+      /**
+       * <code>optional string oepObjectGraph = 11;</code>
+       */
+      public boolean hasOepObjectGraph() {
+        return ((bitField0_ & 0x00000400) == 0x00000400);
+      }
+      /**
+       * <code>optional string oepObjectGraph = 11;</code>
+       */
+      public java.lang.String getOepObjectGraph() {
+        java.lang.Object ref = oepObjectGraph_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            oepObjectGraph_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string oepObjectGraph = 11;</code>
+       */
+      public com.google.protobuf.ByteString
+          getOepObjectGraphBytes() {
+        java.lang.Object ref = oepObjectGraph_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          oepObjectGraph_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string oepObjectGraph = 11;</code>
+       */
+      public Builder setOepObjectGraph(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        oepObjectGraph_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string oepObjectGraph = 11;</code>
+       */
+      public Builder clearOepObjectGraph() {
+        bitField0_ = (bitField0_ & ~0x00000400);
+        oepObjectGraph_ = getDefaultInstance().getOepObjectGraph();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string oepObjectGraph = 11;</code>
+       */
+      public Builder setOepObjectGraphBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00000400;
+        oepObjectGraph_ = value;
+        onChanged();
+        return this;
+      }
+
       // @@protoc_insertion_point(builder_scope:ObjectLifetime)
     }
 
@@ -1143,10 +1438,10 @@ public final class TrackingProtocolBuffers {
     // @@protoc_insertion_point(class_scope:ObjectLifetime)
   }
 
-  public interface EqualsRelationOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface EqualsRelationOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:EqualsRelation)
+      com.google.protobuf.MessageOrBuilder {
 
-    // optional int64 tag1 = 1;
     /**
      * <code>optional int64 tag1 = 1;</code>
      *
@@ -1164,7 +1459,6 @@ public final class TrackingProtocolBuffers {
      */
     long getTag1();
 
-    // optional int64 tag2 = 2;
     /**
      * <code>optional int64 tag2 = 2;</code>
      *
@@ -1182,7 +1476,6 @@ public final class TrackingProtocolBuffers {
      */
     long getTag2();
 
-    // optional bool result = 3;
     /**
      * <code>optional bool result = 3;</code>
      */
@@ -1192,7 +1485,6 @@ public final class TrackingProtocolBuffers {
      */
     boolean getResult();
 
-    // optional int32 deepCount = 4;
     /**
      * <code>optional int32 deepCount = 4;</code>
      *
@@ -1210,7 +1502,6 @@ public final class TrackingProtocolBuffers {
      */
     int getDeepCount();
 
-    // required int64 timestamp = 5;
     /**
      * <code>required int64 timestamp = 5;</code>
      */
@@ -1220,7 +1511,6 @@ public final class TrackingProtocolBuffers {
      */
     long getTimestamp();
 
-    // optional int64 deepTime = 6;
     /**
      * <code>optional int64 deepTime = 6;</code>
      */
@@ -1230,7 +1520,6 @@ public final class TrackingProtocolBuffers {
      */
     long getDeepTime();
 
-    // optional bool isHashLookup = 7;
     /**
      * <code>optional bool isHashLookup = 7;</code>
      */
@@ -1240,7 +1529,6 @@ public final class TrackingProtocolBuffers {
      */
     boolean getIsHashLookup();
 
-    // optional int32 deepReferenceEqualityCount = 8;
     /**
      * <code>optional int32 deepReferenceEqualityCount = 8;</code>
      *
@@ -1258,7 +1546,6 @@ public final class TrackingProtocolBuffers {
      */
     int getDeepReferenceEqualityCount();
 
-    // optional bool isStructuralEquality = 9;
     /**
      * <code>optional bool isStructuralEquality = 9;</code>
      */
@@ -1272,8 +1559,9 @@ public final class TrackingProtocolBuffers {
    * Protobuf type {@code EqualsRelation}
    */
   public static final class EqualsRelation extends
-      com.google.protobuf.GeneratedMessage
-      implements EqualsRelationOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:EqualsRelation)
+      EqualsRelationOrBuilder {
     // Use EqualsRelation.newBuilder() to construct.
     private EqualsRelation(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -1404,7 +1692,6 @@ public final class TrackingProtocolBuffers {
     }
 
     private int bitField0_;
-    // optional int64 tag1 = 1;
     public static final int TAG1_FIELD_NUMBER = 1;
     private long tag1_;
     /**
@@ -1428,7 +1715,6 @@ public final class TrackingProtocolBuffers {
       return tag1_;
     }
 
-    // optional int64 tag2 = 2;
     public static final int TAG2_FIELD_NUMBER = 2;
     private long tag2_;
     /**
@@ -1452,7 +1738,6 @@ public final class TrackingProtocolBuffers {
       return tag2_;
     }
 
-    // optional bool result = 3;
     public static final int RESULT_FIELD_NUMBER = 3;
     private boolean result_;
     /**
@@ -1468,7 +1753,6 @@ public final class TrackingProtocolBuffers {
       return result_;
     }
 
-    // optional int32 deepCount = 4;
     public static final int DEEPCOUNT_FIELD_NUMBER = 4;
     private int deepCount_;
     /**
@@ -1492,7 +1776,6 @@ public final class TrackingProtocolBuffers {
       return deepCount_;
     }
 
-    // required int64 timestamp = 5;
     public static final int TIMESTAMP_FIELD_NUMBER = 5;
     private long timestamp_;
     /**
@@ -1508,7 +1791,6 @@ public final class TrackingProtocolBuffers {
       return timestamp_;
     }
 
-    // optional int64 deepTime = 6;
     public static final int DEEPTIME_FIELD_NUMBER = 6;
     private long deepTime_;
     /**
@@ -1524,7 +1806,6 @@ public final class TrackingProtocolBuffers {
       return deepTime_;
     }
 
-    // optional bool isHashLookup = 7;
     public static final int ISHASHLOOKUP_FIELD_NUMBER = 7;
     private boolean isHashLookup_;
     /**
@@ -1540,7 +1821,6 @@ public final class TrackingProtocolBuffers {
       return isHashLookup_;
     }
 
-    // optional int32 deepReferenceEqualityCount = 8;
     public static final int DEEPREFERENCEEQUALITYCOUNT_FIELD_NUMBER = 8;
     private int deepReferenceEqualityCount_;
     /**
@@ -1564,7 +1844,6 @@ public final class TrackingProtocolBuffers {
       return deepReferenceEqualityCount_;
     }
 
-    // optional bool isStructuralEquality = 9;
     public static final int ISSTRUCTURALEQUALITY_FIELD_NUMBER = 9;
     private boolean isStructuralEquality_;
     /**
@@ -1594,7 +1873,8 @@ public final class TrackingProtocolBuffers {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTimestamp()) {
         memoizedIsInitialized = 0;
@@ -1761,8 +2041,9 @@ public final class TrackingProtocolBuffers {
      * Protobuf type {@code EqualsRelation}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelationOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:EqualsRelation)
+        org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.EqualsRelationOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_EqualsRelation_descriptor;
@@ -1951,7 +2232,6 @@ public final class TrackingProtocolBuffers {
       }
       private int bitField0_;
 
-      // optional int64 tag1 = 1;
       private long tag1_ ;
       /**
        * <code>optional int64 tag1 = 1;</code>
@@ -2000,7 +2280,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int64 tag2 = 2;
       private long tag2_ ;
       /**
        * <code>optional int64 tag2 = 2;</code>
@@ -2049,7 +2328,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional bool result = 3;
       private boolean result_ ;
       /**
        * <code>optional bool result = 3;</code>
@@ -2082,7 +2360,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int32 deepCount = 4;
       private int deepCount_ ;
       /**
        * <code>optional int32 deepCount = 4;</code>
@@ -2131,7 +2408,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // required int64 timestamp = 5;
       private long timestamp_ ;
       /**
        * <code>required int64 timestamp = 5;</code>
@@ -2164,7 +2440,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int64 deepTime = 6;
       private long deepTime_ ;
       /**
        * <code>optional int64 deepTime = 6;</code>
@@ -2197,7 +2472,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional bool isHashLookup = 7;
       private boolean isHashLookup_ ;
       /**
        * <code>optional bool isHashLookup = 7;</code>
@@ -2230,7 +2504,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional int32 deepReferenceEqualityCount = 8;
       private int deepReferenceEqualityCount_ ;
       /**
        * <code>optional int32 deepReferenceEqualityCount = 8;</code>
@@ -2279,7 +2552,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional bool isStructuralEquality = 9;
       private boolean isStructuralEquality_ ;
       /**
        * <code>optional bool isStructuralEquality = 9;</code>
@@ -2323,10 +2595,10 @@ public final class TrackingProtocolBuffers {
     // @@protoc_insertion_point(class_scope:EqualsRelation)
   }
 
-  public interface TagMapOrBuilder
-      extends com.google.protobuf.MessageOrBuilder {
+  public interface TagMapOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:TagMap)
+      com.google.protobuf.MessageOrBuilder {
 
-    // required int64 tag = 1;
     /**
      * <code>required int64 tag = 1;</code>
      */
@@ -2336,7 +2608,6 @@ public final class TrackingProtocolBuffers {
      */
     long getTag();
 
-    // required string digest = 2;
     /**
      * <code>required string digest = 2;</code>
      */
@@ -2351,7 +2622,6 @@ public final class TrackingProtocolBuffers {
     com.google.protobuf.ByteString
         getDigestBytes();
 
-    // optional string classname = 3;
     /**
      * <code>optional string classname = 3;</code>
      */
@@ -2370,8 +2640,9 @@ public final class TrackingProtocolBuffers {
    * Protobuf type {@code TagMap}
    */
   public static final class TagMap extends
-      com.google.protobuf.GeneratedMessage
-      implements TagMapOrBuilder {
+      com.google.protobuf.GeneratedMessage implements
+      // @@protoc_insertion_point(message_implements:TagMap)
+      TagMapOrBuilder {
     // Use TagMap.newBuilder() to construct.
     private TagMap(com.google.protobuf.GeneratedMessage.Builder<?> builder) {
       super(builder);
@@ -2423,13 +2694,15 @@ public final class TrackingProtocolBuffers {
               break;
             }
             case 18: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000002;
-              digest_ = input.readBytes();
+              digest_ = bs;
               break;
             }
             case 26: {
+              com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000004;
-              classname_ = input.readBytes();
+              classname_ = bs;
               break;
             }
           }
@@ -2472,7 +2745,6 @@ public final class TrackingProtocolBuffers {
     }
 
     private int bitField0_;
-    // required int64 tag = 1;
     public static final int TAG_FIELD_NUMBER = 1;
     private long tag_;
     /**
@@ -2488,7 +2760,6 @@ public final class TrackingProtocolBuffers {
       return tag_;
     }
 
-    // required string digest = 2;
     public static final int DIGEST_FIELD_NUMBER = 2;
     private java.lang.Object digest_;
     /**
@@ -2531,7 +2802,6 @@ public final class TrackingProtocolBuffers {
       }
     }
 
-    // optional string classname = 3;
     public static final int CLASSNAME_FIELD_NUMBER = 3;
     private java.lang.Object classname_;
     /**
@@ -2582,7 +2852,8 @@ public final class TrackingProtocolBuffers {
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
-      if (isInitialized != -1) return isInitialized == 1;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
 
       if (!hasTag()) {
         memoizedIsInitialized = 0;
@@ -2711,8 +2982,9 @@ public final class TrackingProtocolBuffers {
      * Protobuf type {@code TagMap}
      */
     public static final class Builder extends
-        com.google.protobuf.GeneratedMessage.Builder<Builder>
-       implements org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMapOrBuilder {
+        com.google.protobuf.GeneratedMessage.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:TagMap)
+        org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.TagMapOrBuilder {
       public static final com.google.protobuf.Descriptors.Descriptor
           getDescriptor() {
         return org.eclipse.imp.pdb.facts.tracking.TrackingProtocolBuffers.internal_static_TagMap_descriptor;
@@ -2855,7 +3127,6 @@ public final class TrackingProtocolBuffers {
       }
       private int bitField0_;
 
-      // required int64 tag = 1;
       private long tag_ ;
       /**
        * <code>required int64 tag = 1;</code>
@@ -2888,7 +3159,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // required string digest = 2;
       private java.lang.Object digest_ = "";
       /**
        * <code>required string digest = 2;</code>
@@ -2902,9 +3172,12 @@ public final class TrackingProtocolBuffers {
       public java.lang.String getDigest() {
         java.lang.Object ref = digest_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          digest_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            digest_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -2962,7 +3235,6 @@ public final class TrackingProtocolBuffers {
         return this;
       }
 
-      // optional string classname = 3;
       private java.lang.Object classname_ = "";
       /**
        * <code>optional string classname = 3;</code>
@@ -2976,9 +3248,12 @@ public final class TrackingProtocolBuffers {
       public java.lang.String getClassname() {
         java.lang.Object ref = classname_;
         if (!(ref instanceof java.lang.String)) {
-          java.lang.String s = ((com.google.protobuf.ByteString) ref)
-              .toStringUtf8();
-          classname_ = s;
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            classname_ = s;
+          }
           return s;
         } else {
           return (java.lang.String) ref;
@@ -3047,17 +3322,17 @@ public final class TrackingProtocolBuffers {
     // @@protoc_insertion_point(class_scope:TagMap)
   }
 
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_ObjectLifetime_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_ObjectLifetime_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_EqualsRelation_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
       internal_static_EqualsRelation_fieldAccessorTable;
-  private static com.google.protobuf.Descriptors.Descriptor
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_TagMap_descriptor;
   private static
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
@@ -3071,52 +3346,53 @@ public final class TrackingProtocolBuffers {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\024objectLifetime.proto\"\363\001\n\016ObjectLifetim" +
+      "\n\024objectLifetime.proto\"\236\002\n\016ObjectLifetim" +
       "e\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \001(\t\022\020\n\010ctorTi" +
       "me\030\003 \002(\003\022\020\n\010dtorTime\030\004 \001(\003\022\033\n\023measuredSi" +
       "zeInBytes\030\005 \001(\003\022,\n$recursiveReferenceEqu" +
       "alitiesEstimate\030\006 \001(\005\022\031\n\021hashTableOverhe" +
       "ad\030\007 \001(\003\022\023\n\013isRedundant\030\010 \001(\010\022%\n\035deepRef" +
-      "erenceEqualityEstimate\030\t \001(\005\"\314\001\n\016EqualsR" +
-      "elation\022\014\n\004tag1\030\001 \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016\n\006r" +
-      "esult\030\003 \001(\010\022\021\n\tdeepCount\030\004 \001(\005\022\021\n\ttimest" +
-      "amp\030\005 \002(\003\022\020\n\010deepTime\030\006 \001(\003\022\024\n\014isHashLoo",
-      "kup\030\007 \001(\010\022\"\n\032deepReferenceEqualityCount\030" +
-      "\010 \001(\005\022\034\n\024isStructuralEquality\030\t \001(\010\"8\n\006T" +
-      "agMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\021\n\tcl" +
-      "assname\030\003 \001(\tB=\n\"org.eclipse.imp.pdb.fac" +
-      "ts.trackingB\027TrackingProtocolBuffers"
+      "erenceEqualityEstimate\030\t \001(\005\022\021\n\toepDiges" +
+      "t\030\n \001(\t\022\026\n\016oepObjectGraph\030\013 \001(\t\"\314\001\n\016Equa" +
+      "lsRelation\022\014\n\004tag1\030\001 \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016" +
+      "\n\006result\030\003 \001(\010\022\021\n\tdeepCount\030\004 \001(\005\022\021\n\ttim",
+      "estamp\030\005 \002(\003\022\020\n\010deepTime\030\006 \001(\003\022\024\n\014isHash" +
+      "Lookup\030\007 \001(\010\022\"\n\032deepReferenceEqualityCou" +
+      "nt\030\010 \001(\005\022\034\n\024isStructuralEquality\030\t \001(\010\"8" +
+      "\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\021\n" +
+      "\tclassname\030\003 \001(\tB=\n\"org.eclipse.imp.pdb." +
+      "facts.trackingB\027TrackingProtocolBuffers"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
-      new com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner() {
-        public com.google.protobuf.ExtensionRegistry assignDescriptors(
-            com.google.protobuf.Descriptors.FileDescriptor root) {
-          descriptor = root;
-          internal_static_ObjectLifetime_descriptor =
-            getDescriptor().getMessageTypes().get(0);
-          internal_static_ObjectLifetime_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_ObjectLifetime_descriptor,
-              new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "RecursiveReferenceEqualitiesEstimate", "HashTableOverhead", "IsRedundant", "DeepReferenceEqualityEstimate", });
-          internal_static_EqualsRelation_descriptor =
-            getDescriptor().getMessageTypes().get(1);
-          internal_static_EqualsRelation_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_EqualsRelation_descriptor,
-              new java.lang.String[] { "Tag1", "Tag2", "Result", "DeepCount", "Timestamp", "DeepTime", "IsHashLookup", "DeepReferenceEqualityCount", "IsStructuralEquality", });
-          internal_static_TagMap_descriptor =
-            getDescriptor().getMessageTypes().get(2);
-          internal_static_TagMap_fieldAccessorTable = new
-            com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-              internal_static_TagMap_descriptor,
-              new java.lang.String[] { "Tag", "Digest", "Classname", });
-          return null;
-        }
-      };
+        new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          public com.google.protobuf.ExtensionRegistry assignDescriptors(
+              com.google.protobuf.Descriptors.FileDescriptor root) {
+            descriptor = root;
+            return null;
+          }
+        };
     com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         }, assigner);
+    internal_static_ObjectLifetime_descriptor =
+      getDescriptor().getMessageTypes().get(0);
+    internal_static_ObjectLifetime_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_ObjectLifetime_descriptor,
+        new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "RecursiveReferenceEqualitiesEstimate", "HashTableOverhead", "IsRedundant", "DeepReferenceEqualityEstimate", "OepDigest", "OepObjectGraph", });
+    internal_static_EqualsRelation_descriptor =
+      getDescriptor().getMessageTypes().get(1);
+    internal_static_EqualsRelation_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_EqualsRelation_descriptor,
+        new java.lang.String[] { "Tag1", "Tag2", "Result", "DeepCount", "Timestamp", "DeepTime", "IsHashLookup", "DeepReferenceEqualityCount", "IsStructuralEquality", });
+    internal_static_TagMap_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_TagMap_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessage.FieldAccessorTable(
+        internal_static_TagMap_descriptor,
+        new java.lang.String[] { "Tag", "Digest", "Classname", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)
