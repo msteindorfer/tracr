@@ -8,7 +8,7 @@ import scala.collection.immutable.{SortedMap, NumericRange}
 import scala._
 import scala.Some
 
-case class ObjectLifetime(tag: Option[Long], digest: Option[String], ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean, oepDigest: Option[String], oepObjectGraph: Option[String], oepIsSuspectForOrderingProblems: Option[Boolean]) {
+case class ObjectLifetime(tag: Option[Long], digest: Option[String], classname: Option[String], ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean, oepDigest: Option[String], oepObjectGraph: Option[String], oepIsSuspectForOrderingProblems: Option[Boolean]) {
   require(ctorTime >= 0)
   require(!dtorTime.isDefined || dtorTime.get >= 0)
   require(measuredSizeInBytes >= 0)
@@ -106,11 +106,12 @@ object Tracr extends App {
 
           if (protoObjectLifetime != null && protoObjectLifetime.isInitialized) {
             val tag = protoObjectLifetime.getTag
-            val digest = if (protoObjectLifetime.hasDigest) Some(protoObjectLifetime.getDigest) else None
+            val digest = if (protoObjectLifetime.hasDigest) Some(protoObjectLifetime.getDigest.intern()) else None
 //            val digest = tagMap.get(tag) match {
 //              case None => None
 //              case Some(tagInfo) => Some(tagInfo.digest)
 //            }
+            val classname = if (protoObjectLifetime.hasClassname) Some(protoObjectLifetime.getClassname.intern()) else None
             val ctorTime = protoObjectLifetime.getCtorTime
             val dtorTime = objectFreeMap.get(tag)
             val measuredSizeInBytes = protoObjectLifetime.getMeasuredSizeInBytes
@@ -118,11 +119,11 @@ object Tracr extends App {
             val hashTableOverhead = protoObjectLifetime.getHashTableOverhead
             val isRedundant = protoObjectLifetime.getIsRedundant
 
-            val oepDigest = if (protoObjectLifetime.hasOepDigest) Some(protoObjectLifetime.getOepDigest) else None
+            val oepDigest = if (protoObjectLifetime.hasOepDigest) Some(protoObjectLifetime.getOepDigest.intern()) else None
             val oepObjectGraph = if (protoObjectLifetime.hasOepObjectGraph) Some(protoObjectLifetime.getOepObjectGraph) else None
             val oepIsSuspectForOrderingProblems = if (protoObjectLifetime.hasOepIsSuspectForOrderingProblems) Some(protoObjectLifetime.getOepIsSuspectForOrderingProblems) else None
 
-            universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, recursiveReferenceEqualitiesEstimate, hashTableOverhead, isRedundant, oepDigest, oepObjectGraph, oepIsSuspectForOrderingProblems)
+            universeBuilder += ObjectLifetime(Some(tag), digest, classname, ctorTime, dtorTime, measuredSizeInBytes, recursiveReferenceEqualitiesEstimate, hashTableOverhead, isRedundant, oepDigest, oepObjectGraph, oepIsSuspectForOrderingProblems)
           } else {
             continue = false
           }
@@ -227,7 +228,8 @@ object Tracr extends App {
 
 
     time("Calculate Object Redundancy Profiling (ORP) over Object Equality Profiling (OEP)") {
-      val recordsGroupedByDigest: GenMap[String, GenSeq[ObjectLifetime]] = sortedUniverse filter { _.oepIsSuspectForOrderingProblems getOrElse false } groupBy (_.digest.get)
+      // optinally filter first: sortedUniverse filter { _.oepIsSuspectForOrderingProblems getOrElse false }
+      val recordsGroupedByDigest: GenMap[String, GenSeq[ObjectLifetime]] = sortedUniverse groupBy (_.digest.get)
       val distinctOepDigestsByDigest: GenMap[String, Int] = recordsGroupedByDigest mapValues { _.map(_.oepDigest).toSet.size }
 
       val frequencyByDistinctOepDigests: GenMap[Int, Int] = distinctOepDigestsByDigest.groupBy(_._2).mapValues(_.size)
@@ -236,6 +238,10 @@ object Tracr extends App {
       val formatFrequency = (freq: Int, numberOfDataPoints: Int) => { "%.4f" format (100 * freq.toDouble / numberOfDataPoints) }
 
       val relativeFrequencyByDistinctOepDigests = frequencyByDistinctOepDigests mapValues { freq => formatFrequency(freq, numberOfDataPoints) }
+
+      // print affected classes
+      println("Affected classes:")
+      (recordsGroupedByDigest mapValues { _.toSet map { _.classname.getOrElse("Not Available") } }).values mkString "\n"
 
       // printing histogram
       println(relativeFrequencyByDistinctOepDigests .toList.sortBy(_._1))
@@ -271,7 +277,7 @@ object Tracr extends App {
         dtorTime = overlap.map(_.dtorTime).max
         size = overlap.head.measuredSizeInBytes
         recursiveReferenceEqualitiesEstimate = overlap.head.recursiveReferenceEqualitiesEstimate
-      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, recursiveReferenceEqualitiesEstimate, 0, false, None, None, None)
+      } yield ObjectLifetime(None, digest, None, ctorTime, dtorTime, size, recursiveReferenceEqualitiesEstimate, 0, false, None, None, None)
     };
 
     /*

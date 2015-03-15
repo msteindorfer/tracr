@@ -134,6 +134,20 @@ public final class TrackingProtocolBuffers {
      * <code>optional bool oepIsSuspectForOrderingProblems = 12;</code>
      */
     boolean getOepIsSuspectForOrderingProblems();
+
+    /**
+     * <code>optional string classname = 13;</code>
+     */
+    boolean hasClassname();
+    /**
+     * <code>optional string classname = 13;</code>
+     */
+    java.lang.String getClassname();
+    /**
+     * <code>optional string classname = 13;</code>
+     */
+    com.google.protobuf.ByteString
+        getClassnameBytes();
   }
   /**
    * Protobuf type {@code ObjectLifetime}
@@ -248,6 +262,12 @@ public final class TrackingProtocolBuffers {
             case 96: {
               bitField0_ |= 0x00000800;
               oepIsSuspectForOrderingProblems_ = input.readBool();
+              break;
+            }
+            case 106: {
+              com.google.protobuf.ByteString bs = input.readBytes();
+              bitField0_ |= 0x00001000;
+              classname_ = bs;
               break;
             }
           }
@@ -551,6 +571,48 @@ public final class TrackingProtocolBuffers {
       return oepIsSuspectForOrderingProblems_;
     }
 
+    public static final int CLASSNAME_FIELD_NUMBER = 13;
+    private java.lang.Object classname_;
+    /**
+     * <code>optional string classname = 13;</code>
+     */
+    public boolean hasClassname() {
+      return ((bitField0_ & 0x00001000) == 0x00001000);
+    }
+    /**
+     * <code>optional string classname = 13;</code>
+     */
+    public java.lang.String getClassname() {
+      java.lang.Object ref = classname_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        if (bs.isValidUtf8()) {
+          classname_ = s;
+        }
+        return s;
+      }
+    }
+    /**
+     * <code>optional string classname = 13;</code>
+     */
+    public com.google.protobuf.ByteString
+        getClassnameBytes() {
+      java.lang.Object ref = classname_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        classname_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
     private void initFields() {
       tag_ = 0L;
       digest_ = "";
@@ -564,6 +626,7 @@ public final class TrackingProtocolBuffers {
       oepDigest_ = "";
       oepObjectGraph_ = "";
       oepIsSuspectForOrderingProblems_ = false;
+      classname_ = "";
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -622,6 +685,9 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         output.writeBool(12, oepIsSuspectForOrderingProblems_);
       }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        output.writeBytes(13, getClassnameBytes());
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -678,6 +744,10 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000800) == 0x00000800)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBoolSize(12, oepIsSuspectForOrderingProblems_);
+      }
+      if (((bitField0_ & 0x00001000) == 0x00001000)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBytesSize(13, getClassnameBytes());
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -820,6 +890,8 @@ public final class TrackingProtocolBuffers {
         bitField0_ = (bitField0_ & ~0x00000400);
         oepIsSuspectForOrderingProblems_ = false;
         bitField0_ = (bitField0_ & ~0x00000800);
+        classname_ = "";
+        bitField0_ = (bitField0_ & ~0x00001000);
         return this;
       }
 
@@ -896,6 +968,10 @@ public final class TrackingProtocolBuffers {
           to_bitField0_ |= 0x00000800;
         }
         result.oepIsSuspectForOrderingProblems_ = oepIsSuspectForOrderingProblems_;
+        if (((from_bitField0_ & 0x00001000) == 0x00001000)) {
+          to_bitField0_ |= 0x00001000;
+        }
+        result.classname_ = classname_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -953,6 +1029,11 @@ public final class TrackingProtocolBuffers {
         }
         if (other.hasOepIsSuspectForOrderingProblems()) {
           setOepIsSuspectForOrderingProblems(other.getOepIsSuspectForOrderingProblems());
+        }
+        if (other.hasClassname()) {
+          bitField0_ |= 0x00001000;
+          classname_ = other.classname_;
+          onChanged();
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1501,6 +1582,82 @@ public final class TrackingProtocolBuffers {
       public Builder clearOepIsSuspectForOrderingProblems() {
         bitField0_ = (bitField0_ & ~0x00000800);
         oepIsSuspectForOrderingProblems_ = false;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object classname_ = "";
+      /**
+       * <code>optional string classname = 13;</code>
+       */
+      public boolean hasClassname() {
+        return ((bitField0_ & 0x00001000) == 0x00001000);
+      }
+      /**
+       * <code>optional string classname = 13;</code>
+       */
+      public java.lang.String getClassname() {
+        java.lang.Object ref = classname_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          if (bs.isValidUtf8()) {
+            classname_ = s;
+          }
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>optional string classname = 13;</code>
+       */
+      public com.google.protobuf.ByteString
+          getClassnameBytes() {
+        java.lang.Object ref = classname_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          classname_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>optional string classname = 13;</code>
+       */
+      public Builder setClassname(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00001000;
+        classname_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string classname = 13;</code>
+       */
+      public Builder clearClassname() {
+        bitField0_ = (bitField0_ & ~0x00001000);
+        classname_ = getDefaultInstance().getClassname();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional string classname = 13;</code>
+       */
+      public Builder setClassnameBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  bitField0_ |= 0x00001000;
+        classname_ = value;
         onChanged();
         return this;
       }
@@ -3424,7 +3581,7 @@ public final class TrackingProtocolBuffers {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\024objectLifetime.proto\"\307\002\n\016ObjectLifetim" +
+      "\n\024objectLifetime.proto\"\332\002\n\016ObjectLifetim" +
       "e\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \001(\t\022\020\n\010ctorTi" +
       "me\030\003 \002(\003\022\020\n\010dtorTime\030\004 \001(\003\022\033\n\023measuredSi" +
       "zeInBytes\030\005 \001(\003\022,\n$recursiveReferenceEqu" +
@@ -3432,15 +3589,16 @@ public final class TrackingProtocolBuffers {
       "ad\030\007 \001(\003\022\023\n\013isRedundant\030\010 \001(\010\022%\n\035deepRef" +
       "erenceEqualityEstimate\030\t \001(\005\022\021\n\toepDiges" +
       "t\030\n \001(\t\022\026\n\016oepObjectGraph\030\013 \001(\t\022\'\n\037oepIs" +
-      "SuspectForOrderingProblems\030\014 \001(\010\"\314\001\n\016Equ" +
-      "alsRelation\022\014\n\004tag1\030\001 \001(\003\022\014\n\004tag2\030\002 \001(\003\022",
-      "\016\n\006result\030\003 \001(\010\022\021\n\tdeepCount\030\004 \001(\005\022\021\n\tti" +
-      "mestamp\030\005 \002(\003\022\020\n\010deepTime\030\006 \001(\003\022\024\n\014isHas" +
-      "hLookup\030\007 \001(\010\022\"\n\032deepReferenceEqualityCo" +
-      "unt\030\010 \001(\005\022\034\n\024isStructuralEquality\030\t \001(\010\"" +
-      "8\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\021" +
-      "\n\tclassname\030\003 \001(\tB=\n\"org.eclipse.imp.pdb" +
-      ".facts.trackingB\027TrackingProtocolBuffers"
+      "SuspectForOrderingProblems\030\014 \001(\010\022\021\n\tclas" +
+      "sname\030\r \001(\t\"\314\001\n\016EqualsRelation\022\014\n\004tag1\030\001",
+      " \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016\n\006result\030\003 \001(\010\022\021\n\tde" +
+      "epCount\030\004 \001(\005\022\021\n\ttimestamp\030\005 \002(\003\022\020\n\010deep" +
+      "Time\030\006 \001(\003\022\024\n\014isHashLookup\030\007 \001(\010\022\"\n\032deep" +
+      "ReferenceEqualityCount\030\010 \001(\005\022\034\n\024isStruct" +
+      "uralEquality\030\t \001(\010\"8\n\006TagMap\022\013\n\003tag\030\001 \002(" +
+      "\003\022\016\n\006digest\030\002 \002(\t\022\021\n\tclassname\030\003 \001(\tB=\n\"" +
+      "org.eclipse.imp.pdb.facts.trackingB\027Trac" +
+      "kingProtocolBuffers"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3459,7 +3617,7 @@ public final class TrackingProtocolBuffers {
     internal_static_ObjectLifetime_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_ObjectLifetime_descriptor,
-        new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "RecursiveReferenceEqualitiesEstimate", "HashTableOverhead", "IsRedundant", "DeepReferenceEqualityEstimate", "OepDigest", "OepObjectGraph", "OepIsSuspectForOrderingProblems", });
+        new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "RecursiveReferenceEqualitiesEstimate", "HashTableOverhead", "IsRedundant", "DeepReferenceEqualityEstimate", "OepDigest", "OepObjectGraph", "OepIsSuspectForOrderingProblems", "Classname", });
     internal_static_EqualsRelation_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_EqualsRelation_fieldAccessorTable = new
