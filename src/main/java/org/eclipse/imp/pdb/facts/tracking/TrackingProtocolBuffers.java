@@ -125,6 +125,15 @@ public final class TrackingProtocolBuffers {
      */
     com.google.protobuf.ByteString
         getOepObjectGraphBytes();
+
+    /**
+     * <code>optional bool oepIsSuspectForOrderingProblems = 12;</code>
+     */
+    boolean hasOepIsSuspectForOrderingProblems();
+    /**
+     * <code>optional bool oepIsSuspectForOrderingProblems = 12;</code>
+     */
+    boolean getOepIsSuspectForOrderingProblems();
   }
   /**
    * Protobuf type {@code ObjectLifetime}
@@ -234,6 +243,11 @@ public final class TrackingProtocolBuffers {
               com.google.protobuf.ByteString bs = input.readBytes();
               bitField0_ |= 0x00000400;
               oepObjectGraph_ = bs;
+              break;
+            }
+            case 96: {
+              bitField0_ |= 0x00000800;
+              oepIsSuspectForOrderingProblems_ = input.readBool();
               break;
             }
           }
@@ -522,6 +536,21 @@ public final class TrackingProtocolBuffers {
       }
     }
 
+    public static final int OEPISSUSPECTFORORDERINGPROBLEMS_FIELD_NUMBER = 12;
+    private boolean oepIsSuspectForOrderingProblems_;
+    /**
+     * <code>optional bool oepIsSuspectForOrderingProblems = 12;</code>
+     */
+    public boolean hasOepIsSuspectForOrderingProblems() {
+      return ((bitField0_ & 0x00000800) == 0x00000800);
+    }
+    /**
+     * <code>optional bool oepIsSuspectForOrderingProblems = 12;</code>
+     */
+    public boolean getOepIsSuspectForOrderingProblems() {
+      return oepIsSuspectForOrderingProblems_;
+    }
+
     private void initFields() {
       tag_ = 0L;
       digest_ = "";
@@ -534,6 +563,7 @@ public final class TrackingProtocolBuffers {
       deepReferenceEqualityEstimate_ = 0;
       oepDigest_ = "";
       oepObjectGraph_ = "";
+      oepIsSuspectForOrderingProblems_ = false;
     }
     private byte memoizedIsInitialized = -1;
     public final boolean isInitialized() {
@@ -589,6 +619,9 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         output.writeBytes(11, getOepObjectGraphBytes());
       }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        output.writeBool(12, oepIsSuspectForOrderingProblems_);
+      }
       getUnknownFields().writeTo(output);
     }
 
@@ -641,6 +674,10 @@ public final class TrackingProtocolBuffers {
       if (((bitField0_ & 0x00000400) == 0x00000400)) {
         size += com.google.protobuf.CodedOutputStream
           .computeBytesSize(11, getOepObjectGraphBytes());
+      }
+      if (((bitField0_ & 0x00000800) == 0x00000800)) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(12, oepIsSuspectForOrderingProblems_);
       }
       size += getUnknownFields().getSerializedSize();
       memoizedSerializedSize = size;
@@ -781,6 +818,8 @@ public final class TrackingProtocolBuffers {
         bitField0_ = (bitField0_ & ~0x00000200);
         oepObjectGraph_ = "";
         bitField0_ = (bitField0_ & ~0x00000400);
+        oepIsSuspectForOrderingProblems_ = false;
+        bitField0_ = (bitField0_ & ~0x00000800);
         return this;
       }
 
@@ -853,6 +892,10 @@ public final class TrackingProtocolBuffers {
           to_bitField0_ |= 0x00000400;
         }
         result.oepObjectGraph_ = oepObjectGraph_;
+        if (((from_bitField0_ & 0x00000800) == 0x00000800)) {
+          to_bitField0_ |= 0x00000800;
+        }
+        result.oepIsSuspectForOrderingProblems_ = oepIsSuspectForOrderingProblems_;
         result.bitField0_ = to_bitField0_;
         onBuilt();
         return result;
@@ -907,6 +950,9 @@ public final class TrackingProtocolBuffers {
           bitField0_ |= 0x00000400;
           oepObjectGraph_ = other.oepObjectGraph_;
           onChanged();
+        }
+        if (other.hasOepIsSuspectForOrderingProblems()) {
+          setOepIsSuspectForOrderingProblems(other.getOepIsSuspectForOrderingProblems());
         }
         this.mergeUnknownFields(other.getUnknownFields());
         return this;
@@ -1423,6 +1469,38 @@ public final class TrackingProtocolBuffers {
   }
   bitField0_ |= 0x00000400;
         oepObjectGraph_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean oepIsSuspectForOrderingProblems_ ;
+      /**
+       * <code>optional bool oepIsSuspectForOrderingProblems = 12;</code>
+       */
+      public boolean hasOepIsSuspectForOrderingProblems() {
+        return ((bitField0_ & 0x00000800) == 0x00000800);
+      }
+      /**
+       * <code>optional bool oepIsSuspectForOrderingProblems = 12;</code>
+       */
+      public boolean getOepIsSuspectForOrderingProblems() {
+        return oepIsSuspectForOrderingProblems_;
+      }
+      /**
+       * <code>optional bool oepIsSuspectForOrderingProblems = 12;</code>
+       */
+      public Builder setOepIsSuspectForOrderingProblems(boolean value) {
+        bitField0_ |= 0x00000800;
+        oepIsSuspectForOrderingProblems_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>optional bool oepIsSuspectForOrderingProblems = 12;</code>
+       */
+      public Builder clearOepIsSuspectForOrderingProblems() {
+        bitField0_ = (bitField0_ & ~0x00000800);
+        oepIsSuspectForOrderingProblems_ = false;
         onChanged();
         return this;
       }
@@ -3346,22 +3424,23 @@ public final class TrackingProtocolBuffers {
       descriptor;
   static {
     java.lang.String[] descriptorData = {
-      "\n\024objectLifetime.proto\"\236\002\n\016ObjectLifetim" +
+      "\n\024objectLifetime.proto\"\307\002\n\016ObjectLifetim" +
       "e\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \001(\t\022\020\n\010ctorTi" +
       "me\030\003 \002(\003\022\020\n\010dtorTime\030\004 \001(\003\022\033\n\023measuredSi" +
       "zeInBytes\030\005 \001(\003\022,\n$recursiveReferenceEqu" +
       "alitiesEstimate\030\006 \001(\005\022\031\n\021hashTableOverhe" +
       "ad\030\007 \001(\003\022\023\n\013isRedundant\030\010 \001(\010\022%\n\035deepRef" +
       "erenceEqualityEstimate\030\t \001(\005\022\021\n\toepDiges" +
-      "t\030\n \001(\t\022\026\n\016oepObjectGraph\030\013 \001(\t\"\314\001\n\016Equa" +
-      "lsRelation\022\014\n\004tag1\030\001 \001(\003\022\014\n\004tag2\030\002 \001(\003\022\016" +
-      "\n\006result\030\003 \001(\010\022\021\n\tdeepCount\030\004 \001(\005\022\021\n\ttim",
-      "estamp\030\005 \002(\003\022\020\n\010deepTime\030\006 \001(\003\022\024\n\014isHash" +
-      "Lookup\030\007 \001(\010\022\"\n\032deepReferenceEqualityCou" +
-      "nt\030\010 \001(\005\022\034\n\024isStructuralEquality\030\t \001(\010\"8" +
-      "\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\021\n" +
-      "\tclassname\030\003 \001(\tB=\n\"org.eclipse.imp.pdb." +
-      "facts.trackingB\027TrackingProtocolBuffers"
+      "t\030\n \001(\t\022\026\n\016oepObjectGraph\030\013 \001(\t\022\'\n\037oepIs" +
+      "SuspectForOrderingProblems\030\014 \001(\010\"\314\001\n\016Equ" +
+      "alsRelation\022\014\n\004tag1\030\001 \001(\003\022\014\n\004tag2\030\002 \001(\003\022",
+      "\016\n\006result\030\003 \001(\010\022\021\n\tdeepCount\030\004 \001(\005\022\021\n\tti" +
+      "mestamp\030\005 \002(\003\022\020\n\010deepTime\030\006 \001(\003\022\024\n\014isHas" +
+      "hLookup\030\007 \001(\010\022\"\n\032deepReferenceEqualityCo" +
+      "unt\030\010 \001(\005\022\034\n\024isStructuralEquality\030\t \001(\010\"" +
+      "8\n\006TagMap\022\013\n\003tag\030\001 \002(\003\022\016\n\006digest\030\002 \002(\t\022\021" +
+      "\n\tclassname\030\003 \001(\tB=\n\"org.eclipse.imp.pdb" +
+      ".facts.trackingB\027TrackingProtocolBuffers"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -3380,7 +3459,7 @@ public final class TrackingProtocolBuffers {
     internal_static_ObjectLifetime_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_ObjectLifetime_descriptor,
-        new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "RecursiveReferenceEqualitiesEstimate", "HashTableOverhead", "IsRedundant", "DeepReferenceEqualityEstimate", "OepDigest", "OepObjectGraph", });
+        new java.lang.String[] { "Tag", "Digest", "CtorTime", "DtorTime", "MeasuredSizeInBytes", "RecursiveReferenceEqualitiesEstimate", "HashTableOverhead", "IsRedundant", "DeepReferenceEqualityEstimate", "OepDigest", "OepObjectGraph", "OepIsSuspectForOrderingProblems", });
     internal_static_EqualsRelation_descriptor =
       getDescriptor().getMessageTypes().get(1);
     internal_static_EqualsRelation_fieldAccessorTable = new

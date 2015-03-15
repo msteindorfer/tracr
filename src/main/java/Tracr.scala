@@ -8,7 +8,7 @@ import scala.collection.immutable.{SortedMap, NumericRange}
 import scala._
 import scala.Some
 
-case class ObjectLifetime(tag: Option[Long], digest: Option[String], ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean, oepDigest: Option[String], oepObjectGraph: Option[String]) {
+case class ObjectLifetime(tag: Option[Long], digest: Option[String], ctorTime: Long, dtorTime: Option[Long], measuredSizeInBytes: Long, recursiveReferenceEqualitiesEstimate: Int, hashTableOverhead: Long, isRedundant: Boolean, oepDigest: Option[String], oepObjectGraph: Option[String], oepIsSuspectForOrderingProblems: Option[Boolean]) {
   require(ctorTime >= 0)
   require(!dtorTime.isDefined || dtorTime.get >= 0)
   require(measuredSizeInBytes >= 0)
@@ -120,8 +120,9 @@ object Tracr extends App {
 
             val oepDigest = if (protoObjectLifetime.hasOepDigest) Some(protoObjectLifetime.getOepDigest) else None
             val oepObjectGraph = if (protoObjectLifetime.hasOepObjectGraph) Some(protoObjectLifetime.getOepObjectGraph) else None
+            val oepIsSuspectForOrderingProblems = if (protoObjectLifetime.hasOepIsSuspectForOrderingProblems) Some(protoObjectLifetime.getOepIsSuspectForOrderingProblems) else None
 
-            universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, recursiveReferenceEqualitiesEstimate, hashTableOverhead, isRedundant, oepDigest, oepObjectGraph)
+            universeBuilder += ObjectLifetime(Some(tag), digest, ctorTime, dtorTime, measuredSizeInBytes, recursiveReferenceEqualitiesEstimate, hashTableOverhead, isRedundant, oepDigest, oepObjectGraph, oepIsSuspectForOrderingProblems)
           } else {
             continue = false
           }
@@ -226,7 +227,7 @@ object Tracr extends App {
 
 
     time("Calculate Object Redundancy Profiling (ORP) over Object Equality Profiling (OEP)") {
-      val recordsGroupedByDigest: GenMap[String, GenSeq[ObjectLifetime]] = sortedUniverse groupBy (_.digest.get)
+      val recordsGroupedByDigest: GenMap[String, GenSeq[ObjectLifetime]] = sortedUniverse filter { _.oepIsSuspectForOrderingProblems getOrElse false } groupBy (_.digest.get)
       val distinctOepDigestsByDigest: GenMap[String, Int] = recordsGroupedByDigest mapValues { _.map(_.oepDigest).toSet.size }
 
       val frequencyByDistinctOepDigests: GenMap[Int, Int] = distinctOepDigestsByDigest.groupBy(_._2).mapValues(_.size)
@@ -270,7 +271,7 @@ object Tracr extends App {
         dtorTime = overlap.map(_.dtorTime).max
         size = overlap.head.measuredSizeInBytes
         recursiveReferenceEqualitiesEstimate = overlap.head.recursiveReferenceEqualitiesEstimate
-      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, recursiveReferenceEqualitiesEstimate, 0, false, None, None)
+      } yield ObjectLifetime(None, digest, ctorTime, dtorTime, size, recursiveReferenceEqualitiesEstimate, 0, false, None, None, None)
     };
 
     /*

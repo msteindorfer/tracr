@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
-  <component name="FacetManager" />
   <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/../target/scala-2.10/classes" />
     <output-test url="file://$MODULE_DIR$/../target/scala-2.10/test-classes" />
@@ -36,6 +35,6 @@
     <orderEntry type="library" scope="TEST" name="SBT: junit:junit:4.11:test" level="project" />
     <orderEntry type="library" scope="TEST" name="SBT: org.hamcrest:hamcrest-core:1.3:test" level="project" />
     <orderEntry type="library" name="SBT: org.scala-lang:scala-library:2.10.3" level="project" />
+    <orderEntry type="library" name="scala-sdk-2.10.5" level="application" />
   </component>
 </module>
-
