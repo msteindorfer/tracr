@@ -241,7 +241,7 @@ object Tracr extends App {
 
       // print affected classes
       println("Affected classes:")
-      (recordsGroupedByDigest mapValues { _.toSet map { _.classname.getOrElse("Not Available") } }).values mkString "\n"
+      (recordsGroupedByDigest mapValues { _.toSet map { (record: ObjectLifetime) => record.classname.getOrElse("Not Available") } }).values mkString "\n"
 
       // printing histogram
       println(relativeFrequencyByDistinctOepDigests .toList.sortBy(_._1))
