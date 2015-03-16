@@ -2,9 +2,32 @@
 setwd("~/Development/rascal-devel/tracr")
 
 require(sitools)
+require(functional)
 
 # http://stackoverflow.com/questions/11340444/is-there-an-r-function-to-format-number-using-unit-prefix
-csUnits <- function (number,rounding=T) 
+# csUnits <- function (number,rounding=T) 
+# {
+#   lut <- c(1e-24, 1e-21, 1e-18, 1e-15, 1e-12, 1e-09, 1e-06, 
+#            0.001, 1, 1000, 1e+06, 1e+09, 1e+12, 1e+15, 1e+18, 1e+21, 
+#            1e+24)
+#   pre <- c("y", "z", "a", "f", "p", "n", "u", "m", "", "K", 
+#            "M", "G", "T", "P", "E", "Z", "Y")
+#   ix <- findInterval(number, lut)
+#   if (lut[ix]!=1) {
+#     if (rounding==T) {
+#       sistring <- paste(formatC(number/lut[ix], digits=0, format="f"),pre[ix], sep="")
+#     }
+#     else {
+#       sistring <- paste(formatC(number/lut[ix], digits=0, format="f"), pre[ix], sep="")
+#     } 
+#   }
+#   else {
+#     sistring <- paste(round(number, digits=0))
+#   }
+#   return(sistring)
+# }
+
+csUnits <- function (number,rounding=T,postfix="") 
 {
   lut <- c(1e-24, 1e-21, 1e-18, 1e-15, 1e-12, 1e-09, 1e-06, 
            0.001, 1, 1000, 1e+06, 1e+09, 1e+12, 1e+15, 1e+18, 1e+21, 
@@ -12,19 +35,27 @@ csUnits <- function (number,rounding=T)
   pre <- c("y", "z", "a", "f", "p", "n", "u", "m", "", "K", 
            "M", "G", "T", "P", "E", "Z", "Y")
   ix <- findInterval(number, lut)
-  if (lut[ix]!=1) {
-    if (rounding==T) {
-      sistring <- paste(formatC(number/lut[ix], digits=0, format="f"),pre[ix], sep="")
-    }
-    else {
-      sistring <- paste(formatC(number/lut[ix], digits=0, format="f"), pre[ix], sep="")
-    } 
+  if (!is.na(ix) && ix >= 1) {
+    #     if (rounding==T) {
+    #       sistring <- paste(formatC(number/lut[ix], digits=0, format="f"),pre[ix], sep="")
+    #     }
+    #     else {
+    #       sistring <- paste(formatC(number/lut[ix], digits=0, format="f"), pre[ix], sep="")
+    #     } 
+    
+    sistring <- paste(formatC(number/lut[ix], digits=0, format="f"), pre[ix], postfix, sep="")
   }
   else {
-    sistring <- paste(round(number, digits=0))
+    sistring <- paste(round(number, digits=0), postfix, sep="")
   }
+  
   return(sistring)
 }
+
+csUnitsNew <- Vectorize(csUnits)
+
+csUnitsNew_Bytes <- Curry(csUnitsNew, postfix="B")
+
 
 tableColumnNames <- c(
     "BenchmarkShortName"
@@ -207,72 +238,103 @@ allDataColumnNames <- c(
 
 allData <- read.csv("all-data.csv", header=FALSE, col.names = allDataColumnNames)
 
+
+###
+# Dividing data in two subsets: control data set and realistic data set.
+####
+ctrlData <- allData[grep("^(S|U).. ", allData$BenchmarkShortName, ignore.case=T),] # excluding additional 'Min' measurements
+realData <- allData[grep("^(S|U)", allData$BenchmarkShortName, ignore.case=T, invert=T),]
+
+ctrlData_memoryMeanAccuracyFactorA <- ((ctrlData$MemEstimated) / ctrlData$MemMeasurementA)
+ctrlData_memoryMeanAccuracyFactorA[is.infinite(ctrlData_memoryMeanAccuracyFactorA)] <- NA
+ctrlData_memoryMeanAccuracyFactorB <- ((ctrlData$MemEstimated) / ctrlData$MemMeasurementB)
+ctrlData_memoryMeanAccuracyFactorB[is.infinite(ctrlData_memoryMeanAccuracyFactorB)] <- NA
+
+realData_memoryMeanAccuracyFactorA <- ((realData$MemEstimated) / realData$MemMeasurementA)
+realData_memoryMeanAccuracyFactorA[is.infinite(realData_memoryMeanAccuracyFactorA)] <- NA
+realData_memoryMeanAccuracyFactorB <- ((realData$MemEstimated) / realData$MemMeasurementB)
+realData_memoryMeanAccuracyFactorB[is.infinite(realData_memoryMeanAccuracyFactorB)] <- NA
+
+
+library(scales)
+trans_sqrt <- trans_breaks("sqrt", function(x) x ^ 2, n=6)
+trans_sqrt_sqrt <- trans_breaks(function(x) sqrt(sqrt(x)), function(x) x ^ 4, n=6)
+trans_continuous <- trans_breaks("identity", function(x) x, n=6)
+
+a_new_trans <- trans_new("sqrtsqrt", function(x) sqrt(sqrt(x)), function(x) x ^ 4)
+
+
 # Plot Memory: Original vs Estimated
-allDataMemSubset <- allData[,c("BenchmarkShortName", "MemOriginal", "MemEstimated")]
+allDataMemSubset <- realData[,c("BenchmarkShortName", "MemOriginal", "MemEstimated")]
 allDataMemSubsetLog <- data.frame(allDataMemSubset[1], log(allDataMemSubset[-1]))
 
 pdf("viz_absolute-memory-original-vs-estimated.pdf", width=7, height=5)  
-mem <- ggplot(data=melt(allDataMemSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(value), fill=variable))
+mem <- ggplot(data=melt(allDataMemSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 mem <- mem + geom_bar(position="dodge", stat="identity")
 mem <- mem + theme_bw()
 mem <- mem + theme(legend.position="top")
 mem <- mem + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-mem <- mem + xlab("Experiment Name") # + ylab("My y label")
-mem <- mem + scale_fill_grey(name="Mean Memory Consumption of",
+mem <- mem + xlab("Experiment Name") + ylab("Mean Memory Consumption")
+mem <- mem + scale_fill_grey(name="Mean Memory Consumption of", # Mean Memory Consumption of
                     breaks=c("MemOriginal", "MemEstimated"),
                     labels=c("Profile", "Estimate"))
+mem <- mem + scale_y_sqrt(breaks=trans_sqrt, labels=csUnitsNew_Bytes)
+# mem <- mem + coord_trans(y = "sqrt")
+# mem <- mem + scale_y_continuous(breaks=trans_breaks("sqrt", function(x) x ^ 2, n=10))
 mem
 dev.off()
 
 
 # Plot Memory: Cache Hits vs Collisions (Factor)
-collisionFactor <- (allData$CacheFalseEquals / allData$CacheHitsEstimated)
+collisionFactor <- (realData$CacheFalseEquals / realData$CacheHitsEstimated)
 collisionFactor[is.infinite(collisionFactor)] <- NA
 
-allDataCollisionFactorSubset <- data.frame(allData$BenchmarkShortName, collisionFactor)
-names(allDataCollisionFactorSubset) <- c("BenchmarkShortName", "collisionFactor")
+realDataCollisionFactorSubset <- data.frame(realData$BenchmarkShortName, collisionFactor)
+names(realDataCollisionFactorSubset) <- c("BenchmarkShortName", "collisionFactor")
 # allDataCollisionFactorSubsetLog <- data.frame(allDataCollisionFactorSubset[1], log(allDataCollisionFactorSubset[-1]))
 
 pdf("viz_cachehits-vs-collisions.pdf", width=7, height=5)  
-chf <- ggplot(data=melt(allDataCollisionFactorSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+chf <- ggplot(data=melt(realDataCollisionFactorSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 # chf <- chf + geom_boxplot() 
 chf <- chf + geom_bar(position="dodge", stat="identity")
 chf <- chf + theme_bw()
 chf <- chf + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-chf <- chf + xlab("Experiment Name") # + ylab("My y label")
-chf <- chf + scale_fill_grey(name="Average of",
+chf <- chf + xlab("Experiment Name") + ylab("Average of False Equals per Cache Hit")
+chf <- chf + scale_fill_grey(name="Average of", # Average of
                     breaks=c("collisionFactor"),
                     labels=c("False Equals per Cache Hit"))
+chf <- chf + scale_y_continuous(breaks=trans_continuous, labels=csUnitsNew)
 chf
 dev.off()
 
 
 # Plot Memory: Allocations vs Cache Hits vs Collisions 
-allDataCacheHitSubset <- allData[,c("BenchmarkShortName", "ObjAllocations", "MeasuredCacheEqualsRoot", "CacheFalseEquals")]
-allDataCacheHitSubsetLog <- data.frame(allDataCacheHitSubset[1], log(allDataCacheHitSubset[-1]))
+realDataCacheHitSubset <- realData[,c("BenchmarkShortName", "ObjAllocations", "MeasuredCacheEqualsRoot", "CacheFalseEquals")]
+realDataCacheHitSubsetLog <- data.frame(realDataCacheHitSubset[1], log(realDataCacheHitSubset[-1]))
 
 pdf("viz_allocations-vs-cachehits-vs-collisions.pdf", width=7, height=5)  
-ch <- ggplot(data=melt(allDataCacheHitSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(value), fill=variable))
+ch <- ggplot(data=melt(realDataCacheHitSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(value), fill=variable))
 ch <- ch + geom_bar(position="dodge", stat="identity")
 ch <- ch + theme_bw()
 ch <- ch + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-ch <- ch + xlab("Experiment Name") # + ylab("My y label")
-ch <- ch + scale_fill_grey(name="Measurments of",
+ch <- ch + xlab("Experiment Name") + ylab("value")
+ch <- ch + scale_fill_grey(name="Measurements of",
                     breaks=c("ObjAllocations", "MeasuredCacheEqualsRoot", "CacheFalseEquals"),
                     labels=c("Object Allocations", "Cache Hits", "False Equals"))
+ch <- ch + scale_y_sqrt(breaks=trans_sqrt, labels=csUnitsNew)
 ch
 dev.off()
 
 
 # Plot Memory: Redundancy vs Mean Memory Savings
-objectRedundancyFactor <- (allData$CacheHitsEstimated / allData$ObjAllocations)
-memoryReductionFactor <- 1 - (allData$MemMeasurementB / allData$MemOriginal)
+objectRedundancyFactor <- (realData$CacheHitsEstimated / realData$ObjAllocations)
+memoryReductionFactor <- 1 - (realData$MemMeasurementB / realData$MemOriginal)
 
-allDataRVSSubset <- data.frame(allData$BenchmarkShortName, objectRedundancyFactor, memoryReductionFactor)
-names(allDataRVSSubset) <- c("BenchmarkShortName", "objectRedundancyFactor", "memoryReductionFactor")
+realDataRVSSubset <- data.frame(realData$BenchmarkShortName, objectRedundancyFactor, memoryReductionFactor)
+names(realDataRVSSubset) <- c("BenchmarkShortName", "objectRedundancyFactor", "memoryReductionFactor")
 
 pdf("viz_object-redundancy-vs-estimated-mean-memory-savings.pdf", width=7, height=5)
-rvs <- ggplot(data=melt(allDataRVSSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+rvs <- ggplot(data=melt(realDataRVSSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 rvs <- rvs + geom_bar(position="dodge", stat="identity")
 rvs <- rvs + theme_bw()
 rvs <- rvs + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -288,27 +350,27 @@ mean(objectRedundancyFactor)
 min(objectRedundancyFactor)
 max(objectRedundancyFactor)
 # D--H Range/Mean
-mean(allDataRVSSubset[4:8,]$objectRedundancyFactor)
-min(allDataRVSSubset[4:8,]$objectRedundancyFactor)
-max(allDataRVSSubset[4:8,]$objectRedundancyFactor)
+mean(realDataRVSSubset[4:8,]$objectRedundancyFactor)
+min(realDataRVSSubset[4:8,]$objectRedundancyFactor)
+max(realDataRVSSubset[4:8,]$objectRedundancyFactor)
 
 
 # Plot Equality: Equality Profile (Root)
-allDataOrigEqRootSubset <- allData[,c("BenchmarkShortName", "OriginalEqualsRoot", "OriginalReferenceRoot", "OriginalEquivRoot")]
-allDataOrigEqRootSubsetLog <- data.frame(allDataOrigEqRootSubset[1], log(allDataOrigEqRootSubset[-1]))
+realDataOrigEqRootSubset <- realData[,c("BenchmarkShortName", "OriginalEqualsRoot", "OriginalReferenceRoot", "OriginalEquivRoot")]
+realDataOrigEqRootSubsetLog <- data.frame(realDataOrigEqRootSubset[1], log(realDataOrigEqRootSubset[-1]))
 
-origEqRoot <- ggplot(data=melt(allDataOrigEqRootSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
+origEqRoot <- ggplot(data=melt(realDataOrigEqRootSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
 origEqRoot <- origEqRoot + geom_bar(position="stack", stat="identity")
 origEqRoot <- origEqRoot + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 origEqRoot 
 
 
 # Plot Equality: Equality Profile (Recursive)
-allDataOrigEqRecursiveSubset <- allData[,c("BenchmarkShortName", "OriginalEqualsRecursive", "OriginalReferenceRecursive", "OriginalEquivRecursive")]
-allDataOrigEqRecursiveSubsetLog <- data.frame(allDataOrigEqRecursiveSubset[1], log(allDataOrigEqRecursiveSubset[-1]))
+realDataOrigEqRecursiveSubset <- realData[,c("BenchmarkShortName", "OriginalEqualsRecursive", "OriginalReferenceRecursive", "OriginalEquivRecursive")]
+realDataOrigEqRecursiveSubsetLog <- data.frame(realDataOrigEqRecursiveSubset[1], log(realDataOrigEqRecursiveSubset[-1]))
 
 pdf("viz_equality-profile-recursive-profiled.pdf", width=7, height=5)  
-origEqRecursive <- ggplot(data=melt(allDataOrigEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
+origEqRecursive <- ggplot(data=melt(realDataOrigEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 origEqRecursive <- origEqRecursive + geom_bar(position="stack", stat="identity")
 origEqRecursive <- origEqRecursive + theme_bw()
 origEqRecursive <- origEqRecursive + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -316,47 +378,48 @@ origEqRecursive <- origEqRecursive + xlab("Experiment Name") # + ylab("My y labe
 origEqRecursive <- origEqRecursive + scale_fill_grey(name="Sum of",
                     breaks=c("OriginalEqualsRecursive", "OriginalReferenceRecursive", "OriginalEquivRecursive"),
                     labels=c("equals", " ==", "isEqual"))
-origEqRecursive <- origEqRecursive + coord_cartesian(ylim=c(0,100))
+origEqRecursive <- origEqRecursive + coord_cartesian(ylim=c(0,80000000))
+origEqRecursive <- origEqRecursive + scale_y_continuous(breaks=trans_sqrt_sqrt, labels=csUnitsNew, trans=a_new_trans)
 origEqRecursive 
 dev.off()
 
 
 # Plot Equality: Equality Profile (Nested)
-allDataOrigEqNestedSubset <- data.frame(allData$BenchmarkShortName, allData$OriginalEqualsRecursive - allData$OriginalEqualsRoot, allData$OriginalReferenceRecursive - allData$OriginalReferenceRoot, allData$OriginalEquivRecursive - allData$OriginalEquivRoot)
-names(allDataOrigEqNestedSubset) <- c("BenchmarkShortName", "OriginalEqualsNested", "OriginalReferenceNested", "OriginalEquivNested")
-allDataOrigEqNestedSubsetLog <- data.frame(allDataOrigEqNestedSubset[1], log(allDataOrigEqNestedSubset[-1]))
+realDataOrigEqNestedSubset <- data.frame(realData$BenchmarkShortName, realData$OriginalEqualsRecursive - realData$OriginalEqualsRoot, realData$OriginalReferenceRecursive - realData$OriginalReferenceRoot, realData$OriginalEquivRecursive - realData$OriginalEquivRoot)
+names(realDataOrigEqNestedSubset) <- c("BenchmarkShortName", "OriginalEqualsNested", "OriginalReferenceNested", "OriginalEquivNested")
+realDataOrigEqNestedSubsetLog <- data.frame(realDataOrigEqNestedSubset[1], log(realDataOrigEqNestedSubset[-1]))
 
-origEqNested <- ggplot(data=melt(allDataOrigEqNestedSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
+origEqNested <- ggplot(data=melt(realDataOrigEqNestedSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
 origEqNested <- origEqNested + geom_bar(position="dodge", stat="identity")
 origEqNested <- origEqNested + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 origEqNested 
 
 
 # Plot Equality: Root vs Recursive
-equalsRootToRecFactor <- (allData$OriginalEqualsRecursive / allData$OriginalEqualsRoot)
-equivRootToRecFactor <- (allData$OriginalEquivRecursive / allData$OriginalEquivRoot)
+equalsRootToRecFactor <- (realData$OriginalEqualsRecursive / realData$OriginalEqualsRoot)
+equivRootToRecFactor <- (realData$OriginalEquivRecursive / realData$OriginalEquivRoot)
 
-equalitiesRootToRecFactor <- ((allData$OriginalEqualsRecursive + allData$OriginalEquivRecursive) / (allData$OriginalEqualsRoot + allData$OriginalEquivRoot))
-referencesRootToRecFactor <- ((allData$OriginalReferenceRecursive - allData$OriginalReferenceRoot) / (allData$OriginalEqualsRoot + allData$OriginalEquivRoot))
+equalitiesRootToRecFactor <- ((realData$OriginalEqualsRecursive + realData$OriginalEquivRecursive) / (realData$OriginalEqualsRoot + realData$OriginalEquivRoot))
+referencesRootToRecFactor <- ((realData$OriginalReferenceRecursive - realData$OriginalReferenceRoot) / (realData$OriginalEqualsRoot + realData$OriginalEquivRoot))
 
 equalitiesRootToRecFactor[is.nan(equalitiesRootToRecFactor)] <- NA
 referencesRootToRecFactor[is.infinite(referencesRootToRecFactor)] <- NA
 
-allDataRootToRecSubset <- data.frame(allData$BenchmarkShortName, equalitiesRootToRecFactor, referencesRootToRecFactor)
-names(allDataRootToRecSubset) <- c("BenchmarkShortName", "equalitiesRootToRecFactor", "referencesRootToRecFactor")
+realDataRootToRecSubset <- data.frame(realData$BenchmarkShortName, equalitiesRootToRecFactor, referencesRootToRecFactor)
+names(realDataRootToRecSubset) <- c("BenchmarkShortName", "equalitiesRootToRecFactor", "referencesRootToRecFactor")
 
-rtr <- ggplot(data=melt(allDataRootToRecSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+rtr <- ggplot(data=melt(realDataRootToRecSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 rtr <- rtr + geom_bar(position="dodge", stat="identity")
 rtr <- rtr + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 rtr 
 
 
 # Plot Equality Measured: Equality Profile (Recursive)
-allDataMeasuredEqRecursiveSubset <- allData[,c("BenchmarkShortName", "MeasuredProgramEqualsRecursive", "MeasuredProgramReferenceRecursive", "MeasuredProgramEquivRecursive")]
-allDataMeasuredEqRecursiveSubsetLog <- data.frame(allDataMeasuredEqRecursiveSubset[1], log(allDataMeasuredEqRecursiveSubset[-1]))
+realDataMeasuredEqRecursiveSubset <- realData[,c("BenchmarkShortName", "MeasuredProgramEqualsRecursive", "MeasuredProgramReferenceRecursive", "MeasuredProgramEquivRecursive")]
+realDataMeasuredEqRecursiveSubsetLog <- data.frame(realDataMeasuredEqRecursiveSubset[1], log(realDataMeasuredEqRecursiveSubset[-1]))
 
 pdf("viz_equality-profile-recursive-measured.pdf", width=7, height=5)  
-measuredEqRecursive <- ggplot(data=melt(allDataMeasuredEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(sqrt(value)), fill=variable))
+measuredEqRecursive <- ggplot(data=melt(realDataMeasuredEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 measuredEqRecursive <- measuredEqRecursive + geom_bar(position="stack", stat="identity")
 measuredEqRecursive <- measuredEqRecursive + theme_bw()
 measuredEqRecursive <- measuredEqRecursive + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -364,32 +427,33 @@ measuredEqRecursive <- measuredEqRecursive + xlab("Experiment Name") # + ylab("M
 measuredEqRecursive <- measuredEqRecursive + scale_fill_grey(name="Sum of", 
                     breaks=c("MeasuredProgramEqualsRecursive", "MeasuredProgramReferenceRecursive", "MeasuredProgramEquivRecursive"),
                     labels=c("equals", "==", "isEqual"))
-measuredEqRecursive <- measuredEqRecursive + coord_cartesian(ylim=c(0,100))
+measuredEqRecursive <- measuredEqRecursive + coord_cartesian(ylim=c(0,80000000))
+measuredEqRecursive <- measuredEqRecursive + scale_y_continuous(breaks=trans_sqrt_sqrt, labels=csUnitsNew, trans=a_new_trans)
 measuredEqRecursive 
 dev.off()
 
 
 # Plot Equality Cache: Equality Profile (Cache)
-allDataEstimatedCacheEqualsSubset <- allData[,c("BenchmarkShortName", "EstimatedCacheEqualsRoot", "EstimatedCacheReferenceRecursive", "MeasuredCacheEqualsRoot", "MeasuredCacheReferenceRecursive")]
-allDataEstimatedCacheEqualsSubsetLog <- data.frame(allDataEstimatedCacheEqualsSubset[1], log(allDataEstimatedCacheEqualsSubset[-1]))
+realDataEstimatedCacheEqualsSubset <- realData[,c("BenchmarkShortName", "EstimatedCacheEqualsRoot", "EstimatedCacheReferenceRecursive", "MeasuredCacheEqualsRoot", "MeasuredCacheReferenceRecursive")]
+realDataEstimatedCacheEqualsSubsetLog <- data.frame(realDataEstimatedCacheEqualsSubset[1], log(realDataEstimatedCacheEqualsSubset[-1]))
 
-ece <- ggplot(data=melt(allDataEstimatedCacheEqualsSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+ece <- ggplot(data=melt(realDataEstimatedCacheEqualsSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 ece <- ece + geom_bar(position="dodge", stat="identity")
 ece <- ece + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ece 
 
 
 # Plot Equality (Cache): Root vs Recursive
-cacheReferencesRootToRecFactor <- (allData$EstimatedCacheReferenceRecursive / allData$EstimatedCacheEqualsRoot)
+cacheReferencesRootToRecFactor <- (realData$EstimatedCacheReferenceRecursive / realData$EstimatedCacheEqualsRoot)
 cacheReferencesRootToRecFactor[is.infinite(cacheReferencesRootToRecFactor)] <- NA
 
-cacheReferencesRootToRecFactorReal <- (allData$EstimatedCacheReferenceRecursive / allData$MeasuredCacheEqualsRoot)
+cacheReferencesRootToRecFactorReal <- (realData$EstimatedCacheReferenceRecursive / realData$MeasuredCacheEqualsRoot)
 cacheReferencesRootToRecFactorReal[is.infinite(cacheReferencesRootToRecFactorReal)] <- NA
 
-allDataCacheRootToRecSubset <- data.frame(allData$BenchmarkShortName, cacheReferencesRootToRecFactor, cacheReferencesRootToRecFactorReal)
-names(allDataCacheRootToRecSubset) <- c("BenchmarkShortName", "cacheReferencesRootToRecFactorEstimated", "cacheReferencesRootToRecFactorReal")
+realDataCacheRootToRecSubset <- data.frame(realData$BenchmarkShortName, cacheReferencesRootToRecFactor, cacheReferencesRootToRecFactorReal)
+names(realDataCacheRootToRecSubset) <- c("BenchmarkShortName", "cacheReferencesRootToRecFactorEstimated", "cacheReferencesRootToRecFactorReal")
 
-crtr <- ggplot(data=melt(allDataCacheRootToRecSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+crtr <- ggplot(data=melt(realDataCacheRootToRecSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 crtr <- crtr + geom_bar(position="dodge", stat="identity")
 crtr <- crtr + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 crtr 
@@ -407,29 +471,29 @@ crtr
 
 
 # Plot Equality (Cache): Precision
-cacheEqualsAccuracyFactor <- (allData$EstimatedCacheEqualsRoot / allData$MeasuredCacheEqualsRoot)
+cacheEqualsAccuracyFactor <- (realData$EstimatedCacheEqualsRoot / realData$MeasuredCacheEqualsRoot)
 cacheEqualsAccuracyFactor[is.infinite(cacheEqualsAccuracyFactor)] <- NA
 
-cacheReferenceAccuracyFactor <- (allData$EstimatedCacheReferenceRecursive / allData$MeasuredCacheReferenceRecursive)
+cacheReferenceAccuracyFactor <- (realData$EstimatedCacheReferenceRecursive / realData$MeasuredCacheReferenceRecursive)
 cacheReferenceAccuracyFactor[is.infinite(cacheReferenceAccuracyFactor)] <- NA
 
-memoryMeanAccuracyFactor <- ((allData$MemEstimated) / allData$MemMeasurementB)
+memoryMeanAccuracyFactor <- ((realData$MemEstimated) / realData$MemMeasurementB)
 memoryMeanAccuracyFactor[is.infinite(memoryMeanAccuracyFactor)] <- NA
 
-allDataEqualsAccuracySubset <- data.frame(allData$BenchmarkShortName, cacheEqualsAccuracyFactor, cacheReferenceAccuracyFactor, memoryMeanAccuracyFactor)
-names(allDataEqualsAccuracySubset) <- c("BenchmarkShortName", "cacheEqualsAccuracyFactor", "cacheReferenceAccuracyFactor", "memoryMeanAccuracyFactor")
+realDataEqualsAccuracySubset <- data.frame(realData$BenchmarkShortName, cacheEqualsAccuracyFactor, cacheReferenceAccuracyFactor, memoryMeanAccuracyFactor)
+names(realDataEqualsAccuracySubset) <- c("BenchmarkShortName", "cacheEqualsAccuracyFactor", "cacheReferenceAccuracyFactor", "memoryMeanAccuracyFactor")
 
-eqac <- ggplot(data=melt(allDataEqualsAccuracySubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
+eqac <- ggplot(data=melt(realDataEqualsAccuracySubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 #eqac <- eqac + geom_boxplot() 
 eqac <- eqac + geom_bar(position="dodge", stat="identity")
 eqac <- eqac + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 eqac 
 
 
-allDataEqualsAccuracySubset <- data.frame(allData$BenchmarkShortName, cacheEqualsAccuracyFactor)
-names(allDataEqualsAccuracySubset) <- c("BenchmarkShortName", "cacheEqualsAccuracyFactor")
+realDataEqualsAccuracySubset <- data.frame(realData$BenchmarkShortName, cacheEqualsAccuracyFactor)
+names(realDataEqualsAccuracySubset) <- c("BenchmarkShortName", "cacheEqualsAccuracyFactor")
 
-new <- ggplot(data=allDataEqualsAccuracySubset, aes("Overall", y = cacheEqualsAccuracyFactor))
+new <- ggplot(data=realDataEqualsAccuracySubset, aes("Overall", y = cacheEqualsAccuracyFactor))
 new <- new + geom_boxplot() 
 # eqac <- eqac + geom_bar(position="dodge", stat="identity")
 new <- new + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
@@ -440,22 +504,9 @@ boxplot(cacheReferenceAccuracyFactor)
 boxplot(memoryMeanAccuracyFactor)
 
 #With Martin
-boxplot(allData$MemMeasurementA, allData$MemMeasurementB)
-t.test(allData$MemEstimated, allData$MemMeasurementB)
-t.test(allData$MemEstimated, allData$MemMeasurementA)
-
-ctrlData <- allData[grep("^(S|U).. ", allData$BenchmarkShortName, ignore.case=T),] # excluding additional 'Min' measurements
-realData <- allData[grep("^(S|U)", allData$BenchmarkShortName, ignore.case=T, invert=T),]
-
-ctrlData_memoryMeanAccuracyFactorA <- ((ctrlData$MemEstimated) / ctrlData$MemMeasurementA)
-ctrlData_memoryMeanAccuracyFactorA[is.infinite(ctrlData_memoryMeanAccuracyFactorA)] <- NA
-ctrlData_memoryMeanAccuracyFactorB <- ((ctrlData$MemEstimated) / ctrlData$MemMeasurementB)
-ctrlData_memoryMeanAccuracyFactorB[is.infinite(ctrlData_memoryMeanAccuracyFactorB)] <- NA
-
-realData_memoryMeanAccuracyFactorA <- ((realData$MemEstimated) / realData$MemMeasurementA)
-realData_memoryMeanAccuracyFactorA[is.infinite(realData_memoryMeanAccuracyFactorA)] <- NA
-realData_memoryMeanAccuracyFactorB <- ((realData$MemEstimated) / realData$MemMeasurementB)
-realData_memoryMeanAccuracyFactorB[is.infinite(realData_memoryMeanAccuracyFactorB)] <- NA
+boxplot(realData$MemMeasurementA, realData$MemMeasurementB)
+t.test(realData$MemEstimated, realData$MemMeasurementB)
+t.test(realData$MemEstimated, realData$MemMeasurementA)
 
 # pdf("mem-hypothesis-1-vs-2_in_control.pdf", width=7, height=5)
 #   boxplot((allData$MemMeasurementA), (allData$MemMeasurementB), names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Mean Memory Usage")
@@ -483,11 +534,12 @@ pdf("mem-hypothesis-1-vs-2_in_control.pdf", width=7, height=4)
 dev.off()
 #c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
 
-pdf("mem-hypothesis-1-vs-2_in_real.pdf", width=7, height=4)
+pdf("mem-hypothesis-1-vs-2_in_real.pdf", width=7, height=3.15)
   boxplot(realData_memoryMeanAccuracyFactorA, realData_memoryMeanAccuracyFactorB, names=c("Method 1 (with GC-Noise)", "Method 2 (without GC-Noise)"), yaxt = "n", ylab = "Accuracy Relative to Estimate", ylim = range(c(0, 0.2, 0.4, 0.6, 0.8, 1.0)))
   yRange <- range(realData_memoryMeanAccuracyFactorA, realData_memoryMeanAccuracyFactorB)
   axis(2, y <- c(0.0, 0.25, 0.5, 0.75, 1.0), labels = paste(round(y*100, digits=0), "%", sep = ""), cex.axis=0.95)
   title("Differences in Validating Mean Memory Usage (in Realistic Experiment)")
+  par(mar=c(0, 0, 0, 0) + 0.1)
 dev.off()
 #c(0.0, 0.2, 0.4, 0.6, 0.8, 1.0)
 
