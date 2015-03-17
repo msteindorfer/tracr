@@ -574,3 +574,7 @@ new
 # #points(log10(memoryProfilesS$MeanMemMeasurementB), type="b", pch=2)  
 # points(x = xTicksLog2, y = log10(memoryProfilesSStressed$MeanMemMeasurementA), type="b", pch=13)
 # dev.off()
+
+
+## Calculate ORP vs OEP overhead.
+orpVsOepDataVector <- 96.5626,87.6487,99.9955,98.2081,99.3054,99.9315,99.8542,99.4194,96.1692,96.1707,96.1693,96.1713,96.1721,96.1728,96.1732,96.1735,96.1763,96.1737,96.1751,96.1768
