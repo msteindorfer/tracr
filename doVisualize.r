@@ -268,17 +268,20 @@ a_new_trans <- trans_new("sqrtsqrt", function(x) sqrt(sqrt(x)), function(x) x ^ 
 allDataMemSubset <- realData[,c("BenchmarkShortName", "MemOriginal", "MemEstimated")]
 allDataMemSubsetLog <- data.frame(allDataMemSubset[1], log(allDataMemSubset[-1]))
 
-pdf("viz_absolute-memory-original-vs-estimated.pdf", width=7, height=5)  
+pdf("viz_absolute-memory-original-vs-estimated.pdf", width=7, height=4.5)  
 mem <- ggplot(data=melt(allDataMemSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 mem <- mem + geom_bar(position="dodge", stat="identity")
 mem <- mem + theme_bw()
-mem <- mem + theme(legend.position="top")
+mem <- mem + theme(legend.position=c(0.85,0.85), legend.title=element_blank())
 mem <- mem + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 mem <- mem + xlab("Experiment Name") + ylab("Mean Memory Consumption")
 mem <- mem + scale_fill_grey(name="Mean Memory Consumption of", # Mean Memory Consumption of
                     breaks=c("MemOriginal", "MemEstimated"),
                     labels=c("Profile", "Estimate"))
-mem <- mem + scale_y_sqrt(breaks=trans_sqrt, labels=csUnitsNew_Bytes)
+mem <- mem + coord_cartesian(ylim=c(0,300000000))
+# mem_breaks <- c(5000000,25000000,50000000,100000000,150000000,225000000,300000000)
+mem_breaks <- c(5000000,25000000,100000000,225000000)
+mem <- mem + scale_y_sqrt(labels=csUnitsNew_Bytes, breaks=trans_sqrt) # breaks=trans_sqrt, 
 # mem <- mem + coord_trans(y = "sqrt")
 # mem <- mem + scale_y_continuous(breaks=trans_breaks("sqrt", function(x) x ^ 2, n=10))
 mem
@@ -293,14 +296,14 @@ realDataCollisionFactorSubset <- data.frame(realData$BenchmarkShortName, collisi
 names(realDataCollisionFactorSubset) <- c("BenchmarkShortName", "collisionFactor")
 # allDataCollisionFactorSubsetLog <- data.frame(allDataCollisionFactorSubset[1], log(allDataCollisionFactorSubset[-1]))
 
-pdf("viz_cachehits-vs-collisions.pdf", width=7, height=5)  
+pdf("viz_cachehits-vs-collisions.pdf", width=7, height=4.5)  
 chf <- ggplot(data=melt(realDataCollisionFactorSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 # chf <- chf + geom_boxplot() 
 chf <- chf + geom_bar(position="dodge", stat="identity")
 chf <- chf + theme_bw()
-chf <- chf + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+chf <- chf + theme(legend.position="none") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 chf <- chf + xlab("Experiment Name") + ylab("Average of False Equals per Cache Hit")
-chf <- chf + scale_fill_grey(name="Average of", # Average of
+chf <- chf + scale_fill_grey(name="", # Average of
                     breaks=c("collisionFactor"),
                     labels=c("False Equals per Cache Hit"))
 chf <- chf + scale_y_continuous(breaks=trans_continuous, labels=csUnitsNew)
@@ -312,16 +315,17 @@ dev.off()
 realDataCacheHitSubset <- realData[,c("BenchmarkShortName", "ObjAllocations", "MeasuredCacheEqualsRoot", "CacheFalseEquals")]
 realDataCacheHitSubsetLog <- data.frame(realDataCacheHitSubset[1], log(realDataCacheHitSubset[-1]))
 
-pdf("viz_allocations-vs-cachehits-vs-collisions.pdf", width=7, height=5)  
+pdf("viz_allocations-vs-cachehits-vs-collisions.pdf", width=7, height=4.5)  
 ch <- ggplot(data=melt(realDataCacheHitSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = sqrt(value), fill=variable))
 ch <- ch + geom_bar(position="dodge", stat="identity")
 ch <- ch + theme_bw()
-ch <- ch + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-ch <- ch + xlab("Experiment Name") + ylab("value")
-ch <- ch + scale_fill_grey(name="Measurements of",
+ch <- ch + theme(legend.position=c(0.15,0.85)) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+ch <- ch + xlab("Experiment Name") + ylab("Factor")
+ch <- ch + scale_fill_grey(name="",
                     breaks=c("ObjAllocations", "MeasuredCacheEqualsRoot", "CacheFalseEquals"),
                     labels=c("Object Allocations", "Cache Hits", "False Equals"))
-ch <- ch + scale_y_sqrt(breaks=trans_sqrt, labels=csUnitsNew)
+ch_breaks <- c(50,650,2000,4000,8000)
+ch <- ch + scale_y_sqrt(labels=csUnitsNew, breaks=ch_breaks) # breaks=trans_sqrt, 
 ch
 dev.off()
 
@@ -333,16 +337,16 @@ memoryReductionFactor <- 1 - (realData$MemMeasurementB / realData$MemOriginal)
 realDataRVSSubset <- data.frame(realData$BenchmarkShortName, objectRedundancyFactor, memoryReductionFactor)
 names(realDataRVSSubset) <- c("BenchmarkShortName", "objectRedundancyFactor", "memoryReductionFactor")
 
-pdf("viz_object-redundancy-vs-estimated-mean-memory-savings.pdf", width=7, height=5)
+pdf("viz_object-redundancy-vs-estimated-mean-memory-savings.pdf", width=7, height=4.5)
 rvs <- ggplot(data=melt(realDataRVSSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 rvs <- rvs + geom_bar(position="dodge", stat="identity")
 rvs <- rvs + theme_bw()
-rvs <- rvs + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-rvs <- rvs + xlab("Experiment Name") # + ylab("My y label")
-rvs <- rvs + scale_fill_grey(name="Factor of",
+rvs <- rvs + theme(legend.position=c(0.18,0.88), legend.title=element_blank()) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+rvs <- rvs + xlab("Experiment Name") + ylab("Factor")
+rvs <- rvs + scale_fill_grey(name="",
                     breaks=c("objectRedundancyFactor", "memoryReductionFactor"),
                     labels=c("Object Redundancy", "Mean Memory Reduction"))
-#rvs <- rvs + coord_cartesian(ylim=c(-1,1))
+rvs <- rvs + coord_cartesian(ylim=c(-0.85,1.1))
 rvs
 dev.off()
 # Total Range/Mean
@@ -369,17 +373,18 @@ origEqRoot
 realDataOrigEqRecursiveSubset <- realData[,c("BenchmarkShortName", "OriginalEqualsRecursive", "OriginalReferenceRecursive", "OriginalEquivRecursive")]
 realDataOrigEqRecursiveSubsetLog <- data.frame(realDataOrigEqRecursiveSubset[1], log(realDataOrigEqRecursiveSubset[-1]))
 
-pdf("viz_equality-profile-recursive-profiled.pdf", width=7, height=5)  
+pdf("viz_equality-profile-recursive-profiled.pdf", width=7, height=4.5)  
 origEqRecursive <- ggplot(data=melt(realDataOrigEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 origEqRecursive <- origEqRecursive + geom_bar(position="stack", stat="identity")
 origEqRecursive <- origEqRecursive + theme_bw()
-origEqRecursive <- origEqRecursive + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-origEqRecursive <- origEqRecursive + xlab("Experiment Name") # + ylab("My y label")
-origEqRecursive <- origEqRecursive + scale_fill_grey(name="Sum of",
+origEqRecursive <- origEqRecursive + theme(legend.position=c(0.85,0.85)) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+origEqRecursive <- origEqRecursive + xlab("Experiment Name") + ylab("Equality Calls")
+origEqRecursive <- origEqRecursive + scale_fill_grey(name="",
                     breaks=c("OriginalEqualsRecursive", "OriginalReferenceRecursive", "OriginalEquivRecursive"),
-                    labels=c("equals", " ==", "isEqual"))
+                    labels=c("equals", "==", "isEqual"))
 origEqRecursive <- origEqRecursive + coord_cartesian(ylim=c(0,80000000))
-origEqRecursive <- origEqRecursive + scale_y_continuous(breaks=trans_sqrt_sqrt, labels=csUnitsNew, trans=a_new_trans)
+origEqRecursive_breaks <- c(5*1024,150000,1024*1024,5000000,15000000,40000000,80000000)
+origEqRecursive <- origEqRecursive + scale_y_continuous(labels=csUnitsNew, trans=a_new_trans, breaks=origEqRecursive_breaks) # breaks=trans_sqrt_sqrt, 
 origEqRecursive 
 dev.off()
 
@@ -418,17 +423,18 @@ rtr
 realDataMeasuredEqRecursiveSubset <- realData[,c("BenchmarkShortName", "MeasuredProgramEqualsRecursive", "MeasuredProgramReferenceRecursive", "MeasuredProgramEquivRecursive")]
 realDataMeasuredEqRecursiveSubsetLog <- data.frame(realDataMeasuredEqRecursiveSubset[1], log(realDataMeasuredEqRecursiveSubset[-1]))
 
-pdf("viz_equality-profile-recursive-measured.pdf", width=7, height=5)  
+pdf("viz_equality-profile-recursive-measured.pdf", width=7, height=4.5)  
 measuredEqRecursive <- ggplot(data=melt(realDataMeasuredEqRecursiveSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 measuredEqRecursive <- measuredEqRecursive + geom_bar(position="stack", stat="identity")
 measuredEqRecursive <- measuredEqRecursive + theme_bw()
-measuredEqRecursive <- measuredEqRecursive + theme(legend.position="top") + theme(axis.text.x = element_text(angle = 45, hjust = 1))
-measuredEqRecursive <- measuredEqRecursive + xlab("Experiment Name") # + ylab("My y label")
-measuredEqRecursive <- measuredEqRecursive + scale_fill_grey(name="Sum of", 
+measuredEqRecursive <- measuredEqRecursive + theme(legend.position=c(0.85,0.85)) + theme(axis.text.x = element_text(angle = 45, hjust = 1))
+measuredEqRecursive <- measuredEqRecursive + xlab("Experiment Name") + ylab("Equality Calls")
+measuredEqRecursive <- measuredEqRecursive + scale_fill_grey(name="", 
                     breaks=c("MeasuredProgramEqualsRecursive", "MeasuredProgramReferenceRecursive", "MeasuredProgramEquivRecursive"),
                     labels=c("equals", "==", "isEqual"))
 measuredEqRecursive <- measuredEqRecursive + coord_cartesian(ylim=c(0,80000000))
-measuredEqRecursive <- measuredEqRecursive + scale_y_continuous(breaks=trans_sqrt_sqrt, labels=csUnitsNew, trans=a_new_trans)
+measuredEqRecursive_breaks <- c(5*1024,150000,1024*1024,5000000,15000000,40000000,80000000)
+measuredEqRecursive <- measuredEqRecursive + scale_y_continuous(labels=csUnitsNew, trans=a_new_trans, breaks=measuredEqRecursive_breaks) # breaks=trans_sqrt_sqrt
 measuredEqRecursive 
 dev.off()
 
@@ -500,8 +506,11 @@ new <- new + theme(legend.position="top") + theme(axis.text.x = element_text(ang
 new 
 
 boxplot(cacheEqualsAccuracyFactor)
+median(cacheEqualsAccuracyFactor)
 boxplot(cacheReferenceAccuracyFactor)
+median(cacheReferenceAccuracyFactor)
 boxplot(memoryMeanAccuracyFactor)
+median(memoryMeanAccuracyFactor)
 
 #With Martin
 boxplot(realData$MemMeasurementA, realData$MemMeasurementB)
@@ -580,3 +589,9 @@ new
 orpVsOepDataVector <- (100 * 100 / c(96.5626,87.6487,99.9955,98.2081,99.3054,99.9315,99.8542,99.4194,96.1692,96.1707,96.1693,96.1713,96.1721,96.1728,96.1732,96.1735,96.1763,96.1737,96.1751,96.1768)) - 100
 median(orpVsOepDataVector)
 max(orpVsOepDataVector)
+
+boxplot(realDataEstimatedCacheEqualsSubset$EstimatedCacheEqualsRoot, realDataEstimatedCacheEqualsSubset$MeasuredCacheEqualsRoot)
+#
+t.test(realDataEstimatedCacheEqualsSubset$EstimatedCacheEqualsRoot, realDataEstimatedCacheEqualsSubset$MeasuredCacheEqualsRoot)
+# t = -0.0032, df = 38, p-value = 0.9975
+#
