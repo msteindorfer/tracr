@@ -81,16 +81,22 @@ xAxis <- function() {
 
 yAxis <- function() {
   yAt = c(100, 1000, 10000, 100000, 1000000, 10000000, 100000000, 1000000000)
-  axis(2, at = log10(yAt), labels = lapply(yAt, csUnits), cex.axis=0.85)
+  axis(2, at = log10(yAt), labels = lapply(yAt, csUnits), cex.axis=0.80)
 }
 
-pdf("calibrationRedundant.pdf", width=7, height=5)  
-  xRange <- range(log(memoryProfilesS$ObjAllocations, base = 2))
+calibrationMargins <- function() {
+  par(mar=c(4.6, 4.1, 0.6, 0.6))
+}
+
+pdf("calibrationRedundant.pdf", width=7, height=3.8)  
+  calibrationMargins()
+
+  #xRange <- range(log(memoryProfilesS$ObjAllocations, base = 2))
   yRange <- range(log10(memoryProfilesS$MeanMemOriginal), log10(memoryProfilesS$MeanMemEstimated))
   
   plot(memoryProfilesS$ObjAllocations, type = "n", xlab=common_xlab, xaxt = "n", xlim = xRange, ylab=common_ylab, ylim = yRange, yaxt = "n")
   
-  legend('topleft', c('original', 'estimate', 'measurement (with default heap size)', 'measurement (with tight heap size)'), 
+  legend('topleft', c('profile', 'maximum sharing model', 'sharing run (with default heap size)', 'sharing run (with tight heap size)'), 
        lty = c(1, 3, 1, 1), bty='n', cex=.75, pch = c(19, 17, 1, 13))
 
   #xLabels = parse(text=paste("2^(", xAt, ")-1", sep=""))
@@ -107,12 +113,14 @@ dev.off()
 
 memoryProfilesU <- read.csv("calibration-redundancy-free-data.csv", header=FALSE, col.names = tableColumnNames)
 
-pdf("calibrationRedundancyFree.pdf", width=7, height=5)
+pdf("calibrationRedundancyFree.pdf", width=7, height=3.8)
+  calibrationMargins()
+
   yRange <- range(log10(memoryProfilesU$MeanMemOriginal), log10(memoryProfilesU$MeanMemEstimated))
 
   plot(memoryProfilesS$ObjAllocations, type = "n", xlab=common_xlab, xaxt = "n", xlim = xRange, ylab=common_ylab, ylim = yRange, yaxt = "n")
 
-  legend('topleft', c('original', 'estimate', 'measurement (with default heap size)'), 
+  legend('topleft', c('profile', 'maximum sharing model', 'sharing run (with default heap size)'), 
        lty = c(1, 3, 1), bty='n', cex=.75, pch = c(19, 17, 1))
 
   #axis(1, x <- seq(from=1, to=length(memoryProfilesU$ObjAllocations)), labels = lapply(memoryProfilesU$ObjAllocations, csUnits))
@@ -272,12 +280,12 @@ pdf("viz_absolute-memory-original-vs-estimated.pdf", width=7, height=4.5)
 mem <- ggplot(data=melt(allDataMemSubset, id.vars=c('BenchmarkShortName')), aes(BenchmarkShortName, y = value, fill=variable))
 mem <- mem + geom_bar(position="dodge", stat="identity")
 mem <- mem + theme_bw()
-mem <- mem + theme(legend.position=c(0.85,0.85), legend.title=element_blank())
+mem <- mem + theme(legend.position=c(0.80,0.85), legend.title=element_blank())
 mem <- mem + theme(axis.text.x = element_text(angle = 45, hjust = 1))
 mem <- mem + xlab("Experiment Name") + ylab("Mean Memory Consumption")
 mem <- mem + scale_fill_grey(name="Mean Memory Consumption of", # Mean Memory Consumption of
                     breaks=c("MemOriginal", "MemEstimated"),
-                    labels=c("Profile", "Estimate"))
+                    labels=c("Without Sharing", "With Sharing"))
 mem <- mem + coord_cartesian(ylim=c(0,300000000))
 # mem_breaks <- c(5000000,25000000,50000000,100000000,150000000,225000000,300000000)
 mem_breaks <- c(5000000,25000000,100000000,225000000)
